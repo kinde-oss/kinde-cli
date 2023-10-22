@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 
+	"github.com/kinde-oss/kinde-cli/pkg/release"
 	"github.com/spf13/cobra"
 )
 
@@ -11,8 +12,8 @@ var rootCmd = &cobra.Command{
 	SilenceUsage:  true,
 	SilenceErrors: true,
 	Annotations:   map[string]string{},
-	Version:       "master",
-	Short:         "CLI to assist you integrate and work with Kinde",
+	Version:       release.Branch,
+	Short:         "Kinde CLI",
 	Long:          "The official command-line for Kinde.",
 }
 
@@ -23,5 +24,6 @@ func Execute(context context.Context) {
 
 func init() {
 	cobra.OnInitialize() //initialize stored creds, logging etc here later
+	rootCmd.AddCommand(newVersionCmd().cmd)
 
 }
