@@ -8,6 +8,7 @@
         "type": "go",
         "request": "launch",
         "mode": "auto",
-        "program": "${workspaceFolder}/cmd/kinde"
+        "program": "${workspaceFolder}/cmd/kinde",
+        "args": ["version"]
     }]
 }

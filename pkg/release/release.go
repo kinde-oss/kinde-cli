@@ -11,18 +11,16 @@ import (
 var Branch = "master"
 
 func IsNeedingUpdate() {
-	if Branch != "master" {
-		client := github.NewClient(nil)
-		rep, _, err := client.Repositories.GetLatestRelease(context.Background(), "kinde-oss", "kinde-cli")
+	client := github.NewClient(nil)
+	rep, _, err := client.Repositories.GetLatestRelease(context.Background(), "kinde-oss", "kinde-cli")
 
-		latest := *rep.TagName
+	if err != nil {
+		return
+	}
 
-		if err != nil {
-			return
-		}
+	latest := *rep.TagName
 
-		if strings.TrimPrefix(Branch, "v") != strings.TrimPrefix(latest, "v") {
-			fmt.Printf("An update is available: %v", latest)
-		}
+	if strings.TrimPrefix(Branch, "v") != strings.TrimPrefix(latest, "v") {
+		fmt.Printf("An update is available: %v", latest)
 	}
 }
