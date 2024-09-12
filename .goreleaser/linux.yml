@@ -1,0 +1,126 @@
+env:
+  - GO111MODULE=on
+before:
+  hooks:
+    - go mod download
+    - go generate ./...
+project_name: kinde
+builds:
+  - id: kinde-linux
+    ldflags:
+      - -s -w -X github.com/kinde-oss/kinde-cli/pkg/version.Version={{.Version}}
+    binary: kinde
+    env:
+      - CGO_ENABLED=0
+    main: ./cmd/kinde/main.go
+    goos:
+      - linux
+    goarch:
+      - amd64
+  - id: kinde-linux-arm
+    ldflags:
+      - -s -w -X github.com/kinde-oss/kinde-cli/pkg/version.Version={{.Version}}
+    binary: kinde
+    env:
+      - CGO_ENABLED=0
+    main: ./cmd/kinde/main.go
+    goos:
+      - linux
+    goarch:
+      - arm64
+archives:
+  - replacements:
+      linux: linux
+      386: i386
+      amd64: x86_64
+    files:
+      - none*
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+checksum:
+  name_template: "{{ .ProjectName }}-linux-checksums.txt"
+snapshot:
+  name_template: "{{ .Tag }}-next"
+nfpms:
+  - id: deb
+    package_name: kinde
+    vendor: kinde
+    homepage: https://kinde.com
+    maintainer: kinde <support@kinde.com>
+    description: kinde CLI utility
+    license: Apache 2.0
+    formats:
+      - deb
+  - id: rpm
+    package_name: kinde
+    vendor: kinde
+    homepage: https://kinde.com
+    maintainer: kinde <support@kinde.com>
+    description: kinde CLI utility
+    license: Apache 2.0
+    formats:
+      - rpm
+dockers:
+  - use: buildx
+    goos: linux
+    goarch: amd64
+    ids:
+      - kinde
+      - kinde-linux
+    image_templates:
+      - "kinde/kinde-cli:latest-amd64"
+      - "kinde/kinde-cli:{{ .Tag }}-amd64"
+    build_flag_templates:
+      - "--pull"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.name={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=repository=https://github.com/kinde-oss/kinde-cli"
+      - "--label=homepage=https://kinde.com"
+      - "--platform=linux/amd64"
+  - use: buildx
+    goos: linux
+    goarch: arm64
+    ids:
+      - kinde
+      - kinde-linux-arm
+    image_templates:
+      - "kinde/kinde-cli:latest-arm64"
+      - "kinde/kinde-cli:{{ .Tag }}-arm64"
+    build_flag_templates:
+      - "--pull"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.name={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=repository=https://github.com/kinde-oss/kinde-cli"
+      - "--label=homepage=https://kinde.com"
+      - "--platform=linux/arm64/v8"
+docker_manifests:
+  - name_template: "kinde/kinde-cli:latest"
+    image_templates:
+      - "kinde/kinde-cli:latest-amd64"
+      - "kinde/kinde-cli:latest-arm64"
+  - name_template: "kinde/kinde-cli:{{ .Tag }}"
+    image_templates:
+      - "kinde/kinde-cli:{{ .Tag }}-amd64"
+      - "kinde/kinde-cli:{{ .Tag }}-arm64"
+
+publishers:
+  - name: deb
+    ids:
+    - deb
+    cmd: scripts/publish-to-artifactory.sh {{ abs .ArtifactPath }} {{ .Version }} {{ .Arch }} debian
+    env:
+    - ARTIFACTORY_SECRET={{ .Env.ARTIFACTORY_SECRET }}
+  - name: rpm
+    ids:
+    - rpm
+    cmd: scripts/publish-to-artifactory.sh {{ abs .ArtifactPath }} {{ .Version }} {{ .Arch }} rpm
+    env:
+    - ARTIFACTORY_SECRET={{ .Env.ARTIFACTORY_SECRET }}
