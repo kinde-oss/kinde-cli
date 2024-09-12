@@ -24,6 +24,26 @@ builds:
       - darwin
     main: ./cmd/kinde
 
+nfpms:
+  - id: deb
+    package_name: kinde
+    vendor: Kinde
+    homepage: https://kinde.com
+    maintainer: Kinde <support@kinde.com>
+    description: Kinde CLI utility
+    license: Apache 2.0
+    formats:
+      - deb
+  - id: rpm
+    package_name: kinde
+    vendor: Kinde
+    homepage: https://kinde.com
+    maintainer: Kinde <support@kinde.com>
+    description: Kinde CLI utility
+    license: Apache 2.0
+    formats:
+      - rpm
+
 archives:
   - format: tar.gz
     # this name template makes the OS and Arch compatible with the results of `uname`.
