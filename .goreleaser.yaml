@@ -24,20 +24,22 @@ builds:
       - darwin
     main: ./cmd/kinde
 
+binary_signs:
+  - {}
+
 notarize:
   macos:
     - # Whether this configuration is enabled or not.
       #
       # Default: false.
       # Templates: allowed.
-      enabled: 'true'
+      enabled: '{{ isEnvSet "MACOS_SIGN_P12" }}'
 
       # IDs to use to filter the built binaries.
       #
       # Default: the project name.
       ids:
-        - build1
-        - build2
+        - default
 
       # Before notarizing, we need to sign the binary.
       # This blocks defines the configuration for doing so.
