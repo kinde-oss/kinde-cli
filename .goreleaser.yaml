@@ -30,7 +30,7 @@ notarize:
       #
       # Default: false.
       # Templates: allowed.
-      enabled: 'true'
+      enabled: '{{ isEnvSet "MACOS_SIGN_P12" }}'
 
       # IDs to use to filter the built binaries.
       #
@@ -43,7 +43,7 @@ notarize:
       # This blocks defines the configuration for doing so.
       sign:
         # The .p12 certificate file path or its base64'd contents.
-        certificate: "{{.Env.MACOS_SIGN_P12}}"
+        certificate: "./certificate.p12"
 
         # The password to be used to open the certificate.
         password: "{{.Env.MACOS_SIGN_PASSWORD}}"
