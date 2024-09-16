@@ -17,6 +17,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - 
+        name: save secret to file
+        run: | 
+          echo -n $SIGNING_CERTIFICATE_BASE64 | base64 -d -o ./certificate.p12
+        env:
+          SIGNING_CERTIFICATE_BASE64: ${{ secrets.P12 }}          
       -
         name: Set up Go
         uses: actions/setup-go@v5
