@@ -16,7 +16,9 @@ before:
     - go generate ./...
 
 builds:
-  - env:
+  - 
+    id: "cli"
+    env:
       - CGO_ENABLED=0
     goos:
       - linux
@@ -39,7 +41,7 @@ notarize:
       #
       # Default: the project name.
       ids:
-        - default
+        - cli
 
       # Before notarizing, we need to sign the binary.
       # This blocks defines the configuration for doing so.
