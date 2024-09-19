@@ -8,7 +8,7 @@ import (
 	"github.com/google/go-github/v28/github"
 )
 
-var Branch = "master"
+var Branch = "main"
 
 func IsNeedingUpdate() {
 	client := github.NewClient(nil)
