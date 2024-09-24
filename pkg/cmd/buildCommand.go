@@ -25,7 +25,7 @@ func newBuildCmd() *buildCmd {
 				EntryPoint:    "./*.ts",
 			})
 			result := builder.Build()
-			log.Info().Msgf("Build result: %v", result)
+			log.Info().Msgf("Build result: %v", string(result.Compiled.Source))
 
 		},
 	}

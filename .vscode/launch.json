@@ -23,6 +23,6 @@
         "request": "launch",
         "mode": "auto",
         "program": "${workspaceFolder}/cmd/kinde",
-        "args": ["build", "--cwd", "/home/evgeny/projects/kinde_oss/infrastructure-template/kindeSrc/environment/workflows/evTest"]
+        "args": ["build", "--cwd", "${workspaceFolder}/testData/kindeSrc/environment/workflows/evTest"]
     }]
 }
