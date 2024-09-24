@@ -1,10 +1,9 @@
 package cmd
 
 import (
-	"fmt"
-
-	"github.com/kinde-oss/kinde-cli/pkg/builder"
 	"github.com/kinde-oss/kinde-cli/pkg/validators"
+	builder "github.com/kinde-oss/kinde-cli/pkg/workflowBuilder"
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
 
@@ -21,8 +20,13 @@ func newBuildCmd() *buildCmd {
 		Args:  validators.NoArgs,
 		Short: "Creating deployable version of code in ./kinde/output",
 		Run: func(cmd *cobra.Command, args []string) {
-			builder := builder.NewBuilder()
-			fmt.Printf("version %v - %v\n", builder, dc.cwd)
+			builder := builder.NewWorkflowBuilder(builder.BuildOptions{
+				WorkingFolder: dc.cwd,
+				EntryPoint:    "./*.ts",
+			})
+			result := builder.Build()
+			log.Info().Msgf("Build result: %v", result)
+
 		},
 	}
 

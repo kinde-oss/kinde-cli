@@ -15,7 +15,7 @@ func newTestCmd() *testCmd {
 		cmd: &cobra.Command{
 			Use:   "test",
 			Args:  nil,
-			Short: "Executs pests",
+			Short: "Runs tests",
 			Run: func(cmd *cobra.Command, args []string) {
 				fmt.Println("not implemented")
 			},
