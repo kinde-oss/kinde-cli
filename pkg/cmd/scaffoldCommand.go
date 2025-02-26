@@ -80,7 +80,7 @@ func newCustomUICmd() *customUICmd {
 }
 
 func (c *customUICmd) run(cmd *cobra.Command, args []string) error {
-	fmt.Println("\n🚀 Getting started with Kinde Custom UIs\n")
+	fmt.Println("\n🚀 Getting started with Kinde Custom UIs")
 
 	shouldProceed, err := c.checkExistingSetup()
 	if err != nil {
@@ -160,7 +160,7 @@ func (c *customUICmd) run(cmd *cobra.Command, args []string) error {
 	fmt.Println("\nNext steps:")
 	fmt.Printf("1. cd %s\n", c.rootDir)
 	fmt.Println("2. Edit page.tsx to customise your authentication UI")
-	fmt.Println("3. Sync your changes on GitHub and Kinde\n")
+	fmt.Println("3. Sync your changes on GitHub and Kinde")
 
 	return nil
 }
