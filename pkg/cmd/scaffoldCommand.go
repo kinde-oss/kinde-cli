@@ -26,24 +26,31 @@ type KindeConfig struct {
 }
 
 var templates = map[string]Template{
-	"basic": {
-		Name:        "Basic Template",
+	"orbit": {
+		Name:        "Orbit Template",
 		Description: "A simple starter template with essential Kinde authentication",
-		Repo:        "kinde-starter/basic-template",
+		Repo:        "kinde-starter-kits/custom-ui-orbit",
 		Branch:      "main",
 		Path:        "kindeSrc",
 	},
 	"splitscape": {
 		Name:        "Splitscape Template",
-		Description: "Split-screen layout optimized for SaaS applications",
+		Description: "A simple starter template with essential Kinde authentication",
 		Repo:        "kinde-starter-kits/custom-ui-splitscape",
 		Branch:      "main",
 		Path:        "kindeSrc",
 	},
-	"gridster": {
-		Name:        "Gridster Template",
-		Description: "Grid-based dashboard layout with advanced features",
-		Repo:        "kinde-starter-kits/custom-ui-gridster",
+	"evolve-ai": {
+		Name:        "Evolve.ai Template",
+		Description: "A simple starter template with essential Kinde authentication",
+		Repo:        "kinde-starter-kits/custom-ui-evolve-ai",
+		Branch:      "main",
+		Path:        "kindeSrc",
+	},
+	"bark-n-bite": {
+		Name:        "Bark & Bite Template",
+		Description: "A simple starter template with essential Kinde authentication",
+		Repo:        "kinde-starter-kits/custom-ui-barknbite",
 		Branch:      "main",
 		Path:        "kindeSrc",
 	},
@@ -116,30 +123,31 @@ func (c *customUICmd) run(cmd *cobra.Command, args []string) error {
 	}
 
 	if c.template == "" {
-		var items []string
-		for key, tmpl := range templates {
-			items = append(items, fmt.Sprintf("%s - %s (%s)", tmpl.Name, tmpl.Description, key))
+		type templateItem struct {
+			Key         string
+			DisplayName string
 		}
-
+		
+		var items []templateItem
+		var displayItems []string
+		
+		for key, tmpl := range templates {
+			displayName := fmt.Sprintf("%s - %s", tmpl.Name, tmpl.Description)
+			items = append(items, templateItem{Key: key, DisplayName: displayName})
+			displayItems = append(displayItems, displayName)
+		}
+		
 		prompt := promptui.Select{
 			Label: "Select a template",
-			Items: items,
+			Items: displayItems,
 		}
-
-		_, result, err := prompt.Run()
+		
+		index, _, err := prompt.Run()
 		if err != nil {
 			return fmt.Errorf("prompt failed: %w", err)
 		}
-
-		fmt.Println("Selected template:", result)
-
-		// Extract template key from selection
-		for key, tmpl := range templates {
-			if result == fmt.Sprintf("%s - %s (%s)", tmpl.Name, tmpl.Description, key) {
-				c.template = key
-				break
-			}
-		}
+		
+		c.template = items[index].Key
 	}
 
 	targetDir := filepath.Join(".", c.rootDir)
