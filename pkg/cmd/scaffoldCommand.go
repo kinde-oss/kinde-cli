@@ -80,7 +80,7 @@ func newCustomUICmd() *customUICmd {
 	}
 
 	cmd.Flags().StringVar(&c.rootDir, "rootDir", "kindeSrc", "Specify the root directory name")
-	cmd.Flags().StringVar(&c.template, "template", "", "Specify the template (basic, splitscape, or gridster)")
+  cmd.Flags().StringVar(&c.template, "template", "", "Specify the template (orbit, splitscape, evolve-ai, or bark-n-bite)")
 
 	c.cmd = cmd
 	return c
