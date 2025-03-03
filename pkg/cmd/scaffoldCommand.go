@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"io"
 
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
@@ -265,15 +266,21 @@ func (c *customUICmd) createFromGitTemplate(template, targetDir string) error {
 		if info.IsDir() {
 			return os.MkdirAll(destPath, 0755)
 		}
-
-		// Copy file
-		input, err := os.ReadFile(path)
+		// Copy file using streaming approach
+		srcFile, err := os.Open(path)
 		if err != nil {
-			return fmt.Errorf("failed to read source file: %w", err)
+			return fmt.Errorf("failed to open source file: %w", err)
 		}
+		defer srcFile.Close()
 
-		if err := os.WriteFile(destPath, input, 0644); err != nil {
-			return fmt.Errorf("failed to write destination file: %w", err)
+		destFile, err := os.Create(destPath)
+		if err != nil {
+			return fmt.Errorf("failed to create destination file: %w", err)
+		}
+		defer destFile.Close()
+
+		if _, err := io.Copy(destFile, srcFile); err != nil {
+			return fmt.Errorf("failed to copy file: %w", err)
 		}
 
 		return nil
