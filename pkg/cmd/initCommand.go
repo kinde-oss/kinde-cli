@@ -3,11 +3,11 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"regexp"
-	"io"
 
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
@@ -57,11 +57,11 @@ var templates = map[string]Template{
 	},
 }
 
-// scaffoldCmd represents the scaffold command
-var scaffoldCmd = &cobra.Command{
-	Use:   "scaffold",
-	Short: "Scaffold Kinde projects",
-	Long:  "Scaffold various types of Kinde projects",
+// initCmd represents the init command
+var initCmd = &cobra.Command{
+	Use:   "init",
+	Short: "Init Kinde projects",
+	Long:  "Init various types of Kinde projects",
 }
 
 // customUICmd represents the custom-ui subcommand
@@ -81,7 +81,7 @@ func newCustomUICmd() *customUICmd {
 	}
 
 	cmd.Flags().StringVar(&c.rootDir, "rootDir", "kindeSrc", "Specify the root directory name")
-  cmd.Flags().StringVar(&c.template, "template", "", "Specify the template (orbit, splitscape, evolve-ai, or bark-n-bite)")
+	cmd.Flags().StringVar(&c.template, "template", "", "Specify the template (orbit, splitscape, evolve-ai, or bark-n-bite)")
 
 	c.cmd = cmd
 	return c
@@ -128,31 +128,31 @@ func (c *customUICmd) run(cmd *cobra.Command, args []string) error {
 			Key         string
 			DisplayName string
 		}
-		
+
 		var items []templateItem
 		var displayItems []string
-		
+
 		for key, tmpl := range templates {
 			displayName := fmt.Sprintf("%s - %s", tmpl.Name, tmpl.Description)
 			items = append(items, templateItem{Key: key, DisplayName: displayName})
 			displayItems = append(displayItems, displayName)
 		}
-		
+
 		prompt := promptui.Select{
 			Label: "Select a template",
 			Items: displayItems,
 		}
-		
+
 		index, _, err := prompt.Run()
 		if err != nil {
 			return fmt.Errorf("prompt failed: %w", err)
 		}
-		
+
 		c.template = items[index].Key
 	}
 
 	targetDir := filepath.Join(".", c.rootDir)
-	
+
 	if err := c.createFromGitTemplate(c.template, targetDir); err != nil {
 		return fmt.Errorf("failed to create template: %w", err)
 	}
@@ -217,7 +217,7 @@ func (c *customUICmd) checkExistingSetup() (bool, error) {
 
 func (c *customUICmd) createFromGitTemplate(template, targetDir string) error {
 	fmt.Println("Creating template from GitHub...")
-	
+
 	tmpl, ok := templates[template]
 	if !ok {
 		return fmt.Errorf("template %s not found", template)
@@ -339,7 +339,7 @@ func (c *customUICmd) installDependencies() error {
 	installCmd := exec.Command("npm", args...)
 	installCmd.Stdout = os.Stdout
 	installCmd.Stderr = os.Stderr
-	
+
 	if err := installCmd.Run(); err != nil {
 		return fmt.Errorf("failed to install dependencies: %w", err)
 	}
@@ -349,10 +349,10 @@ func (c *customUICmd) installDependencies() error {
 }
 
 func init() {
-	// Add scaffold command to root command
-	rootCmd.AddCommand(scaffoldCmd)
-	
-	// Add custom-ui command to scaffold command
+	// Add init command to root command
+	rootCmd.AddCommand(initCmd)
+
+	// Add custom-ui command to init command
 	customUICmd := newCustomUICmd()
-	scaffoldCmd.AddCommand(customUICmd.cmd)
+	initCmd.AddCommand(customUICmd.cmd)
 }
