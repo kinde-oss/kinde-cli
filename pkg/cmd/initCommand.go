@@ -1,13 +1,16 @@
 package cmd
 
 import (
+	"archive/zip"
 	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"regexp"
-	"io"
+	"strings"
+	"time"
 
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
@@ -29,39 +32,39 @@ type KindeConfig struct {
 var templates = map[string]Template{
 	"orbit": {
 		Name:        "Orbit Template",
-		Description: "A simple starter template with essential Kinde authentication",
+		Description: "A React starter template",
 		Repo:        "kinde-starter-kits/custom-ui-orbit",
 		Branch:      "main",
 		Path:        "kindeSrc",
 	},
 	"splitscape": {
 		Name:        "Splitscape Template",
-		Description: "A simple starter template with essential Kinde authentication",
+		Description: "A React starter template",
 		Repo:        "kinde-starter-kits/custom-ui-splitscape",
 		Branch:      "main",
 		Path:        "kindeSrc",
 	},
 	"evolve-ai": {
 		Name:        "Evolve.ai Template",
-		Description: "A simple starter template with essential Kinde authentication",
+		Description: "A React starter template",
 		Repo:        "kinde-starter-kits/custom-ui-evolve-ai",
 		Branch:      "main",
 		Path:        "kindeSrc",
 	},
 	"bark-n-bite": {
 		Name:        "Bark & Bite Template",
-		Description: "A simple starter template with essential Kinde authentication",
+		Description: "A React starter template",
 		Repo:        "kinde-starter-kits/custom-ui-barknbite",
 		Branch:      "main",
 		Path:        "kindeSrc",
 	},
 }
 
-// scaffoldCmd represents the scaffold command
-var scaffoldCmd = &cobra.Command{
-	Use:   "scaffold",
-	Short: "Scaffold Kinde projects",
-	Long:  "Scaffold various types of Kinde projects",
+// initCmd represents the init command
+var initCmd = &cobra.Command{
+	Use:   "init",
+	Short: "Initialize Kinde projects",
+	Long:  "Initialize various types of Kinde projects",
 }
 
 // customUICmd represents the custom-ui subcommand
@@ -161,9 +164,6 @@ func (c *customUICmd) run(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to create config: %w", err)
 	}
 
-	if err := c.installDependencies(); err != nil {
-		return fmt.Errorf("failed to install dependencies: %w", err)
-	}
 
 	fmt.Println("\n✨ Custom UI template created successfully!")
 	fmt.Println("\nNext steps:")
@@ -215,6 +215,94 @@ func (c *customUICmd) checkExistingSetup() (bool, error) {
 	return true, nil
 }
 
+// LimitedWriter wraps an io.Writer with a byte limit
+type LimitedWriter struct {
+	Writer   io.Writer
+	MaxBytes int64
+	Written  int64
+}
+
+// Write implements the io.Writer interface
+func (lw *LimitedWriter) Write(p []byte) (n int, err error) {
+	if lw.Written+int64(len(p)) > lw.MaxBytes {
+		return 0, fmt.Errorf("file too large: limit is %d bytes", lw.MaxBytes)
+	}
+	n, err = lw.Writer.Write(p)
+	lw.Written += int64(n)
+	return n, err
+}
+
+// unzip extracts a zip archive to a destination directory
+func unzip(src, dest string) error {
+	r, err := zip.OpenReader(src)
+	if err != nil {
+		return err
+	}
+	defer r.Close()
+
+	// Create destination directory if it doesn't exist
+	if err := os.MkdirAll(dest, 0755); err != nil {
+		return err
+	}
+
+	// Get the root directory name inside the ZIP
+	var rootDir string
+	if len(r.File) > 0 {
+		rootDir = filepath.Dir(r.File[0].Name)
+		// If root directory has multiple levels, get only the first directory
+		if rootDir != "." {
+			parts := strings.Split(rootDir, string(os.PathSeparator))
+			rootDir = parts[0]
+		}
+	}
+
+	// Extract files
+	for _, f := range r.File {
+		// Skip directories
+		if f.FileInfo().IsDir() {
+			continue
+		}
+
+		// Calculate relative path (removing root directory)
+		relPath := f.Name
+		if rootDir != "." && strings.HasPrefix(relPath, rootDir) {
+			relPath = strings.TrimPrefix(relPath, rootDir+string(os.PathSeparator))
+		}
+
+		// Create target file path
+		targetPath := filepath.Join(dest, relPath)
+
+		// Create directory for file if it doesn't exist
+		if err := os.MkdirAll(filepath.Dir(targetPath), 0755); err != nil {
+			return err
+		}
+
+		// Open source file
+		rc, err := f.Open()
+		if err != nil {
+			return err
+		}
+
+		// Create target file
+		targetFile, err := os.Create(targetPath)
+		if err != nil {
+			rc.Close()
+			return err
+		}
+
+		// Copy content
+		_, err = io.Copy(targetFile, rc)
+		targetFile.Close()
+		rc.Close()
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+
 func (c *customUICmd) createFromGitTemplate(template, targetDir string) error {
 	fmt.Println("Creating template from GitHub...")
 	
@@ -228,69 +316,115 @@ func (c *customUICmd) createFromGitTemplate(template, targetDir string) error {
 		return fmt.Errorf("failed to create directory: %w", err)
 	}
 
-	// Create temporary directory for cloning
+	// Create temporary directory for downloading
 	tempDir, err := os.MkdirTemp("", "kinde-template-*")
 	if err != nil {
 		return fmt.Errorf("failed to create temp directory: %w", err)
 	}
 	defer os.RemoveAll(tempDir)
 
-	// Clone the repository using git command
-	repoURL := fmt.Sprintf("https://github.com/%s.git", tmpl.Repo)
-	gitCmd := exec.Command("git", "clone", "--depth", "1", "--branch", tmpl.Branch, repoURL, tempDir)
-	if output, err := gitCmd.CombinedOutput(); err != nil {
-		return fmt.Errorf("failed to clone repository: %s: %w", string(output), err)
+	// Download zip file from GitHub API
+	url := fmt.Sprintf("https://api.github.com/repos/%s/zipball/%s", tmpl.Repo, tmpl.Branch)
+	fmt.Printf("Downloading template from %s...\n", url)
+	
+	// Create HTTP client
+	client := &http.Client{
+		Timeout: 60 * time.Second,
 	}
-
+	
+	// Create request
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return fmt.Errorf("failed to create request: %w", err)
+	}
+	
+	// Set User-Agent header (GitHub API requires this)
+	req.Header.Set("User-Agent", "Kinde-CLI")
+	
+	// Make request
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to download template: %w", err)
+	}
+	defer resp.Body.Close()
+	
+	// Check response status
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("failed to download template: HTTP status %s", resp.Status)
+	}
+	
+	// Create zip file path
+	zipPath := filepath.Join(tempDir, "template.zip")
+	zipFile, err := os.Create(zipPath)
+	if err != nil {
+		return fmt.Errorf("failed to create zip file: %w", err)
+	}
+	defer zipFile.Close()
+	
+	// Limit download size to 50MB to prevent abuse
+	limitedWriter := &LimitedWriter{
+		Writer:   zipFile,
+		MaxBytes: 50 * 1024 * 1024, // 50MB limit
+	}
+	
+	// Download the zip file
+	_, err = io.Copy(limitedWriter, resp.Body)
+	if err != nil {
+		return fmt.Errorf("failed to download zip file: %w", err)
+	}
+	
+	// Extract the zip file
+	extractPath := filepath.Join(tempDir, "extracted")
+	if err := unzip(zipPath, extractPath); err != nil {
+		return fmt.Errorf("failed to extract zip file: %w", err)
+	}
+	
+	// Find the template path inside the extracted directory
+	sourcePath := filepath.Join(extractPath, tmpl.Path)
+	
 	// Copy files from template to target directory
-	srcPath := filepath.Join(tempDir, tmpl.Path)
-	if err := filepath.Walk(srcPath, func(path string, info os.FileInfo, err error) error {
+	if err := filepath.Walk(sourcePath, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
-
+		
 		// Calculate relative path
-		relPath, err := filepath.Rel(srcPath, path)
+		relPath, err := filepath.Rel(sourcePath, path)
 		if err != nil {
 			return fmt.Errorf("failed to get relative path: %w", err)
 		}
-
+		
 		// Skip root directory
 		if relPath == "." {
 			return nil
 		}
-
+		
 		// Create target path
 		destPath := filepath.Join(targetDir, relPath)
-
+		
 		if info.IsDir() {
 			return os.MkdirAll(destPath, 0755)
 		}
-		// Copy file using streaming approach
-		srcFile, err := os.Open(path)
+		
+		// Copy file
+		input, err := os.ReadFile(path)
 		if err != nil {
-			return fmt.Errorf("failed to open source file: %w", err)
+			return fmt.Errorf("failed to read source file: %w", err)
 		}
-		defer srcFile.Close()
-
-		destFile, err := os.Create(destPath)
-		if err != nil {
-			return fmt.Errorf("failed to create destination file: %w", err)
+		
+		if err := os.WriteFile(destPath, input, 0644); err != nil {
+			return fmt.Errorf("failed to write destination file: %w", err)
 		}
-		defer destFile.Close()
-
-		if _, err := io.Copy(destFile, srcFile); err != nil {
-			return fmt.Errorf("failed to copy file: %w", err)
-		}
-
+		
 		return nil
 	}); err != nil {
 		return fmt.Errorf("failed to copy template files: %w", err)
 	}
-
+	
 	fmt.Println("Template files copied successfully!")
 	return nil
 }
+
 
 func (c *customUICmd) createKindeConfig() error {
 	config := KindeConfig{
@@ -310,49 +444,12 @@ func (c *customUICmd) createKindeConfig() error {
 	return nil
 }
 
-func (c *customUICmd) installDependencies() error {
-	fmt.Println("Installing dependencies...")
-
-	// Define dependencies to install
-	dependencies := []string{
-		"@kinde/infrastructure",
-		"react",
-		"react-dom",
-	}
-
-	// Change to project directory
-	if err := os.Chdir(c.rootDir); err != nil {
-		return fmt.Errorf("failed to change to project directory: %w", err)
-	}
-	defer os.Chdir("..")
-
-	// Initialize package.json if it doesn't exist
-	if _, err := os.Stat("package.json"); os.IsNotExist(err) {
-		npmInitCmd := exec.Command("npm", "init", "-y")
-		if output, err := npmInitCmd.CombinedOutput(); err != nil {
-			return fmt.Errorf("failed to initialize package.json: %s: %w", string(output), err)
-		}
-	}
-
-	// Install dependencies
-	args := append([]string{"install", "--save"}, dependencies...)
-	installCmd := exec.Command("npm", args...)
-	installCmd.Stdout = os.Stdout
-	installCmd.Stderr = os.Stderr
-	
-	if err := installCmd.Run(); err != nil {
-		return fmt.Errorf("failed to install dependencies: %w", err)
-	}
-
-	fmt.Println("Dependencies installed successfully!")
-	return nil
-}
 
 func init() {
-	// Add scaffold command to root command
-	rootCmd.AddCommand(scaffoldCmd)
+	// Add init command to root command
+	rootCmd.AddCommand(initCmd)
 	
-	// Add custom-ui command to scaffold command
+	// Add custom-ui command to init command
 	customUICmd := newCustomUICmd()
-	scaffoldCmd.AddCommand(customUICmd.cmd)
+	initCmd.AddCommand(customUICmd.cmd)
 }
