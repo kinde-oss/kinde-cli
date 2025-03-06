@@ -84,7 +84,7 @@ func newCustomUICmd() *customUICmd {
 	}
 
 	cmd.Flags().StringVar(&c.rootDir, "rootDir", "kindeSrc", "Specify the root directory name")
-  cmd.Flags().StringVar(&c.template, "template", "", "Specify the template (orbit, splitscape, evolve-ai, or bark-n-bite)")
+	cmd.Flags().StringVar(&c.template, "template", "", "Specify the template (orbit, splitscape, evolve-ai, or bark-n-bite)")
 
 	c.cmd = cmd
 	return c
@@ -131,31 +131,31 @@ func (c *customUICmd) run(cmd *cobra.Command, args []string) error {
 			Key         string
 			DisplayName string
 		}
-		
+
 		var items []templateItem
 		var displayItems []string
-		
+
 		for key, tmpl := range templates {
 			displayName := fmt.Sprintf("%s - %s", tmpl.Name, tmpl.Description)
 			items = append(items, templateItem{Key: key, DisplayName: displayName})
 			displayItems = append(displayItems, displayName)
 		}
-		
+
 		prompt := promptui.Select{
 			Label: "Select a template",
 			Items: displayItems,
 		}
-		
+
 		index, _, err := prompt.Run()
 		if err != nil {
 			return fmt.Errorf("prompt failed: %w", err)
 		}
-		
+
 		c.template = items[index].Key
 	}
 
 	targetDir := filepath.Join(".", c.rootDir)
-	
+
 	if err := c.createFromGitTemplate(c.template, targetDir); err != nil {
 		return fmt.Errorf("failed to create template: %w", err)
 	}
@@ -305,7 +305,7 @@ func unzip(src, dest string) error {
 
 func (c *customUICmd) createFromGitTemplate(template, targetDir string) error {
 	fmt.Println("Creating template from GitHub...")
-	
+
 	tmpl, ok := templates[template]
 	if !ok {
 		return fmt.Errorf("template %s not found", template)
