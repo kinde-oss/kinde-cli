@@ -20,7 +20,7 @@ func newLoginCmd() *loginCmd {
 	loginCmd.cmd = &cobra.Command{
 		Use:   "login",
 		Args:  nil,
-		Short: "Version",
+		Short: "login to Kinde",
 		RunE:  loginCmd.runLogin,
 	}
 
