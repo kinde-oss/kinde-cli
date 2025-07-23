@@ -7,5 +7,7 @@ import (
 )
 
 func main() {
-	cmd.Execute(context.Background())
+	ctx, cancel := context.WithTimeout(context.Background(), 10)
+	defer cancel()
+	cmd.Execute(ctx)
 }
