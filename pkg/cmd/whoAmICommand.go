@@ -23,8 +23,6 @@ func newWhoAmI() *whoAmICmd {
 		RunE:  whoAmICmd.runWhoAmI,
 	}
 
-	whoAmICmd.cmd.Flags().StringVar(&whoAmICmd.kindeDomain, "kinde-domain", "app.kinde.com", "Uses the kinde domain to connect to")
-
 	return whoAmICmd
 }
 

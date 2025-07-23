@@ -14,9 +14,9 @@ import (
 )
 
 const (
-	CLI_NAME                 = "kinde"
-	USER_AGENT               = "Kinde CLI"
-	LogContextKey contextKey = "log"
+	CLI_NAME                    = "kinde"
+	USER_AGENT                  = "Kinde CLI"
+	ConfigContextKey contextKey = "config"
 )
 
 type (
@@ -58,7 +58,7 @@ func NewConfig() (IConfig, error) {
 	config := &Config{
 		Environments: make(map[string]Environment),
 	}
-	if isRead, err := config.readConfig(); !isRead || err == nil {
+	if isRead, err := config.readConfig(); isRead && err == nil {
 		config.SwitchEnvironment(config.CurrentEnvironment)
 	}
 	return config, nil
@@ -66,12 +66,12 @@ func NewConfig() (IConfig, error) {
 
 // Ctx returns a new context with the Config instance stored in it.
 func Ctx(ctx context.Context, config IConfig) context.Context {
-	return context.WithValue(ctx, LogContextKey, config)
+	return context.WithValue(ctx, ConfigContextKey, config)
 }
 
 // NewContext retrieves the Config instance from the context.
 func FromContext(ctx context.Context) IConfig {
-	if config, ok := ctx.Value(LogContextKey).(IConfig); ok {
+	if config, ok := ctx.Value(ConfigContextKey).(IConfig); ok {
 		return config
 	}
 	return nil

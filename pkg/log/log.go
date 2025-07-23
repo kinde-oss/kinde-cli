@@ -35,13 +35,12 @@ func GetLogWriter(settings *SharedLogSettings) zerolog.Logger {
 
 	var zerologWriter zerolog.Logger
 
+	prettyPrintLogs := true
+
 	prettyPrintLogs, err := strconv.ParseBool(os.Getenv("KINDE_PRETTY_PRINT_LOGS"))
 	if err != nil {
 		prettyPrintLogs = settings.PrettyPrint
 	}
-
-	prettyPrintLogs = true
-
 	logLevel, ok := os.LookupEnv("KINDE_SERVER_LOG_LEVEL")
 	if !ok {
 		logLevel = "info"
