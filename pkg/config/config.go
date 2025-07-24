@@ -30,7 +30,7 @@ type (
 	IConfig interface {
 		Validate() (error, bool)
 		SwitchEnvironment(val string) error
-		NewDeviceAuthorizationFlow() (*authorization_code.AuthorizationCodeFlow, error)
+		NewDeviceAuthorizationFlow() (authorization_code.IDeviceAuthorizationFlow, error)
 		PersistConfig() error
 		GetEnvironment() *Environment
 	}
@@ -101,7 +101,7 @@ func (c *Config) SwitchEnvironment(val string) error {
 }
 
 // NewDeviceAuthorizationFlow creates a new Device Authorization Flow with the given options.
-func (c *Config) NewDeviceAuthorizationFlow() (*authorization_code.AuthorizationCodeFlow, error) {
+func (c *Config) NewDeviceAuthorizationFlow() (authorization_code.IDeviceAuthorizationFlow, error) {
 
 	env := c.Environment
 
@@ -118,7 +118,7 @@ func (c *Config) NewDeviceAuthorizationFlow() (*authorization_code.Authorization
 		authorization_code.WithOffline(),
 		authorization_code.WithTokenValidation(
 			true,
-			jwt.WillValidateAlgorythm(),
+			jwt.WillValidateAlgorithm(),
 			jwt.WillValidateIssuer(kindeDomain),
 		),
 	)
