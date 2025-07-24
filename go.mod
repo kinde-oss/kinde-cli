@@ -7,6 +7,12 @@ toolchain go1.24.5
 require github.com/kinde-oss/kinde-go v0.0.5
 
 require (
+	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
+)
+
+require (
 	github.com/99designs/go-keychain v0.0.0-20191008050251-8e49817e8af4 // indirect
 	github.com/99designs/keyring v1.2.2 // indirect
 	github.com/MicahParks/jwkset v0.9.6 // indirect
@@ -30,6 +36,7 @@ require (
 	github.com/samber/slog-zerolog/v2 v2.7.3
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/pflag v1.0.7 // indirect
+	github.com/stretchr/testify v1.10.0
 	golang.org/x/crypto v0.40.0 // indirect
 	golang.org/x/oauth2 v0.30.0 // indirect
 	golang.org/x/sys v0.34.0 // indirect
