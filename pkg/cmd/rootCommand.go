@@ -67,4 +67,8 @@ func Execute(ctx context.Context) {
 	if err := rootCmd.ExecuteContext(ctx); err != nil {
 		log.Error().Err(err).Msg("Command execution failed")
 	}
+
+	if err := cfg.PersistConfig(); err != nil {
+		log.Error().Err(err).Msg("Failed to persist configuration")
+	}
 }

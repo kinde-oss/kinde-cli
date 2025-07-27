@@ -24,13 +24,25 @@ func newLoginCmd() *loginCmd {
 		RunE:  loginCmd.runLogin,
 	}
 
+	loginCmd.cmd.PersistentFlags().Func("client_id", "Client ID to use for login", func(val string) error {
+		return config.FromContext[config.Config](loginCmd.cmd.Context()).
+			SetEnvironment(func(env *config.Environment) {
+				env.ClientID = val
+			})
+	})
+	loginCmd.cmd.PersistentFlags().Func("client_secret", "Client secret to use for login", func(val string) error {
+		return config.FromContext[config.Config](loginCmd.cmd.Context()).
+			SetEnvironment(func(env *config.Environment) {
+				env.ClientSecret = val
+			})
+	})
 	return loginCmd
 }
 
 func (c *loginCmd) runLogin(cmd *cobra.Command, args []string) error {
 
 	log := log.Ctx(cmd.Context())
-	config := config.FromContext(cmd.Context())
+	config := config.FromContext[config.Config](cmd.Context())
 
 	env := config.GetEnvironment()
 
@@ -38,29 +50,46 @@ func (c *loginCmd) runLogin(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("no environment configured. Please run 'kinde login'")
 	}
 
-	deviceFlow, err := config.NewDeviceAuthorizationFlow()
-	if err != nil {
-		return err
-	}
+	if env.ClientSecret != "" {
+		clientCredentialsFlow, err := env.NewClientCredentialsFlow()
+		if err != nil {
+			return err
+		}
+		token, err := clientCredentialsFlow.GetToken(context.WithoutCancel(cmd.Context()))
+		if err != nil {
+			return fmt.Errorf("failed to get token: %w", err)
+		}
+		if token.IsValid() {
+			log.Info().Msgf("Authenticated using client_credentials")
+		} else {
+			return fmt.Errorf("failed to authenticate using client_credentials")
+		}
 
-	deviceAuth, err := deviceFlow.StartDeviceAuth(c.cmd.Context())
-	if err != nil {
-		return err
-	}
+	} else {
 
-	log.Info().Msgf("Please open the following URL in your browser: %v", deviceAuth.VerificationURIComplete)
-	log.Info().Msg("Waiting for user to authorize...")
+		deviceFlow, err := env.NewDeviceAuthorizationFlow()
+		if err != nil {
+			return err
+		}
 
-	err = deviceFlow.ExchangeDeviceAccessToken(context.WithoutCancel(cmd.Context()), deviceAuth)
-	if err != nil {
-		return err
-	}
-	token, err := deviceFlow.GetToken()
-	if err != nil {
-		return fmt.Errorf("failed to get token: %w", err)
-	}
+		deviceAuth, err := deviceFlow.StartDeviceAuth(c.cmd.Context())
+		if err != nil {
+			return err
+		}
 
-	log.Info().Msgf("Authenticated as %v", token.GetSubject())
+		log.Info().Msgf("Please open the following URL in your browser: %v", deviceAuth.VerificationURIComplete)
+		log.Info().Msg("Waiting for user to authorize...")
+
+		err = deviceFlow.ExchangeDeviceAccessToken(context.WithoutCancel(cmd.Context()), deviceAuth)
+		if err != nil {
+			return err
+		}
+		token, err := deviceFlow.GetToken(cmd.Context())
+		if err != nil {
+			return fmt.Errorf("failed to get token: %w", err)
+		}
+		log.Info().Msgf("Authenticated as %v", token.GetSubject())
+	}
 
 	return nil
 }

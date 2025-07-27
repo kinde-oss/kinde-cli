@@ -7,10 +7,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/kinde-oss/kinde-go/frameworks/cli"
-	"github.com/kinde-oss/kinde-go/jwt"
-	"github.com/kinde-oss/kinde-go/oauth2/authorization_code"
 )
 
 const (
@@ -22,32 +18,42 @@ const (
 type (
 	contextKey string
 
-	Environment struct {
-		DomainName string `json:"domain_name"`
-	}
-
 	// used for testing
 	IConfig interface {
 		Validate() (error, bool)
 		SwitchEnvironment(val string) error
-		NewDeviceAuthorizationFlow() (authorization_code.IDeviceAuthorizationFlow, error)
 		PersistConfig() error
 		GetEnvironment() *Environment
+		SetEnvironment(f func(e *Environment)) error
 	}
 	Config struct {
 		CurrentEnvironment string                 `json:"current"`
-		Environment        *Environment           `json:"-"`
 		Environments       map[string]Environment `json:"environments"`
 	}
 )
 
+func (i *Config) SetEnvironment(f func(e *Environment)) error {
+	env := i.GetEnvironment()
+	f(env)
+	i.Environments[i.CurrentEnvironment] = *env
+	return nil
+}
+
 // GetEnvironment implements IConfig.
 func (i *Config) GetEnvironment() *Environment {
-	return i.Environment
+	if env, ok := i.Environments[i.CurrentEnvironment]; !ok {
+		i.Environments[i.CurrentEnvironment] = Environment{
+			DomainName: i.CurrentEnvironment,
+		}
+		env := i.Environments[i.CurrentEnvironment]
+		return &env
+	} else {
+		return &env
+	}
 }
 
 func (c *Config) Validate() (error, bool) {
-	if c.Environment == nil {
+	if c.CurrentEnvironment == "" {
 		return fmt.Errorf("no environment configured, please use `kinde login`"), false
 	}
 	return nil, true
@@ -70,8 +76,8 @@ func Ctx(ctx context.Context, config IConfig) context.Context {
 }
 
 // NewContext retrieves the Config instance from the context.
-func FromContext(ctx context.Context) IConfig {
-	if config, ok := ctx.Value(ConfigContextKey).(IConfig); ok {
+func FromContext[T any](ctx context.Context) *T {
+	if config, ok := ctx.Value(ConfigContextKey).(*T); ok {
 		return config
 	}
 	return nil
@@ -92,40 +98,9 @@ func (c *Config) SwitchEnvironment(val string) error {
 		}
 	}
 
-	env := c.Environments[c.CurrentEnvironment]
-	c.Environment = &env
-
 	c.PersistConfig()
 
 	return nil
-}
-
-// NewDeviceAuthorizationFlow creates a new Device Authorization Flow with the given options.
-func (c *Config) NewDeviceAuthorizationFlow() (authorization_code.IDeviceAuthorizationFlow, error) {
-
-	env := c.Environment
-
-	kindeDomain := fmt.Sprintf("https://%s", env.DomainName)
-
-	cliSession, err := cli.NewCliSession(fmt.Sprintf("kinde_%v", env.DomainName))
-
-	if err != nil {
-		return nil, fmt.Errorf("failed to create session: %w", err)
-	}
-	deviceFlow, err := authorization_code.NewDeviceAuthorizationFlow(
-		kindeDomain,
-		authorization_code.WithSessionHooks(cliSession),
-		authorization_code.WithOffline(),
-		authorization_code.WithTokenValidation(
-			true,
-			jwt.WillValidateAlgorithm(),
-			jwt.WillValidateIssuer(kindeDomain),
-		),
-	)
-	if err != nil {
-		return nil, err
-	}
-	return deviceFlow, nil
 }
 
 func (c *Config) detectConfigFileName() (string, error) {

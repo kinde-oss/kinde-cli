@@ -28,18 +28,18 @@ func newWhoAmI() *whoAmICmd {
 
 func (c *whoAmICmd) runWhoAmI(cmd *cobra.Command, args []string) error {
 	log := log.Ctx(cmd.Context())
-	config := config.FromContext(cmd.Context())
+	config := config.FromContext[config.Config](cmd.Context())
 
-	deviceFlow, err := config.NewDeviceAuthorizationFlow()
+	deviceFlow, err := config.GetEnvironment().NewDeviceAuthorizationFlow()
 	if err != nil {
 		return err
 	}
 
-	if !deviceFlow.IsAuthenticated() {
+	if !deviceFlow.IsAuthenticated(cmd.Context()) {
 		return fmt.Errorf("you are not logged in. Please run 'login' command first")
 	}
 
-	token, err := deviceFlow.GetToken()
+	token, err := deviceFlow.GetToken(cmd.Context())
 	if err != nil {
 		return fmt.Errorf("failed to get token: %w", err)
 	}
