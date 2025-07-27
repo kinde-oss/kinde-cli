@@ -24,13 +24,13 @@ func newLoginCmd() *loginCmd {
 		RunE:  loginCmd.runLogin,
 	}
 
-	loginCmd.cmd.PersistentFlags().Func("client_id", "Client ID to use for login", func(val string) error {
+	loginCmd.cmd.PersistentFlags().Func("client_id", "Client ID to use", func(val string) error {
 		return config.FromContext[config.Config](loginCmd.cmd.Context()).
 			SetEnvironment(func(env *config.Environment) {
 				env.ClientID = val
 			})
 	})
-	loginCmd.cmd.PersistentFlags().Func("client_secret", "Client secret to use for login", func(val string) error {
+	loginCmd.cmd.PersistentFlags().Func("client_secret", "Client secret to use, CLI will switch to client_credentials", func(val string) error {
 		return config.FromContext[config.Config](loginCmd.cmd.Context()).
 			SetEnvironment(func(env *config.Environment) {
 				env.ClientSecret = val
@@ -51,6 +51,7 @@ func (c *loginCmd) runLogin(cmd *cobra.Command, args []string) error {
 	}
 
 	if env.ClientSecret != "" {
+		log.Debug().Str("client_id", env.ClientID).Msg("Using client credentials flow")
 		clientCredentialsFlow, err := env.NewClientCredentialsFlow()
 		if err != nil {
 			return err
@@ -66,7 +67,7 @@ func (c *loginCmd) runLogin(cmd *cobra.Command, args []string) error {
 		}
 
 	} else {
-
+		log.Debug().Str("client_id", env.ClientID).Msg("Using device authorization flow")
 		deviceFlow, err := env.NewDeviceAuthorizationFlow()
 		if err != nil {
 			return err
