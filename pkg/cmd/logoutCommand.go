@@ -25,9 +25,9 @@ func newLogoutCmd() *logoutCmd {
 
 func (c *logoutCmd) runLogout(cmd *cobra.Command, args []string) error {
 	log := log.Ctx(cmd.Context())
-	config := config.FromContext(cmd.Context())
+	config := config.FromContext[config.Config](cmd.Context())
 
-	deviceFlow, err := config.NewDeviceAuthorizationFlow()
+	deviceFlow, err := config.GetEnvironment().NewDeviceAuthorizationFlow()
 	if err != nil {
 		return err
 	}

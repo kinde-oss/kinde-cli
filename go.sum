@@ -35,8 +35,8 @@ github.com/gsterjov/go-libsecret v0.0.0-20161001094733-a6f4afe4910c h1:6rhixN/i8
 github.com/gsterjov/go-libsecret v0.0.0-20161001094733-a6f4afe4910c/go.mod h1:NMPJylDgVpX0MLRlPy15sqSwOFv/U1GZ2m21JhFfek0=
 github.com/inconshreveable/mousetrap v1.1.0 h1:wN+x4NVGpMsO7ErUn/mUI3vEoE6Jt13X2s0bqwp9tc8=
 github.com/inconshreveable/mousetrap v1.1.0/go.mod h1:vpF70FUmC8bwa3OWnCshd2FqLfsEA9PFc4w1p2J65bw=
-github.com/kinde-oss/kinde-go v0.0.5 h1:/+1ZsluR+al+rXAmsxzyNrzuBasQbYyP7XXHJPpjvz8=
-github.com/kinde-oss/kinde-go v0.0.5/go.mod h1:qmIZslyCKuhvf3FkeenYI6O+XqnZE+Aw9p/6048r1YU=
+github.com/kinde-oss/kinde-go v0.0.6 h1:RL+aOh4C/JlF7FLGq0jPK3BSXLNNqG8tIyzU/zlCeWg=
+github.com/kinde-oss/kinde-go v0.0.6/go.mod h1:qmIZslyCKuhvf3FkeenYI6O+XqnZE+Aw9p/6048r1YU=
 github.com/kr/pty v1.1.1/go.mod h1:pFQYn66WHrOpPYNljwOMqo10TkYh1fy3cYio2l3bCsQ=
 github.com/kr/text v0.1.0 h1:45sCR5RtlFHMR4UwH9sdQ5TC8v0qDQCHnXt+kaKSTVE=
 github.com/kr/text v0.1.0/go.mod h1:4Jbv+DJW3UT/LiOwJeYQe1efqtUx/iVham/4vfdArNI=
