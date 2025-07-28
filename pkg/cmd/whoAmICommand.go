@@ -44,7 +44,7 @@ func (c *whoAmICmd) runWhoAmI(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to get token: %w", err)
 	}
 
-	log.Info().Msgf("Authenticated as %v", token.GetSubject())
+	log.Info().Str("token_subject", token.GetSubject()).Msgf("Authenticated")
 
 	return nil
 }

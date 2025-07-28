@@ -38,6 +38,7 @@ func (env *Environment) NewClientCredentialsFlow() (client_credentials.IClientCr
 
 	opts := []client_credentials.Option{
 		client_credentials.WithSessionHooks(cliSession),
+		client_credentials.WithAudience(fmt.Sprintf("%s/api", kindeDomain)),
 		client_credentials.WithTokenValidation(
 			true,
 			jwt.WillValidateAlgorithm(),
