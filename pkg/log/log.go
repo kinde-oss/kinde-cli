@@ -7,8 +7,8 @@ import (
 	"log/slog"
 	"os"
 	"strconv"
-	"time"
 
+	"github.com/UnnoTed/horizontal"
 	"github.com/rs/zerolog"
 	slogzerolog "github.com/samber/slog-zerolog/v2"
 )
@@ -55,37 +55,7 @@ func GetLogWriter(settings *SharedLogSettings) zerolog.Logger {
 
 	if prettyPrintLogs {
 
-		if settings.ConsolePartsExclude == nil {
-			settings.ConsolePartsExclude = &[]string{"sub_component", "elapsed"}
-		}
-
-		if settings.ConsoleFieldsExclude == nil {
-			settings.ConsoleFieldsExclude = &[]string{}
-		}
-
-		if settings.ConsolePartsOrder == nil {
-			settings.ConsolePartsOrder = &[]string{
-				zerolog.TimestampFieldName,
-				"component",
-				zerolog.LevelFieldName,
-				zerolog.CallerFieldName,
-				zerolog.MessageFieldName,
-			}
-		}
-
-		consoleWriter := zerolog.ConsoleWriter{
-			Out:           os.Stderr,
-			TimeFormat:    time.RFC3339,
-			PartsOrder:    *settings.ConsolePartsOrder,
-			PartsExclude:  *settings.ConsolePartsExclude,
-			FieldsExclude: *settings.ConsoleFieldsExclude,
-			//NoColor:       true,
-			FormatExtra: settings.ConsoleFormatExtra,
-		}
-
-		//using local time for pretty logging
-		consoleWriter.TimeFormat = time.Stamp
-		consoleWriter.NoColor = false
+		consoleWriter := horizontal.ConsoleWriter{Out: os.Stderr}
 
 		zerologWriter = zerolog.New(consoleWriter).With().Timestamp().Str("component", settings.ComponentName).Logger()
 	} else {
