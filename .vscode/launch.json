@@ -80,6 +80,6 @@
         "request": "launch",
         "mode": "auto",
         "program": "${workspaceFolder}/cmd/kinde",
-        "args": ["manage", "business", "update", "--business_name", "New name2", "--is_show_kinde_branding=false"]
+        "args": ["manage", "business", "update", "--business_name", "New name", "--is_show_kinde_branding=true"]
     }]
 }
