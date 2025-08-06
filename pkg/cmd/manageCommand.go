@@ -310,7 +310,6 @@ func callApiMethod(cmd *cobra.Command, env *config.Environment, op commandOperat
 	}
 
 	kindeDomainUrl := fmt.Sprintf("https://%s", env.DomainName)
-
 	managementApi, err := kinde.NewManagementAPI(ctx, kindeDomainUrl, clientCredentials)
 	if err != nil {
 		return fmt.Errorf("failed to create management API client: %w", err)
@@ -327,6 +326,10 @@ func callApiMethod(cmd *cobra.Command, env *config.Environment, op commandOperat
 			continue
 		}
 		argInstance := mapFlagsToStruct(methodType.In(i), cmd.Flags())
+		argKind := methodType.In(i).Kind()
+		if argKind != reflect.Ptr {
+			argInstance = reflect.ValueOf(argInstance).Elem().Interface()
+		}
 		args = append(args, reflect.ValueOf(argInstance))
 	}
 
