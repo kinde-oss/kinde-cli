@@ -259,35 +259,6 @@ func newManageCmd(ctx context.Context) *manageCmd {
 		manageCmd.cmd.AddCommand(groupCmd)
 	}
 
-	// business := &cobra.Command{
-	// 	Use:  "business",
-	// 	Args: cobra.MatchAll(),
-	// }
-
-	// manageCmd.cmd.AddCommand(business)
-	// addCommand[management_api.UpdateBusinessReq,
-	// 	management_api.SuccessResponse,
-	// 	management_api.UpdateBusinessTooManyRequests,
-	// 	management_api.UpdateBusinessForbidden,
-	// 	management_api.UpdateBusinessBadRequest,
-	// ](business, &cobra.Command{
-	// 	Use:   "update",
-	// 	Args:  cobra.ArbitraryArgs,
-	// 	Short: "Update business information",
-	// 	Long:  "Update information about the Kinde business, such as name, domain, and other details.",
-	// }, "UpdateBusiness")
-	// addCommand[management_api.UpdateBusinessReq,
-	// 	management_api.GetBusinessResponse,
-	// 	management_api.GetBusinessTooManyRequests,
-	// 	management_api.GetBusinessForbidden,
-	// 	management_api.GetBusinessBadRequest,
-	// ](business, &cobra.Command{
-	// 	Use:   "get",
-	// 	Args:  cobra.ArbitraryArgs,
-	// 	Short: "Get business information",
-	// 	Long:  "Retrieve information about the Kinde business, such as name, domain, and other details.",
-	// }, "GetBusiness")
-
 	return manageCmd
 }
 
@@ -301,19 +272,10 @@ func buildCobraCommand(ctx context.Context, op commandOperationPair[string, mana
 		return nil, fmt.Errorf("no environment configured. Please run 'kinde login'")
 	}
 
-	clientCredentials, err := env.NewClientCredentialsFlow()
-	if err != nil {
-		return nil, fmt.Errorf("failed to create client credentials flow: %w", err)
+	apiMethod, found := reflect.TypeOf(&management_api.Client{}).MethodByName(op.operation)
+	if !found {
+		return nil, fmt.Errorf("operation %s not found in management API", op.operation)
 	}
-
-	kindeDomainUrl := fmt.Sprintf("https://%s", env.DomainName)
-
-	managementApi, err := kinde.NewManagementAPI(ctx, kindeDomainUrl, clientCredentials)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create management API client: %w", err)
-	}
-
-	apiMethod := reflect.ValueOf(managementApi).MethodByName(op.operation)
 
 	command := &cobra.Command{
 		Use:   op.commandName,
@@ -321,15 +283,15 @@ func buildCobraCommand(ctx context.Context, op commandOperationPair[string, mana
 		Short: fmt.Sprintf("Manage %s operation", op.commandName),
 		Long:  fmt.Sprintf("Manage %s operation in Kinde", op.commandName),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return callApiMethod(cmd, managementApi, apiMethod)
+			return callApiMethod(cmd, env, op)
 		},
 	}
 
-	numArgs := apiMethod.Type().NumIn()
+	numArgs := apiMethod.Type.NumIn()
 	var methodArgs []reflect.Value
 	for i := range numArgs {
-		if apiMethod.Type().In(i).String() != "context.Context" {
-			argumentType := reflect.Zero(apiMethod.Type().In(i))
+		if apiMethod.Type.In(i).String() != "context.Context" {
+			argumentType := reflect.Zero(apiMethod.Type.In(i))
 			methodArgs = append(methodArgs, argumentType)
 			generateCommandFlags(argumentType.Type(), command)
 		}
@@ -338,20 +300,37 @@ func buildCobraCommand(ctx context.Context, op commandOperationPair[string, mana
 	return command, nil
 }
 
-func callApiMethod(cmd *cobra.Command, _ *management_api.Client, apiMethod reflect.Value) error {
-	methodType := apiMethod.Type()
+func callApiMethod(cmd *cobra.Command, env *config.Environment, op commandOperationPair[string, management_api.OperationName]) error {
+
+	ctx := cmd.Context()
+
+	clientCredentials, err := env.NewClientCredentialsFlow()
+	if err != nil {
+		return fmt.Errorf("failed to create client credentials flow: %w", err)
+	}
+
+	kindeDomainUrl := fmt.Sprintf("https://%s", env.DomainName)
+
+	managementApi, err := kinde.NewManagementAPI(ctx, kindeDomainUrl, clientCredentials)
+	if err != nil {
+		return fmt.Errorf("failed to create management API client: %w", err)
+	}
+
+	instanceMethod := reflect.ValueOf(managementApi).MethodByName(op.operation)
+
+	methodType := instanceMethod.Type()
 	inParams := methodType.NumIn()
 	args := []reflect.Value{}
 	for i := range inParams {
 		if methodType.In(i) == reflect.TypeOf((*context.Context)(nil)).Elem() {
-			args = append(args, reflect.ValueOf(cmd.Context()))
+			args = append(args, reflect.ValueOf(ctx))
 			continue
 		}
 		argInstance := mapFlagsToStruct(methodType.In(i), cmd.Flags())
 		args = append(args, reflect.ValueOf(argInstance))
 	}
 
-	results := apiMethod.Call(args[0:inParams])
+	results := instanceMethod.Call(args[0:inParams])
 	for _, result := range results {
 		if result.IsNil() {
 			continue
@@ -390,7 +369,7 @@ func generateCommandFlags(t reflect.Type, command *cobra.Command) {
 
 func mapFlagsToStruct(t reflect.Type, flagSet *pflag.FlagSet) any {
 	if t.Kind() == reflect.Ptr {
-		t = t.Elem() //unpointing the pointer to create an instance
+		t = t.Elem()
 	}
 	instance := reflect.New(t).Interface()
 	val := reflect.Indirect(reflect.ValueOf(instance))

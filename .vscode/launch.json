@@ -75,11 +75,11 @@
         "program": "${workspaceFolder}/cmd/kinde",
         "args": ["manage", "business", "get"]
     },{
-        "name": "kinde manage business update",
+        "name": "kinde manage user create",
         "type": "go",
         "request": "launch",
         "mode": "auto",
         "program": "${workspaceFolder}/cmd/kinde",
-        "args": ["manage", "business", "update", "--business_name", "New name", "--is_show_kinde_branding=true"]
+        "args": ["manage", "user", "create"]
     }]
 }
