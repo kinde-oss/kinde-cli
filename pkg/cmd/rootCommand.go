@@ -50,7 +50,7 @@ func Execute(ctx context.Context) {
 	}
 
 	rootCmd.AddCommand(newVersionCmd().cmd)
-	rootCmd.AddCommand(newBuildCmd().cmd)
+	//rootCmd.AddCommand(newBuildCmd().cmd)
 	rootCmd.AddCommand(newLoginCmd().cmd)
 	rootCmd.AddCommand(newLogoutCmd().cmd)
 	rootCmd.AddCommand(newWhoAmI().cmd)

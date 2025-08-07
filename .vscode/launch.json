@@ -24,7 +24,7 @@
         "request": "launch",
         "mode": "auto",
         "program": "${workspaceFolder}/cmd/kinde",
-        "args": ["help", "manage", "business", "update"]
+        "args": ["help", "manage", "user", "get_all"]
     },{
         "name": "kinde version",
         "type": "go",
@@ -81,5 +81,12 @@
         "mode": "auto",
         "program": "${workspaceFolder}/cmd/kinde",
         "args": ["manage", "user", "create"]
+    },{
+        "name": "kinde manage user get_all",
+        "type": "go",
+        "request": "launch",
+        "mode": "auto",
+        "program": "${workspaceFolder}/cmd/kinde",
+        "args": ["manage", "user", "get_all", "--page_size", "2"]
     }]
 }

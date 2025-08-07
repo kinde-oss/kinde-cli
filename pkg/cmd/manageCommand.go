@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"reflect"
+	"regexp"
+	"strings"
 
 	"github.com/kinde-oss/kinde-cli/pkg/config"
 	"github.com/kinde-oss/kinde-go/kinde"
@@ -29,7 +31,10 @@ func newManageCmd(ctx context.Context) *manageCmd {
 	manageCmd.cmd = &cobra.Command{
 		Use:   "manage",
 		Args:  cobra.NoArgs,
-		Short: "Manage Kinde business",
+		Short: "Kinde management API commands",
+		Long: `Manage Kinde resources using the management API. 
+This command allows you to perform various operations such as creating, updating, and deleting resources like applications, organizations, users, roles, and more.
+Management API scopes need to be granted to the application you are using to run this command.`,
 	}
 
 	ops := map[string][]commandOperationPair[string, management_api.OperationName]{
@@ -263,7 +268,6 @@ func newManageCmd(ctx context.Context) *manageCmd {
 }
 
 func buildCobraCommand(ctx context.Context, op commandOperationPair[string, management_api.OperationName]) (*cobra.Command, error) {
-	//log := log.Ctx(ctx)
 	config := config.FromContext[config.Config](ctx)
 
 	env := config.GetEnvironment()
@@ -289,19 +293,18 @@ func buildCobraCommand(ctx context.Context, op commandOperationPair[string, mana
 
 	numArgs := apiMethod.Type.NumIn()
 	var methodArgs []reflect.Value
-	for i := range numArgs {
-		if apiMethod.Type.In(i).String() != "context.Context" {
-			argumentType := reflect.Zero(apiMethod.Type.In(i))
-			methodArgs = append(methodArgs, argumentType)
-			generateCommandFlags(argumentType.Type(), command)
-		}
+
+	for i := 1; i < numArgs; i++ {
+		argumentType := reflect.Zero(apiMethod.Type.In(i))
+		methodArgs = append(methodArgs, argumentType)
+		generateCommandFlags(argumentType.Type(), command)
 	}
 
 	return command, nil
 }
 
 func callApiMethod(cmd *cobra.Command, env *config.Environment, op commandOperationPair[string, management_api.OperationName]) error {
-
+	log := log.Ctx(cmd.Context())
 	ctx := cmd.Context()
 
 	clientCredentials, err := env.NewClientCredentialsFlow()
@@ -315,6 +318,47 @@ func callApiMethod(cmd *cobra.Command, env *config.Environment, op commandOperat
 		return fmt.Errorf("failed to create management API client: %w", err)
 	}
 
+	var setAllFields func(v reflect.Value)
+
+	setAllFields = func(v reflect.Value) {
+		if !v.IsValid() {
+			return
+		}
+
+		if v.Kind() == reflect.Ptr {
+			if !v.IsNil() {
+				setAllFields(v.Elem())
+			}
+			return
+		}
+
+		if v.Kind() == reflect.Array || v.Kind() == reflect.Slice {
+			arrayLen := v.Len()
+			if arrayLen > 0 {
+				for i := range arrayLen {
+					setAllFields(v.Index(i))
+				}
+			} else if v.CanSet() {
+				newSlice := reflect.MakeSlice(v.Type(), 1, 1)
+				v.Set(newSlice)
+				setAllFields(v.Index(0))
+			}
+		}
+
+		if v.Kind() == reflect.Struct {
+			for i := 0; i < v.NumField(); i++ {
+				field := v.Field(i)
+				if v.Type().Field(i).Name == "Set" {
+					if field.CanSet() && field.Kind() == reflect.Bool {
+						field.SetBool(true)
+					}
+				} else {
+					setAllFields(field)
+				}
+			}
+		}
+	}
+
 	instanceMethod := reflect.ValueOf(managementApi).MethodByName(op.operation)
 
 	methodType := instanceMethod.Type()
@@ -326,11 +370,26 @@ func callApiMethod(cmd *cobra.Command, env *config.Environment, op commandOperat
 			continue
 		}
 		argInstance := mapFlagsToStruct(methodType.In(i), cmd.Flags())
-		argKind := methodType.In(i).Kind()
-		if argKind != reflect.Ptr {
+
+		v := reflect.ValueOf(argInstance)
+		marshalMethod := v.MethodByName("MarshalJSON")
+
+		if methodType.In(i).Kind() != reflect.Ptr && methodType.In(i).Kind() != reflect.Interface {
 			argInstance = reflect.ValueOf(argInstance).Elem().Interface()
 		}
 		args = append(args, reflect.ValueOf(argInstance))
+
+		setAllFields(reflect.ValueOf(argInstance))
+
+		if marshalMethod.IsValid() {
+
+			results := marshalMethod.Call(nil)
+
+			marshalledBytes, _ := results[0].Interface().([]byte)
+
+			log.Info().RawJSON("opt", marshalledBytes).Msg("OptCreateUserReq")
+		}
+
 	}
 
 	results := instanceMethod.Call(args[0:inParams])
@@ -361,13 +420,41 @@ func generateCommandFlags(t reflect.Type, command *cobra.Command) {
 		case reflect.TypeOf(management_api.OptNilBool{}), reflect.TypeOf(management_api.OptBool{}):
 			if tag != "" {
 				command.Flags().Bool(tag, false, "")
+			} else {
+				command.Flags().Bool(toSnakeCase(field.Name), false, "")
+			}
+		case reflect.TypeOf(management_api.OptNilInt{}), reflect.TypeOf(management_api.OptInt{}):
+			if tag != "" {
+				command.Flags().Int(tag, 0, "")
+			} else {
+				command.Flags().Int(toSnakeCase(field.Name), 0, "")
 			}
 		default:
 			if tag != "" {
 				command.Flags().String(tag, "", "")
+			} else {
+				command.Flags().String(toSnakeCase(field.Name), "", "")
 			}
 		}
 	}
+
+}
+
+func toSnakeCase(s string) string {
+	if s == "" {
+		return ""
+	}
+
+	// 1. Insert underscore before each uppercase letter that is preceded by a lowercase
+	re1 := regexp.MustCompile(`([a-z0-9])([A-Z])`)
+	s = re1.ReplaceAllString(s, "${1}_${2}")
+
+	// 2. Handle consecutive capitals (e.g., “HTTPServer” -> “http_server”)
+	re2 := regexp.MustCompile(`([A-Z]+)([A-Z][a-z])`)
+	s = re2.ReplaceAllString(s, "${1}_${2}")
+
+	// 3. Convert the whole string to lower case
+	return strings.ToLower(s)
 }
 
 func mapFlagsToStruct(t reflect.Type, flagSet *pflag.FlagSet) any {
@@ -383,22 +470,36 @@ func mapFlagsToStruct(t reflect.Type, flagSet *pflag.FlagSet) any {
 		field := t.Field(i)
 		tag := field.Tag.Get("json")
 
+		flag := flagSet.Lookup(tag)
+		if flag == nil {
+			possibleName := toSnakeCase(field.Name)
+			flag = flagSet.Lookup(possibleName)
+		}
+
 		switch field.Type {
 		case reflect.TypeOf(management_api.OptNilString{}):
-			flag := flagSet.Lookup(tag)
 			if flag != nil && flag.Changed {
-				val.Field(i).Set(reflect.ValueOf(management_api.NewOptNilString(flag.Value.String())))
+				if flagValue, err := flagSet.GetString(flag.Name); err == nil {
+					val.Field(i).Set(reflect.ValueOf(management_api.NewOptNilString(flagValue)))
+				}
 			}
 		case reflect.TypeOf(management_api.OptNilBool{}):
-			flag := flagSet.Lookup(tag)
 			if flag != nil && flag.Changed {
-				if flagValue, err := flagSet.GetBool(tag); err == nil {
+				if flagValue, err := flagSet.GetBool(flag.Name); err == nil {
 					val.Field(i).Set(reflect.ValueOf(management_api.NewOptNilBool(flagValue)))
 				}
 			}
+		case reflect.TypeOf(management_api.OptNilInt{}):
+			if flag != nil && flag.Changed {
+				if flagValue, err := flagSet.GetInt(flag.Name); err == nil {
+					val.Field(i).Set(reflect.ValueOf(management_api.NewOptNilInt(flagValue)))
+				}
+			}
 		default:
-			if value, err := flagSet.GetString(tag); err == nil {
-				val.Field(i).Set(reflect.ValueOf(management_api.NewOptNilString(value)))
+			if flag != nil && flag.Changed {
+				if flagValue, err := flagSet.GetString(flag.Name); err == nil {
+					val.Field(i).Set(reflect.ValueOf(management_api.NewOptNilString(flagValue)))
+				}
 			}
 		}
 	}

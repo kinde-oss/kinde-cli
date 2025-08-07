@@ -17,7 +17,7 @@ func TestNewLoginCmd_CommandProperties(t *testing.T) {
 	cmd := cmdStruct.cmd
 
 	assert.Equal(t, "login", cmd.Use)
-	assert.Equal(t, "login to Kinde", cmd.Short)
+	assert.Equal(t, "Login to Kinde", cmd.Short)
 	assert.Nil(t, cmd.Args)
 	assert.NotNil(t, cmd.RunE)
 }
