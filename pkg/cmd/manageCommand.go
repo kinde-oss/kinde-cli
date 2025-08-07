@@ -379,7 +379,7 @@ func callApiMethod(cmd *cobra.Command, env *config.Environment, op commandOperat
 		}
 		args = append(args, reflect.ValueOf(argInstance))
 
-		setAllFields(reflect.ValueOf(argInstance))
+		//setAllFields(reflect.ValueOf(argInstance))
 
 		// if marshalMethod.IsValid() {
 
@@ -394,7 +394,7 @@ func callApiMethod(cmd *cobra.Command, env *config.Environment, op commandOperat
 
 	results := instanceMethod.Call(args[0:inParams])
 	for _, result := range results {
-		if result.IsNil() {
+		if !result.IsValid() || (result.Kind() == reflect.Ptr || result.Kind() == reflect.Interface) && result.IsNil() {
 			continue
 		}
 		resultInstance := result.Interface()
