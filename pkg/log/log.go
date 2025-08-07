@@ -42,13 +42,14 @@ func GetLogWriter(settings *SharedLogSettings) zerolog.Logger {
 		prettyPrintLogs = !structuredLog
 	}
 
-	if logLevel, ok := os.LookupEnv("KINDE_LOG_LEVEL"); ok {
-		logLevel, err := zerolog.ParseLevel(logLevel)
+	if logLevelStr, ok := os.LookupEnv("KINDE_LOG_LEVEL"); ok {
+		parsedLogLevel, err := zerolog.ParseLevel(logLevelStr)
 		if err != nil {
-			fmt.Printf("Log Level of %v is not a valid value - Defaulting to INFO level\n", logLevel)
+			fmt.Printf("Log Level of %v is not a valid value - Defaulting to INFO level\n", logLevelStr)
 			zerolog.SetGlobalLevel(zerolog.InfoLevel)
+		} else {
+			logLevel = parsedLogLevel
 		}
-
 	}
 
 	zerolog.SetGlobalLevel(logLevel)

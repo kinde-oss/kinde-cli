@@ -371,8 +371,8 @@ func callApiMethod(cmd *cobra.Command, env *config.Environment, op commandOperat
 		}
 		argInstance := mapFlagsToStruct(methodType.In(i), cmd.Flags())
 
-		v := reflect.ValueOf(argInstance)
-		marshalMethod := v.MethodByName("MarshalJSON")
+		//v := reflect.ValueOf(argInstance)
+		//marshalMethod := v.MethodByName("MarshalJSON")
 
 		if methodType.In(i).Kind() != reflect.Ptr && methodType.In(i).Kind() != reflect.Interface {
 			argInstance = reflect.ValueOf(argInstance).Elem().Interface()
@@ -381,14 +381,14 @@ func callApiMethod(cmd *cobra.Command, env *config.Environment, op commandOperat
 
 		setAllFields(reflect.ValueOf(argInstance))
 
-		if marshalMethod.IsValid() {
+		// if marshalMethod.IsValid() {
 
-			results := marshalMethod.Call(nil)
+		// 	results := marshalMethod.Call(nil)
 
-			marshalledBytes, _ := results[0].Interface().([]byte)
+		// 	marshalledBytes, _ := results[0].Interface().([]byte)
 
-			log.Info().RawJSON("opt", marshalledBytes).Msg("OptCreateUserReq")
-		}
+		// 	log.Info().RawJSON("opt", marshalledBytes).Msg("OptCreateUserReq")
+		// }
 
 	}
 
