@@ -7,8 +7,8 @@ import (
 	"log/slog"
 	"os"
 	"strconv"
-	"time"
 
+	"github.com/UnnoTed/horizontal"
 	"github.com/rs/zerolog"
 	slogzerolog "github.com/samber/slog-zerolog/v2"
 )
@@ -36,57 +36,27 @@ func GetLogWriter(settings *SharedLogSettings) zerolog.Logger {
 	var zerologWriter zerolog.Logger
 
 	prettyPrintLogs := true
+	logLevel := zerolog.InfoLevel
 
-	prettyPrintLogs, err := strconv.ParseBool(os.Getenv("KINDE_PRETTY_PRINT_LOGS"))
-	if err != nil {
-		prettyPrintLogs = settings.PrettyPrint
-	}
-	logLevel, ok := os.LookupEnv("KINDE_SERVER_LOG_LEVEL")
-	if !ok {
-		logLevel = "info"
+	if structuredLog, err := strconv.ParseBool(os.Getenv("KINDE_STRUCTURED_LOG")); err == nil {
+		prettyPrintLogs = !structuredLog
 	}
 
-	zeroLogLevel, err := zerolog.ParseLevel(logLevel)
-	if err != nil {
-		fmt.Printf("Log Level of %v is not a valid value - Defaulting to INFO level\n", logLevel)
-		zerolog.SetGlobalLevel(zerolog.InfoLevel)
-	} else {
-		zerolog.SetGlobalLevel(zeroLogLevel)
+	if logLevelStr, ok := os.LookupEnv("KINDE_LOG_LEVEL"); ok {
+		parsedLogLevel, err := zerolog.ParseLevel(logLevelStr)
+		if err != nil {
+			fmt.Printf("Log Level of %v is not a valid value - Defaulting to INFO level\n", logLevelStr)
+			zerolog.SetGlobalLevel(zerolog.InfoLevel)
+		} else {
+			logLevel = parsedLogLevel
+		}
 	}
+
+	zerolog.SetGlobalLevel(logLevel)
 
 	if prettyPrintLogs {
 
-		if settings.ConsolePartsExclude == nil {
-			settings.ConsolePartsExclude = &[]string{"sub_component", "elapsed"}
-		}
-
-		if settings.ConsoleFieldsExclude == nil {
-			settings.ConsoleFieldsExclude = &[]string{}
-		}
-
-		if settings.ConsolePartsOrder == nil {
-			settings.ConsolePartsOrder = &[]string{
-				zerolog.TimestampFieldName,
-				"component",
-				zerolog.LevelFieldName,
-				zerolog.CallerFieldName,
-				zerolog.MessageFieldName,
-			}
-		}
-
-		consoleWriter := zerolog.ConsoleWriter{
-			Out:           os.Stderr,
-			TimeFormat:    time.RFC3339,
-			PartsOrder:    *settings.ConsolePartsOrder,
-			PartsExclude:  *settings.ConsolePartsExclude,
-			FieldsExclude: *settings.ConsoleFieldsExclude,
-			//NoColor:       true,
-			FormatExtra: settings.ConsoleFormatExtra,
-		}
-
-		//using local time for pretty logging
-		consoleWriter.TimeFormat = time.Stamp
-		consoleWriter.NoColor = false
+		consoleWriter := horizontal.ConsoleWriter{Out: os.Stderr}
 
 		zerologWriter = zerolog.New(consoleWriter).With().Timestamp().Str("component", settings.ComponentName).Logger()
 	} else {
