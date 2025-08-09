@@ -318,47 +318,6 @@ func callApiMethod(cmd *cobra.Command, env *config.Environment, op commandOperat
 		return fmt.Errorf("failed to create management API client: %w", err)
 	}
 
-	var setAllFields func(v reflect.Value)
-
-	setAllFields = func(v reflect.Value) {
-		if !v.IsValid() {
-			return
-		}
-
-		if v.Kind() == reflect.Ptr {
-			if !v.IsNil() {
-				setAllFields(v.Elem())
-			}
-			return
-		}
-
-		if v.Kind() == reflect.Array || v.Kind() == reflect.Slice {
-			arrayLen := v.Len()
-			if arrayLen > 0 {
-				for i := range arrayLen {
-					setAllFields(v.Index(i))
-				}
-			} else if v.CanSet() {
-				newSlice := reflect.MakeSlice(v.Type(), 1, 1)
-				v.Set(newSlice)
-				setAllFields(v.Index(0))
-			}
-		}
-
-		if v.Kind() == reflect.Struct {
-			for i := 0; i < v.NumField(); i++ {
-				field := v.Field(i)
-				if v.Type().Field(i).Name == "Set" {
-					if field.CanSet() && field.Kind() == reflect.Bool {
-						field.SetBool(true)
-					}
-				} else {
-					setAllFields(field)
-				}
-			}
-		}
-	}
-
 	instanceMethod := reflect.ValueOf(managementApi).MethodByName(op.operation)
 
 	methodType := instanceMethod.Type()
@@ -371,24 +330,10 @@ func callApiMethod(cmd *cobra.Command, env *config.Environment, op commandOperat
 		}
 		argInstance := mapFlagsToStruct(methodType.In(i), cmd.Flags())
 
-		//v := reflect.ValueOf(argInstance)
-		//marshalMethod := v.MethodByName("MarshalJSON")
-
 		if methodType.In(i).Kind() != reflect.Ptr && methodType.In(i).Kind() != reflect.Interface {
 			argInstance = reflect.ValueOf(argInstance).Elem().Interface()
 		}
 		args = append(args, reflect.ValueOf(argInstance))
-
-		//setAllFields(reflect.ValueOf(argInstance))
-
-		// if marshalMethod.IsValid() {
-
-		// 	results := marshalMethod.Call(nil)
-
-		// 	marshalledBytes, _ := results[0].Interface().([]byte)
-
-		// 	log.Info().RawJSON("opt", marshalledBytes).Msg("OptCreateUserReq")
-		// }
 
 	}
 
@@ -483,6 +428,12 @@ func mapFlagsToStruct(t reflect.Type, flagSet *pflag.FlagSet) any {
 					val.Field(i).Set(reflect.ValueOf(management_api.NewOptNilString(flagValue)))
 				}
 			}
+		case reflect.TypeOf(""):
+			if flag != nil && flag.Changed {
+				if flagValue, err := flagSet.GetString(flag.Name); err == nil {
+					val.Field(i).Set(reflect.ValueOf(flagValue))
+				}
+			}
 		case reflect.TypeOf(management_api.OptNilBool{}):
 			if flag != nil && flag.Changed {
 				if flagValue, err := flagSet.GetBool(flag.Name); err == nil {
@@ -498,7 +449,18 @@ func mapFlagsToStruct(t reflect.Type, flagSet *pflag.FlagSet) any {
 		default:
 			if flag != nil && flag.Changed {
 				if flagValue, err := flagSet.GetString(flag.Name); err == nil {
-					val.Field(i).Set(reflect.ValueOf(management_api.NewOptNilString(flagValue)))
+					newVar := val.Field(i).Type().String()
+					if strings.HasPrefix(newVar, "management_api.Opt") {
+						val.Field(i).FieldByName("Value").SetString(flagValue)
+						val.Field(i).FieldByName("Set").SetBool(true)
+					} else {
+						// For other types, try to assign the string value directly if compatible
+						if reflect.TypeOf(flagValue).AssignableTo(val.Field(i).Type()) {
+							val.Field(i).Set(reflect.ValueOf(flagValue))
+						} else if reflect.TypeOf(flagValue).ConvertibleTo(val.Field(i).Type()) {
+							val.Field(i).Set(reflect.ValueOf(flagValue).Convert(val.Field(i).Type()))
+						}
+					}
 				}
 			}
 		}
