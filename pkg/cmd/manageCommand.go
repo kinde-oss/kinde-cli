@@ -272,10 +272,6 @@ func buildCobraCommand(ctx context.Context, op commandOperationPair[string, mana
 
 	env := config.GetEnvironment()
 
-	if env.DomainName == "" {
-		return nil, fmt.Errorf("no environment configured. Please run 'kinde login'")
-	}
-
 	apiMethod, found := reflect.TypeOf(&management_api.Client{}).MethodByName(op.operation)
 	if !found {
 		return nil, fmt.Errorf("operation %s not found in management API", op.operation)
@@ -287,6 +283,9 @@ func buildCobraCommand(ctx context.Context, op commandOperationPair[string, mana
 		Short: fmt.Sprintf("Manage %s operation", op.commandName),
 		Long:  fmt.Sprintf("Manage %s operation in Kinde", op.commandName),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if env == nil {
+				return fmt.Errorf("no environment configured. Please run 'kinde login'")
+			}
 			return callApiMethod(cmd, env, op)
 		},
 	}

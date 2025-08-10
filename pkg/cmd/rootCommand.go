@@ -54,16 +54,13 @@ func Execute(ctx context.Context) {
 	rootCmd.AddCommand(newLoginCmd().cmd)
 	rootCmd.AddCommand(newLogoutCmd().cmd)
 	rootCmd.AddCommand(newWhoAmI().cmd)
-
-	if cfg.GetEnvironment() != nil {
-		rootCmd.AddCommand(newManageCmd(ctx).cmd)
-	}
+	rootCmd.AddCommand(newManageCmd(ctx).cmd)
 
 	cfg.PersistConfig()
 
 	rootCmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
 		if err, isValid := cfg.Validate(); !isValid {
-			return err
+			log.Error().Err(err).Msg("Issues with configuration")
 		}
 		return nil
 	}
