@@ -6,7 +6,7 @@
 
 - Official CLI for interacting with Kinde APIs.
 - Secure handling of credentials via OS-specific secrets store.
-- 100% verifyiable authenticity
+- 100% verifiable authenticity
   - 100% built in go without external native dependencies
   - Compiles into a single executable for ease of maintenance and deployment
   - Ships for multiple platforms - Linux, MacOS, Windows
@@ -17,7 +17,7 @@
 
 TODO:
 - [x] Client-credentials authentication
-- [x] Managaement API top-level sub-commands and flags
+- [x] Management API top-level sub-commands and flags
   - [ ] Support for array arguments
 - [x] Online token verification
   - [ ] Offline token verification
@@ -73,13 +73,13 @@ kinde whoami
 
 Kinde CLI supports authentication to multiple businesses via the `--domain` argument.
 
-Enviornments are independent from each-other and cannot be cross-authenticated, each token is linked to an environment, and cannot be used to cross-authenticate into multiple environments.
+Environments are independent from each-other and cannot be cross-authenticated, each token is linked to an environment, and cannot be used to cross-authenticate into multiple environments.
 
 When `--domain` is not specified, the last logged-in business becomes `current`.
 
 ## Terminal autocomplete
 
-Kinde CLI comes with terminal autompletion support for `bash`, `fish`, `powershell` and `zsh`
+Kinde CLI comes with terminal autocompletion support for `bash`, `fish`, `powershell` and `zsh`
 
 You can see instruction for your shell/OS combination by executing the following
 
@@ -166,7 +166,7 @@ Example:
     ```bash
     kinde manage users create
     ```
-- Create an enviornment-level feature-flag of type `string`
+- Create an environment-level feature-flag of type `string`
   ```
     kinde manage feature_flags create --name "first flag" --key "first_key" --allow_override_level "env" --type "str"
    ```
