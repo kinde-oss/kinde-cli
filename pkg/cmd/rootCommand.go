@@ -54,7 +54,10 @@ func Execute(ctx context.Context) {
 	rootCmd.AddCommand(newLoginCmd().cmd)
 	rootCmd.AddCommand(newLogoutCmd().cmd)
 	rootCmd.AddCommand(newWhoAmI().cmd)
-	rootCmd.AddCommand(newManageCmd(ctx).cmd)
+
+	if cfg.GetEnvironment() != nil {
+		rootCmd.AddCommand(newManageCmd(ctx).cmd)
+	}
 
 	cfg.PersistConfig()
 

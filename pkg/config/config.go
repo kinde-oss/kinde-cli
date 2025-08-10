@@ -42,11 +42,7 @@ func (i *Config) SetEnvironment(f func(e *Environment)) error {
 // GetEnvironment implements IConfig.
 func (i *Config) GetEnvironment() *Environment {
 	if env, ok := i.Environments[i.CurrentEnvironment]; !ok {
-		i.Environments[i.CurrentEnvironment] = Environment{
-			DomainName: i.CurrentEnvironment,
-		}
-		env := i.Environments[i.CurrentEnvironment]
-		return &env
+		return nil
 	} else {
 		return &env
 	}
