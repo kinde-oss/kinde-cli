@@ -38,7 +38,7 @@ Management API scopes need to be granted to the application you are using to run
 	}
 
 	ops := map[string][]commandOperationPair[string, management_api.OperationName]{
-		"api": {
+		"apis": {
 			{"add_application_scope", management_api.AddAPIApplicationScopeOperation},
 			{"add_scope", management_api.AddAPIScopeOperation},
 			{"add_apis", management_api.AddAPIsOperation},
@@ -65,7 +65,7 @@ Management API scopes need to be granted to the application you are using to run
 			{"token_introspection", management_api.TokenIntrospectionOperation},
 			{"token_revocation", management_api.TokenRevocationOperation},
 		},
-		"application": {
+		"applications": {
 			{"create", management_api.CreateApplicationOperation},
 			{"delete", management_api.DeleteApplicationOperation},
 			{"get", management_api.GetApplicationOperation},
@@ -80,7 +80,7 @@ Management API scopes need to be granted to the application you are using to run
 			{"get", management_api.GetBusinessOperation},
 			{"update", management_api.UpdateBusinessOperation},
 		},
-		"organization": {
+		"organizations": {
 			{"create", management_api.CreateOrganizationOperation},
 			{"delete", management_api.DeleteOrganizationOperation},
 			{"get", management_api.GetOrganizationOperation},
@@ -116,7 +116,7 @@ Management API scopes need to be granted to the application you are using to run
 			{"delete_feature_flag_overrides", management_api.DeleteOrganizationFeatureFlagOverridesOperation},
 			{"replace_mfa", management_api.ReplaceOrganizationMFAOperation},
 		},
-		"user": {
+		"users": {
 			{"create", management_api.CreateUserOperation},
 			{"delete", management_api.DeleteUserOperation},
 			{"get_data", management_api.GetUserDataOperation},
@@ -144,7 +144,7 @@ Management API scopes need to be granted to the application you are using to run
 			{"replace_mfa", management_api.ReplaceMFAOperation},
 			{"update_identity", management_api.UpdateIdentityOperation},
 		},
-		"role": {
+		"roles": {
 			{"add_scope", management_api.AddRoleScopeOperation},
 			{"create", management_api.CreateRoleOperation},
 			{"delete", management_api.DeleteRoleOperation},
@@ -157,25 +157,25 @@ Management API scopes need to be granted to the application you are using to run
 			{"update_permissions", management_api.UpdateRolePermissionsOperation},
 			{"update", management_api.UpdateRolesOperation},
 		},
-		"permission": {
+		"permissions": {
 			{"create", management_api.CreatePermissionOperation},
 			{"delete", management_api.DeletePermissionOperation},
 			{"get_all", management_api.GetPermissionsOperation},
 			{"update", management_api.UpdatePermissionsOperation},
 		},
-		"feature_flag": {
+		"feature_flags": {
 			{"create", management_api.CreateFeatureFlagOperation},
 			{"delete", management_api.DeleteFeatureFlagOperation},
 			{"get_all", management_api.GetFeatureFlagsOperation},
 			{"update", management_api.UpdateFeatureFlagOperation},
 		},
-		"property": {
+		"properties": {
 			{"create", management_api.CreatePropertyOperation},
 			{"delete", management_api.DeletePropertyOperation},
 			{"get_all", management_api.GetPropertiesOperation},
 			{"update", management_api.UpdatePropertyOperation},
 		},
-		"connection": {
+		"connections": {
 			{"create", management_api.CreateConnectionOperation},
 			{"delete", management_api.DeleteConnectionOperation},
 			{"enable", management_api.EnableConnectionOperation},
@@ -187,31 +187,31 @@ Management API scopes need to be granted to the application you are using to run
 			{"enable_org", management_api.EnableOrgConnectionOperation},
 			{"remove_org", management_api.RemoveOrgConnectionOperation},
 		},
-		"environment": {
+		"environments": {
 			{"get", management_api.GetEnvironmentOperation},
 			{"get_feature_flags", management_api.GetEnvironementFeatureFlagsOperation},
 			{"update_feature_flag_override", management_api.UpdateEnvironementFeatureFlagOverrideOperation},
 			{"delete_feature_flag_override", management_api.DeleteEnvironementFeatureFlagOverrideOperation},
 			{"delete_feature_flag_overrides", management_api.DeleteEnvironementFeatureFlagOverridesOperation},
 		},
-		"environment_variable": {
+		"environment_variables": {
 			{"create", management_api.CreateEnvironmentVariableOperation},
 			{"delete", management_api.DeleteEnvironmentVariableOperation},
 			{"get", management_api.GetEnvironmentVariableOperation},
 			{"get_all", management_api.GetEnvironmentVariablesOperation},
 			{"update", management_api.UpdateEnvironmentVariableOperation},
 		},
-		"category": {
+		"categories": {
 			{"create", management_api.CreateCategoryOperation},
 			{"get_all", management_api.GetCategoriesOperation},
 			{"update", management_api.UpdateCategoryOperation},
 		},
-		"subscriber": {
+		"subscribers": {
 			{"create", management_api.CreateSubscriberOperation},
 			{"get", management_api.GetSubscriberOperation},
 			{"get_all", management_api.GetSubscribersOperation},
 		},
-		"webhook": {
+		"webhooks": {
 			{"create", management_api.CreateWebHookOperation},
 			{"delete", management_api.DeleteWebHookOperation},
 			{"get_all", management_api.GetWebHooksOperation},
@@ -224,20 +224,20 @@ Management API scopes need to be granted to the application you are using to run
 			{"get_entitlement", management_api.GetEntitlementOperation},
 			{"create_meter_usage_record", management_api.CreateMeterUsageRecordOperation},
 		},
-		"event": {
+		"events": {
 			{"get", management_api.GetEventOperation},
 			{"get_types", management_api.GetEventTypesOperation},
 		},
 		"portal": {
 			{"get_link", management_api.GetPortalLinkOperation},
 		},
-		"industry": {
+		"industries": {
 			{"get_all", management_api.GetIndustriesOperation},
 		},
-		"timezone": {
+		"timezones": {
 			{"get_all", management_api.GetTimezonesOperation},
 		},
-		"connected_app": {
+		"connected_apps": {
 			{"get_auth_url", management_api.GetConnectedAppAuthUrlOperation},
 			{"get_token", management_api.GetConnectedAppTokenOperation},
 			{"revoke_token", management_api.RevokeConnectedAppTokenOperation},

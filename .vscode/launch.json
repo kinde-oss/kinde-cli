@@ -24,7 +24,7 @@
         "request": "launch",
         "mode": "auto",
         "program": "${workspaceFolder}/cmd/kinde",
-        "args": ["help", "manage", "user", "get_all"]
+        "args": ["help", "manage", "users", "get_all"]
     },{
         "name": "kinde version",
         "type": "go",
@@ -80,20 +80,20 @@
         "request": "launch",
         "mode": "auto",
         "program": "${workspaceFolder}/cmd/kinde",
-        "args": ["manage", "user", "create"]
+        "args": ["manage", "users", "create"]
     },{
         "name": "kinde manage user get_all",
         "type": "go",
         "request": "launch",
         "mode": "auto",
         "program": "${workspaceFolder}/cmd/kinde",
-        "args": ["manage", "user", "get_all", "--page_size", "2"]
+        "args": ["manage", "users", "get_all", "--page_size", "2"]
     },{
         "name": "kinde manage ff create",
         "type": "go",
         "request": "launch",
         "mode": "auto",
         "program": "${workspaceFolder}/cmd/kinde",
-        "args": ["manage", "feature_flag", "create", "--name", "ev flag", "--key", "ev_key", "--allow_override_level", "env", "--type", "str"]
+        "args": ["manage", "feature_flags", "create", "--name", "ev flag", "--key", "ev_key1", "--allow_override_level", "env", "--type", "str"]
     }]
 }
