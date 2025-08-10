@@ -1,6 +1,8 @@
 # Kinde command line utility
 
-##### This is work in progress. API is subject to change without warning or be missing.
+## Status
+
+This is a work in progress. APIs may change without notice or be missing.
 
 ## Features
 
@@ -53,9 +55,7 @@ kinde login --domain <your Kinde business domain> \
 
 ### To login using device authorization flow
 
-Please note, although this authentication method is supported, account API is in TODO.
-
-Please configure a default application for defice flow or specify `client_id`
+Please configure a default application for device flow or specify `client_id`
 
 ```bash
 kinde login
@@ -63,25 +63,13 @@ kinde login
     --client_id [optional]
 ```
 
-## Check authenticaton status
-
-```bash
-kinde whoami
-```
-
-## Multiple businesses and environments
-
-Kinde CLI supports authentication to multiple businesses via the `--domain` argument.
-
-Environments are independent from each-other and cannot be cross-authenticated, each token is linked to an environment, and cannot be used to cross-authenticate into multiple environments.
-
-When `--domain` is not specified, the last logged-in business becomes `current`.
+## Check authentication status
 
 ## Terminal autocomplete
 
-Kinde CLI comes with terminal autocompletion support for `bash`, `fish`, `powershell` and `zsh`
+Kinde CLI comes with terminal autocompletion support for `bash`, `fish`, `powershell`, and `zsh`
 
-You can see instruction for your shell/OS combination by executing the following
+You can see instructions for your shell/OS combination by executing the following
 
 ```
 kinde help completion <bash|fish|powershell|ash>
