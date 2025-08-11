@@ -4,10 +4,7 @@ go 1.24.4
 
 toolchain go1.24.5
 
-require (
-	github.com/UnnoTed/horizontal v0.0.0-20220811200655-cbe810c8df9b
-	github.com/kinde-oss/kinde-go v0.0.11
-)
+require github.com/kinde-oss/kinde-go v0.0.11
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
@@ -19,9 +16,8 @@ require (
 	github.com/go-faster/yaml v0.4.6 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
-	github.com/nwidger/jsoncolor v0.3.2 // indirect
+	github.com/hokaccha/go-prettyjson v0.0.0-20211117102719-0474bc63780f // indirect
 	github.com/ogen-go/ogen v1.14.0 // indirect
-	github.com/olekukonko/ts v0.0.0-20171002115256-78ecb04241c0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
@@ -44,6 +40,7 @@ require (
 	github.com/99designs/keyring v1.2.2 // indirect
 	github.com/MicahParks/jwkset v0.9.6 // indirect
 	github.com/MicahParks/keyfunc/v3 v3.6.1 // indirect
+	github.com/TylerBrock/colorjson v0.0.0-20200706003622-8a50f05110d2
 	github.com/danieljoos/wincred v1.2.2 // indirect
 	github.com/dvsekhvalnov/jose2go v1.8.0 // indirect
 	github.com/evanw/esbuild v0.25.8
@@ -54,7 +51,8 @@ require (
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gsterjov/go-libsecret v0.0.0-20161001094733-a6f4afe4910c // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
-	github.com/mattn/go-colorable v0.1.14 // indirect
+	github.com/jwalton/go-supportscolor v1.2.0
+	github.com/mattn/go-colorable v0.1.14
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mtibben/percent v0.2.1 // indirect
 	github.com/rs/zerolog v1.34.0

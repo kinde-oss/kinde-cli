@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 
+	"github.com/jwalton/go-supportscolor"
 	"github.com/rs/zerolog"
 	log "github.com/rs/zerolog/log"
 
@@ -18,6 +19,8 @@ func init() {
 
 	log.Logger = cli_log.GetLogWriter(&cli_log.SharedLogSettings{
 		ComponentName:        "kinde_cli",
+		PrettyPrint:          true,
+		UseColor:             supportscolor.Stdout().SupportsColor,
 		ConsoleFieldsExclude: &[]string{"component"}, //this is only used for pretty printing
 	})
 
