@@ -35,7 +35,7 @@ func Execute(ctx context.Context) {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		Annotations:   map[string]string{},
-		Version:       release.Branch,
+		Version:       release.Version,
 		Short:         "Kinde CLI",
 		Long:          "The official command-line for Kinde.",
 	}
