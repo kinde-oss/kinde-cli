@@ -8,7 +8,11 @@ import (
 	"github.com/google/go-github/v28/github"
 )
 
-var Branch = "main"
+var (
+	Version = ""
+	Commit  = ""
+	Date    = ""
+)
 
 func IsNeedingUpdate() {
 	client := github.NewClient(nil)
@@ -20,7 +24,7 @@ func IsNeedingUpdate() {
 
 	latest := *rep.TagName
 
-	if strings.TrimPrefix(Branch, "v") != strings.TrimPrefix(latest, "v") {
+	if strings.TrimPrefix(Version, "v") != strings.TrimPrefix(latest, "v") {
 		fmt.Printf("An update is available: %v", latest)
 	}
 }

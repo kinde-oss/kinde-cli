@@ -12,12 +12,15 @@ builds:
     id: "cli"
     binary: kinde
     env:
+      - GO111MODULE=on
       - CGO_ENABLED=0
     goos:
       - linux
       - windows
       - darwin
     main: ./cmd/kinde
+checksum:
+  name_template: "{{ .ProjectName }}-checksums.txt"
 
 binary_signs:
   - {}
@@ -72,7 +75,7 @@ notarize:
 
 nfpms:
   - id: deb
-    package_name: kinde
+    package_name: kinde-cli
     vendor: Kinde
     homepage: https://kinde.com
     maintainer: Kinde <support@kinde.com>
@@ -81,7 +84,7 @@ nfpms:
     formats:
       - deb
   - id: rpm
-    package_name: kinde
+    package_name: kinde-cli
     vendor: Kinde
     homepage: https://kinde.com
     maintainer: Kinde <support@kinde.com>

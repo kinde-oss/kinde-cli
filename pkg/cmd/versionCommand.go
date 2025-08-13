@@ -18,7 +18,7 @@ func newVersionCmd() *versionCmd {
 			Args:  nil,
 			Short: "Version",
 			Run: func(cmd *cobra.Command, args []string) {
-				fmt.Printf("version %v\n", release.Branch)
+				fmt.Printf("version %v\n", release.Version)
 				release.IsNeedingUpdate()
 			},
 		},
