@@ -17,8 +17,8 @@ var (
 func main() {
 
 	release.Version = version
-	release.Commit = version
-	release.Date = version
+	release.Commit = commit
+	release.Date = date
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
