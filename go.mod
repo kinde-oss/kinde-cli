@@ -4,7 +4,7 @@ go 1.24.4
 
 toolchain go1.24.5
 
-require github.com/kinde-oss/kinde-go v0.0.11
+require github.com/kinde-oss/kinde-go v0.0.12
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
@@ -26,7 +26,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.37.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
-	golang.org/x/exp v0.0.0-20250808145144-a408d31f581a // indirect
+	golang.org/x/exp v0.0.0-20250813145105-42675adae3e6 // indirect
 	golang.org/x/mod v0.27.0 // indirect
 	golang.org/x/net v0.43.0 // indirect
 	golang.org/x/sync v0.16.0 // indirect
@@ -44,7 +44,7 @@ require (
 	github.com/TylerBrock/colorjson v0.0.0-20200706003622-8a50f05110d2
 	github.com/danieljoos/wincred v1.2.2 // indirect
 	github.com/dvsekhvalnov/jose2go v1.8.0 // indirect
-	github.com/evanw/esbuild v0.25.8
+	github.com/evanw/esbuild v0.25.9
 	github.com/godbus/dbus v0.0.0-20190726142602-4481cbc300e2 // indirect
 	github.com/golang-jwt/jwt/v5 v5.3.0 // indirect
 	github.com/google/go-github/v28 v28.1.1
