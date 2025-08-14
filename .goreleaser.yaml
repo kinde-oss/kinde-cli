@@ -85,6 +85,8 @@ notarize:
 nfpms:
   - id: deb
     package_name: kinde-cli
+    file_name_template: >-
+      {{ .PackageName }}_{{ .Os }}_{{ .Arch }}{{ with .Arm }}v{{ . }}{{ end }}{{ with .Mips }}_{{ . }}{{ end }}{{ if not (eq .Amd64 "v1") }}{{ .Amd64 }}{{ end }}
     vendor: Kinde
     homepage: https://kinde.com
     maintainer: Kinde <support@kinde.com>
@@ -94,6 +96,8 @@ nfpms:
       - deb
   - id: rpm
     package_name: kinde-cli
+    file_name_template: >-
+      {{ .PackageName }}_{{ .Os }}_{{ .Arch }}{{ with .Arm }}v{{ . }}{{ end }}{{ with .Mips }}_{{ . }}{{ end }}{{ if not (eq .Amd64 "v1") }}{{ .Amd64 }}{{ end }}
     vendor: Kinde
     homepage: https://kinde.com
     maintainer: Kinde <support@kinde.com>
