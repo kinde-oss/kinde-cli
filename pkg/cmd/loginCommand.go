@@ -3,8 +3,10 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/kinde-oss/kinde-cli/pkg/config"
+	"github.com/mdp/qrterminal/v3"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
@@ -46,6 +48,10 @@ func (c *loginCmd) runLogin(cmd *cobra.Command, args []string) error {
 
 	env := config.GetEnvironment()
 
+	if env == nil {
+		return fmt.Errorf("no environment configured. Please specify --domain")
+	}
+
 	if env.DomainName == "" {
 		return fmt.Errorf("no environment configured. Please run 'kinde login'")
 	}
@@ -79,6 +85,10 @@ func (c *loginCmd) runLogin(cmd *cobra.Command, args []string) error {
 		}
 
 		log.Info().Msgf("Please open the following URL in your browser: %v", deviceAuth.VerificationURIComplete)
+		fmt.Println()
+		qrterminal.GenerateHalfBlock(deviceAuth.VerificationURIComplete, qrterminal.M, os.Stdout)
+		fmt.Println()
+
 		log.Info().Msg("Waiting for user to authorize...")
 
 		err = deviceFlow.ExchangeDeviceAccessToken(context.WithoutCancel(cmd.Context()), deviceAuth)

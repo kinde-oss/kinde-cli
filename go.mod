@@ -33,6 +33,7 @@ require (
 	golang.org/x/tools v0.36.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+	rsc.io/qr v0.2.0 // indirect
 )
 
 require (
@@ -54,6 +55,7 @@ require (
 	github.com/jwalton/go-supportscolor v1.2.0
 	github.com/mattn/go-colorable v0.1.14
 	github.com/mattn/go-isatty v0.0.20 // indirect
+	github.com/mdp/qrterminal/v3 v3.2.1
 	github.com/mtibben/percent v0.2.1 // indirect
 	github.com/rs/zerolog v1.34.0
 	github.com/samber/lo v1.51.0 // indirect
