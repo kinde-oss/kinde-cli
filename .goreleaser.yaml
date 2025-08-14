@@ -23,7 +23,7 @@ checksum:
   name_template: "{{ .ProjectName }}-checksums.txt"
 
 snapshot:
-  version_template: "{{ .Version }}-next"
+  version_template: "next"
 
 #binary_signs:
 #  - {}
@@ -106,7 +106,7 @@ archives:
   - formats: tar.gz
     # this name template makes the OS and Arch compatible with the results of `uname`.
     name_template: >-
-      {{ .ProjectName }}_{{ .Version }}_
+      {{ .ProjectName }}_
       {{- if eq .Os "darwin"}}mac-os
       {{- else }}{{- title .Os }}{{ end }}_
       {{- if eq .Arch "amd64" }}x86_64
