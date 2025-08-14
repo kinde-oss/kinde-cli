@@ -22,8 +22,16 @@ builds:
 checksum:
   name_template: "{{ .ProjectName }}-checksums.txt"
 
-binary_signs:
-  - {}
+snapshot:
+  version_template: "next"
+
+#binary_signs:
+#  - {}
+
+universal_binaries:
+  - replace: true
+    ids:
+      - cli
 
 notarize:
   macos:
@@ -31,7 +39,8 @@ notarize:
       #
       # Default: false.
       # Templates: allowed.
-      enabled: '{{ isEnvSet "MACOS_SIGN_P12" }}'
+      #enabled: '{{ isEnvSet "MACOS_SIGN_P12" }}'
+      enabled: false
 
       # IDs to use to filter the built binaries.
       #
@@ -98,7 +107,8 @@ archives:
     # this name template makes the OS and Arch compatible with the results of `uname`.
     name_template: >-
       {{ .ProjectName }}_
-      {{- title .Os }}_
+      {{- if eq .Os "darwin"}}mac-os
+      {{- else }}{{- title .Os }}{{ end }}_
       {{- if eq .Arch "amd64" }}x86_64
       {{- else if eq .Arch "386" }}i386
       {{- else }}{{ .Arch }}{{ end }}

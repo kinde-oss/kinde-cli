@@ -49,9 +49,6 @@ func (i *Config) GetEnvironment() *Environment {
 }
 
 func (c *Config) Validate() (error, bool) {
-	if c.CurrentEnvironment == "" {
-		return fmt.Errorf("no environment configured, please use `kinde login`"), false
-	}
 	return nil, true
 }
 

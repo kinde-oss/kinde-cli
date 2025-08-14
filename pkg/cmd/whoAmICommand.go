@@ -37,7 +37,7 @@ func (c *whoAmICmd) runWhoAmI(cmd *cobra.Command, args []string) error {
 
 	if isAuthenticated, err := deviceFlow.IsAuthenticated(cmd.Context()); !isAuthenticated {
 		if err != nil {
-			log.Error().Err(err).Msg("failed to check authentication status")
+			log.Debug().Err(err).Msg("failed to check authentication status")
 		}
 		return fmt.Errorf("you are not logged in. Please run 'login' command first")
 	}
