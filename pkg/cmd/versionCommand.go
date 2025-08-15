@@ -31,6 +31,7 @@ func newVersionCmd() *versionCmd {
 				fmt.Println()
 				fmt.Printf("version %v\n", release.Version)
 				release.IsNeedingUpdate()
+				fmt.Println()
 			},
 		},
 	}
