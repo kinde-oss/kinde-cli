@@ -375,14 +375,14 @@ func generateCommandFlags(t reflect.Type, command *cobra.Command) {
 					command.Flags().String(flagName, "", "")
 				default:
 					if strings.HasPrefix(field.Type.String(), "management_api.Opt") {
-						log.Debug().Msgf("%s - mapping type for field %s: %s", t.Name(), field.Name, field.Type.String())
+						log.Trace().Msgf("%s - mapping type for field %s: %s", t.Name(), field.Name, field.Type.String())
 						var i reflect.Value
 						if p.OptionalSetter.Value != nil && p.OptionalSetter.Value.IsValid() {
 							i = p.OptionalSetter.Value.FieldByName(field.Name)
 						}
 						visits = append(visits, visitor.Walker[reflect.Type]{T1: field.Type, T2: flagName, OptionalSetter: visitor.OptSetter{Value: &i}})
 					} else {
-						log.Debug().Msgf("%s - skipping unsupported type for field %s: %s", t.Name(), field.Name, field.Type.String())
+						log.Trace().Msgf("%s - skipping unsupported type for field %s: %s", t.Name(), field.Name, field.Type.String())
 					}
 				}
 			}
@@ -422,76 +422,74 @@ func mapFlagsToInstance(t reflect.Type, flagSet *pflag.FlagSet) any {
 					flag = flagSet.Lookup(possibleName)
 				}
 
-				log.Debug().Msgf("Mapping field %s with flag %s, val type %s", field.Name, flagName, val.Type().String())
+				log.Trace().Msgf("Mapping field %s with flag %s, val type %s", field.Name, flagName, val.Type().String())
+				instanceField := p.OptionalSetter.Value.FieldByName(field.Name)
+
+				set := func(v any) {
+					instanceField.Set(reflect.ValueOf(v))
+					if p.OptionalSetter.IsSet.IsValid() {
+						p.OptionalSetter.IsSet.SetBool(true)
+					}
+
+				}
+
 				switch field.Type {
+				case reflect.TypeOf(""):
+					if flag != nil && flag.Changed {
+						if flagValue, err := flagSet.GetString(flag.Name); err == nil {
+							set(flagValue)
+						}
+					}
 				case reflect.TypeOf(management_api.OptString{}):
 					if flag != nil && flag.Changed {
 						if flagValue, err := flagSet.GetString(flag.Name); err == nil {
-							instanceField := p.OptionalSetter.Value.FieldByName(field.Name)
-							instanceField.Set(reflect.ValueOf(management_api.NewOptString(flagValue)))
-							p.OptionalSetter.IsSet.SetBool(true)
-						}
-					}
-				case reflect.TypeOf(management_api.OptBool{}):
-					if flag != nil && flag.Changed {
-						if flagValue, err := flagSet.GetBool(flag.Name); err == nil {
-							instanceField := p.OptionalSetter.Value.FieldByName(field.Name)
-							instanceField.Set(reflect.ValueOf(management_api.NewOptBool(flagValue)))
-							p.OptionalSetter.IsSet.SetBool(true)
-						}
-					}
-				case reflect.TypeOf(management_api.OptNilBool{}):
-					if flag != nil && flag.Changed {
-						if flagValue, err := flagSet.GetBool(flag.Name); err == nil {
-							instanceField := p.OptionalSetter.Value.FieldByName(field.Name)
-							instanceField.Set(reflect.ValueOf(management_api.NewOptBool(flagValue)))
-							p.OptionalSetter.IsSet.SetBool(true)
-						}
-					}
-				case reflect.TypeOf(management_api.OptInt{}):
-					if flag != nil && flag.Changed {
-						if flagValue, err := flagSet.GetInt(flag.Name); err == nil {
-							instanceField := p.OptionalSetter.Value.FieldByName(field.Name)
-							instanceField.Set(reflect.ValueOf(management_api.NewOptInt(flagValue)))
-							p.OptionalSetter.IsSet.SetBool(true)
-						}
-					}
-				case reflect.TypeOf(management_api.OptNilInt{}):
-					if flag != nil && flag.Changed {
-						if flagValue, err := flagSet.GetInt(flag.Name); err == nil {
-							instanceField := p.OptionalSetter.Value.FieldByName(field.Name)
-							instanceField.Set(reflect.ValueOf(management_api.NewOptInt(flagValue)))
-							p.OptionalSetter.IsSet.SetBool(true)
+							set(management_api.NewOptString(flagValue))
 						}
 					}
 				case reflect.TypeOf(management_api.OptNilString{}):
 					if flag != nil && flag.Changed {
 						if flagValue, err := flagSet.GetString(flag.Name); err == nil {
-							instanceField := p.OptionalSetter.Value.FieldByName(field.Name)
-							instanceField.Set(reflect.ValueOf(management_api.NewOptNilString(flagValue)))
-							p.OptionalSetter.IsSet.SetBool(true)
+							set(management_api.NewOptNilString(flagValue))
 						}
 					}
-				case reflect.TypeOf(""):
+				case reflect.TypeOf(management_api.OptBool{}):
 					if flag != nil && flag.Changed {
-						if flagValue, err := flagSet.GetString(flag.Name); err == nil {
-							instanceField := p.OptionalSetter.Value.FieldByName(field.Name)
-							instanceField.Set(reflect.ValueOf(flagValue))
+						if flagValue, err := flagSet.GetBool(flag.Name); err == nil {
+							set(management_api.NewOptBool(flagValue))
+						}
+					}
+				case reflect.TypeOf(management_api.OptNilBool{}):
+					if flag != nil && flag.Changed {
+						if flagValue, err := flagSet.GetBool(flag.Name); err == nil {
+							set(management_api.NewOptBool(flagValue))
+						}
+					}
+				case reflect.TypeOf(management_api.OptInt{}):
+					if flag != nil && flag.Changed {
+						if flagValue, err := flagSet.GetInt(flag.Name); err == nil {
+							set(management_api.NewOptInt(flagValue))
+						}
+					}
+				case reflect.TypeOf(management_api.OptNilInt{}):
+					if flag != nil && flag.Changed {
+						if flagValue, err := flagSet.GetInt(flag.Name); err == nil {
+							set(management_api.NewOptInt(flagValue))
 						}
 					}
 				default:
 					if strings.HasPrefix(field.Type.String(), "management_api.Opt") {
-						subProperty := p.OptionalSetter.Value.FieldByName(field.Name)
-						log.Debug().Msgf("%s - mapping type for field %s: %s: %s", t.Name(), field.Name, field.Type.String(), subProperty.Type().String())
+						subProperty := instanceField
+						log.Trace().Msgf("%s - mapping type for field %s: %s: %s", t.Name(), field.Name, field.Type.String(), subProperty.Type().String())
 						additionalVisits = append(additionalVisits, visitor.Walker[reflect.Type]{T1: field.Type, T2: flagName, OptionalSetter: visitor.OptSetter{Value: &subProperty}})
 					} else {
-						log.Debug().Msgf("%s - skipping unsupported type for field %s: %s", t.Name(), field.Name, field.Type.String())
+						log.Trace().Msgf("%s - skipping unsupported type for field %s: %s", t.Name(), field.Name, field.Type.String())
 					}
 				}
 			}
 			return additionalVisits
 		})
 
+	log.Debug().Any("post_mapping", instance).Msgf("Mapped instance for type %s", t.Name())
 	return instance
 }
 

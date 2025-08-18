@@ -96,7 +96,7 @@ func (v *Visitor) Visit(rootInstance *reflect.Value, f func(t Walker[reflect.Typ
 	for len(toVisit) > 0 {
 		var p Walker[reflect.Type]
 		p, toVisit = toVisit[0], toVisit[1:]
-		log.Debug().Msgf("Visiting type: %s, prefix: `%s`", p.T1.Name(), p.T2)
+		log.Trace().Msgf("Visiting type: %s, prefix: `%s`", p.T1.Name(), p.T2)
 
 		t = p.T1
 		if strings.HasPrefix(p.T1.Name(), "Opt") {
@@ -107,10 +107,10 @@ func (v *Visitor) Visit(rootInstance *reflect.Value, f func(t Walker[reflect.Typ
 			}
 		}
 
-		log.Debug().Msgf("- processing type: %s, prefix: `%s`", t.Name(), p.T2)
+		log.Trace().Msgf("- processing type: %s, prefix: `%s`", t.Name(), p.T2)
 
 		if t.Kind() != reflect.Struct {
-			log.Debug().Msgf("Skipping non-struct type: %s", t.Name())
+			log.Trace().Msgf("Skipping non-struct type: %s", t.Name())
 			continue
 		}
 		adds := f(Walker[reflect.Type]{t, p.T2, instance})
