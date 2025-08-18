@@ -43,7 +43,7 @@ func Execute(ctx context.Context) {
 	cfg, err := config.NewConfig()
 	ctx = config.Ctx(ctx, cfg)
 
-	rootCmd.PersistentFlags().Func("domain", "Specific kinde domain to authenticate against.", func(val string) error {
+	rootCmd.PersistentFlags().Func("domain", "Kinde domain (environment) to work against.", func(val string) error {
 		return cfg.SwitchEnvironment(val)
 	})
 
