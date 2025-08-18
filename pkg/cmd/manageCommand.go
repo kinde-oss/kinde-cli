@@ -169,7 +169,6 @@ Management API scopes need to be granted to the application you are using to run
 		"feature_flags": {
 			{"create", management_api.CreateFeatureFlagOperation},
 			{"delete", management_api.DeleteFeatureFlagOperation},
-			// {"get_all", management_api.GetFeatureFlagsOperation},
 			{"update", management_api.UpdateFeatureFlagOperation},
 		},
 		"properties": {
@@ -402,8 +401,6 @@ func mapFlagsToInstance(t reflect.Type, flagSet *pflag.FlagSet) any {
 	if t.Kind() != reflect.Struct {
 		return instance
 	}
-
-	fmt.Println()
 
 	visitor.NewVisitor(t).
 		Visit(&val, func(p visitor.Walker[reflect.Type]) []visitor.Walker[reflect.Type] {
