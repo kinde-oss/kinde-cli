@@ -8,22 +8,20 @@ This is a work in progress. APIs may change without notice or be missing.
 
 - Official CLI for interacting with Kinde APIs.
 - Secure handling of credentials via OS-specific secrets store.
-- 100% verifiable authenticity
-  - 100% built in go without external native dependencies
-  - Compiles into a single executable for ease of maintenance and deployment
+- Verifiable authenticity
+  - single native binary for ease of maintenance and deployment
   - Ships for multiple platforms - Linux, MacOS, Windows
-  - Ships for multiple architectures - x64, ARM, Apple ARM
+  - Ships for multiple architectures - x64, i386, ARM, Apple ARM
   - Each variation comes with the checksum to verify authenticity
-  - Where applicable the binary is signed/notarized with Kinde private key
 - Secure by default. Kinde business cannot be managed via the CLI until a new M2M application is created with the management API authorized and the select scopes granted.
 
 TODO:
 - [x] Client-credentials authentication
 - [x] Management API top-level sub-commands and flags
-  - [ ] Support for array arguments
 - [x] Online token verification
   - [ ] Offline token verification
-- [ ] Support for user tokens and account API
+- [x] Support for user tokens and account API
+  - [ ] Spport for account API
 
 ## Getting Started
 
@@ -93,27 +91,48 @@ kinde help completion <bash|fish|powershell|ash>
 - `--help` – Show help information.
 
 ### Management API sub-commands
-- `apis`
-- `applications`
-- `billing`
-- `business`
-- `categories`
-- `connected_apps`
-- `connections`
-- `environment_variables`
-- `environments`
-- `events`
-- `feature_flags`
-- `industries`
-- `organizations`
-- `permissions`
-- `portal`
-- `properties`
-- `roles`
-- `subscribers`
-- `timezones`
+
+- api_keys
+
+- apis
+
+- applications
+
+- billing
+
+- business
+
+- categories
+
+- connected_apps
+
+- connections
+
+- environment_variables
+
+- environments
+
+- events
+
+- feature_flags
+
+- industries
+
+- organizations
+
+- permissions
+
+- properties
+
+- roles
+
+- subscribers
+
+- timezones
+
 - [`users`](docs/subcommands/users.md)
-- `webhooks`
+
+- webhooks
 
 ## Configuration
 
