@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/kinde-oss/kinde-cli/pkg/config"
+	visitor "github.com/kinde-oss/kinde-cli/pkg/reflectVisitor"
 	"github.com/kinde-oss/kinde-go/kinde"
 	"github.com/kinde-oss/kinde-go/kinde/management_api"
 	"github.com/rs/zerolog/log"
@@ -15,14 +16,16 @@ import (
 	"github.com/spf13/pflag"
 )
 
-type manageCmd struct {
-	cmd *cobra.Command
-}
+type (
+	manageCmd struct {
+		cmd *cobra.Command
+	}
 
-type commandOperationPair[string, T any] struct {
-	commandName string
-	operation   T
-}
+	commandOperationPair[string, T any] struct {
+		commandName string
+		operation   T
+	}
+)
 
 func newManageCmd(ctx context.Context) *manageCmd {
 
@@ -166,7 +169,7 @@ Management API scopes need to be granted to the application you are using to run
 		"feature_flags": {
 			{"create", management_api.CreateFeatureFlagOperation},
 			{"delete", management_api.DeleteFeatureFlagOperation},
-			{"get_all", management_api.GetFeatureFlagsOperation},
+			// {"get_all", management_api.GetFeatureFlagsOperation},
 			{"update", management_api.UpdateFeatureFlagOperation},
 		},
 		"properties": {
@@ -327,7 +330,7 @@ func callApiMethod(cmd *cobra.Command, env *config.Environment, op commandOperat
 			args = append(args, reflect.ValueOf(ctx))
 			continue
 		}
-		argInstance := mapFlagsToStruct(methodType.In(i), cmd.Flags())
+		argInstance := mapFlagsToInstance(methodType.In(i), cmd.Flags())
 
 		if methodType.In(i).Kind() != reflect.Ptr && methodType.In(i).Kind() != reflect.Interface {
 			argInstance = reflect.ValueOf(argInstance).Elem().Interface()
@@ -349,39 +352,103 @@ func callApiMethod(cmd *cobra.Command, env *config.Environment, op commandOperat
 }
 
 func generateCommandFlags(t reflect.Type, command *cobra.Command) {
-	// Ensure t is a struct type (dereference pointer if needed)
+
+	visitor.NewVisitor(t).
+		Visit(nil, func(p visitor.Walker[reflect.Type]) []visitor.Walker[reflect.Type] {
+			visits := []visitor.Walker[reflect.Type]{}
+			for i := range p.T1.NumField() {
+				field := p.T1.Field(i)
+				flagName := field.Tag.Get("json")
+
+				if flagName == "" {
+					flagName = toSnakeCase(field.Name)
+				}
+				if p.T2 != "" {
+					flagName = fmt.Sprintf("%v.%v", p.T2, flagName)
+				}
+
+				switch field.Type {
+				case reflect.TypeOf(management_api.OptNilBool{}), reflect.TypeOf(management_api.OptBool{}):
+					command.Flags().Bool(flagName, false, "")
+				case reflect.TypeOf(management_api.OptNilInt{}), reflect.TypeOf(management_api.OptInt{}):
+					command.Flags().Int(flagName, 0, "")
+				case reflect.TypeOf(management_api.OptString{}), reflect.TypeOf(management_api.OptNilString{}), reflect.TypeOf(""):
+					command.Flags().String(flagName, "", "")
+				default:
+					if strings.HasPrefix(field.Type.String(), "management_api.Opt") {
+						log.Debug().Msgf("%s - mapping type for field %s: %s", t.Name(), field.Name, field.Type.String())
+						var i reflect.Value
+						if p.OptionalSetter.Value != nil && p.OptionalSetter.Value.IsValid() {
+							i = p.OptionalSetter.Value.FieldByName(field.Name)
+						}
+						visits = append(visits, visitor.Walker[reflect.Type]{T1: field.Type, T2: flagName, OptionalSetter: visitor.OptSetter{Value: &i}})
+					} else {
+						log.Debug().Msgf("%s - skipping unsupported type for field %s: %s", t.Name(), field.Name, field.Type.String())
+					}
+				}
+			}
+			return visits
+		})
+
+}
+
+func mapFlagsToInstance(t reflect.Type, flagSet *pflag.FlagSet) any {
+
 	if t.Kind() == reflect.Ptr {
 		t = t.Elem()
 	}
+	instance := reflect.New(t).Interface()
+	val := reflect.Indirect(reflect.ValueOf(instance))
 	if t.Kind() != reflect.Struct {
-		return
-	}
-	for i := 0; i < t.NumField(); i++ {
-		field := t.Field(i)
-		tag := field.Tag.Get("json")
-
-		switch field.Type {
-		case reflect.TypeOf(management_api.OptNilBool{}), reflect.TypeOf(management_api.OptBool{}):
-			if tag != "" {
-				command.Flags().Bool(tag, false, "")
-			} else {
-				command.Flags().Bool(toSnakeCase(field.Name), false, "")
-			}
-		case reflect.TypeOf(management_api.OptNilInt{}), reflect.TypeOf(management_api.OptInt{}):
-			if tag != "" {
-				command.Flags().Int(tag, 0, "")
-			} else {
-				command.Flags().Int(toSnakeCase(field.Name), 0, "")
-			}
-		default:
-			if tag != "" {
-				command.Flags().String(tag, "", "")
-			} else {
-				command.Flags().String(toSnakeCase(field.Name), "", "")
-			}
-		}
+		return instance
 	}
 
+	fmt.Println()
+
+	visitor.NewVisitor(t).
+		Visit(&val, func(p visitor.Walker[reflect.Type]) []visitor.Walker[reflect.Type] {
+			additionalVisits := []visitor.Walker[reflect.Type]{}
+			for i := range p.T1.NumField() {
+				field := p.T1.Field(i)
+				flagName := field.Tag.Get("json")
+
+				if flagName == "" {
+					flagName = toSnakeCase(field.Name)
+				}
+				if p.T2 != "" {
+					flagName = fmt.Sprintf("%v.%v", p.T2, flagName)
+				}
+
+				flag := flagSet.Lookup(flagName)
+				if flag == nil {
+					possibleName := toSnakeCase(field.Name)
+					flag = flagSet.Lookup(possibleName)
+				}
+
+				log.Debug().Msgf("Mapping field %s with flag %s, val type %s", field.Name, flagName, val.Type().String())
+				switch field.Type {
+				case reflect.TypeOf(management_api.OptString{}):
+					if flag != nil && flag.Changed {
+						if flagValue, err := flagSet.GetString(flag.Name); err == nil {
+							instanceField := p.OptionalSetter.Value.FieldByName(field.Name)
+							instanceField.Set(reflect.ValueOf(management_api.NewOptString(flagValue)))
+							p.OptionalSetter.IsSet.SetBool(true)
+						}
+					}
+				default:
+					if strings.HasPrefix(field.Type.String(), "management_api.Opt") {
+						subProperty := p.OptionalSetter.Value.FieldByName(field.Name)
+						log.Debug().Msgf("%s - mapping type for field %s: %s: %s", t.Name(), field.Name, field.Type.String(), subProperty.Type().String())
+						additionalVisits = append(additionalVisits, visitor.Walker[reflect.Type]{T1: field.Type, T2: flagName, OptionalSetter: visitor.OptSetter{Value: &subProperty}})
+					} else {
+						log.Debug().Msgf("%s - skipping unsupported type for field %s: %s", t.Name(), field.Name, field.Type.String())
+					}
+				}
+			}
+			return additionalVisits
+		})
+
+	return instance
 }
 
 func toSnakeCase(s string) string {
@@ -399,70 +466,4 @@ func toSnakeCase(s string) string {
 
 	// 3. Convert the whole string to lower case
 	return strings.ToLower(s)
-}
-
-func mapFlagsToStruct(t reflect.Type, flagSet *pflag.FlagSet) any {
-	if t.Kind() == reflect.Ptr {
-		t = t.Elem()
-	}
-	instance := reflect.New(t).Interface()
-	val := reflect.Indirect(reflect.ValueOf(instance))
-	if t.Kind() != reflect.Struct {
-		return instance
-	}
-	for i := 0; i < t.NumField(); i++ {
-		field := t.Field(i)
-		tag := field.Tag.Get("json")
-
-		flag := flagSet.Lookup(tag)
-		if flag == nil {
-			possibleName := toSnakeCase(field.Name)
-			flag = flagSet.Lookup(possibleName)
-		}
-
-		switch field.Type {
-		case reflect.TypeOf(management_api.OptNilString{}):
-			if flag != nil && flag.Changed {
-				if flagValue, err := flagSet.GetString(flag.Name); err == nil {
-					val.Field(i).Set(reflect.ValueOf(management_api.NewOptNilString(flagValue)))
-				}
-			}
-		case reflect.TypeOf(""):
-			if flag != nil && flag.Changed {
-				if flagValue, err := flagSet.GetString(flag.Name); err == nil {
-					val.Field(i).Set(reflect.ValueOf(flagValue))
-				}
-			}
-		case reflect.TypeOf(management_api.OptNilBool{}):
-			if flag != nil && flag.Changed {
-				if flagValue, err := flagSet.GetBool(flag.Name); err == nil {
-					val.Field(i).Set(reflect.ValueOf(management_api.NewOptNilBool(flagValue)))
-				}
-			}
-		case reflect.TypeOf(management_api.OptNilInt{}):
-			if flag != nil && flag.Changed {
-				if flagValue, err := flagSet.GetInt(flag.Name); err == nil {
-					val.Field(i).Set(reflect.ValueOf(management_api.NewOptNilInt(flagValue)))
-				}
-			}
-		default:
-			if flag != nil && flag.Changed {
-				if flagValue, err := flagSet.GetString(flag.Name); err == nil {
-					newVar := val.Field(i).Type().String()
-					if strings.HasPrefix(newVar, "management_api.Opt") {
-						val.Field(i).FieldByName("Value").SetString(flagValue)
-						val.Field(i).FieldByName("Set").SetBool(true)
-					} else {
-						// For other types, try to assign the string value directly if compatible
-						if reflect.TypeOf(flagValue).AssignableTo(val.Field(i).Type()) {
-							val.Field(i).Set(reflect.ValueOf(flagValue))
-						} else if reflect.TypeOf(flagValue).ConvertibleTo(val.Field(i).Type()) {
-							val.Field(i).Set(reflect.ValueOf(flagValue).Convert(val.Field(i).Type()))
-						}
-					}
-				}
-			}
-		}
-	}
-	return instance
 }

@@ -24,7 +24,10 @@
         "request": "launch",
         "mode": "auto",
         "program": "${workspaceFolder}/cmd/kinde",
-        "args": ["help", "manage", "users", "get_all"]
+        "args": ["help", "manage", "users", "create"],
+        "env": {
+            "KINDE_LOG_LEVEL": "info"
+        }
     },{
         "name": "kinde version",
         "type": "go",
@@ -80,7 +83,10 @@
         "request": "launch",
         "mode": "auto",
         "program": "${workspaceFolder}/cmd/kinde",
-        "args": ["manage", "users", "create"]
+        "args": ["manage", "users", "create", "--provided_id", "test_id", "--profile.family_name", "test_user"],
+        "env": {
+            "KINDE_LOG_LEVEL": "info"
+        }
     },{
         "name": "kinde manage user get_all",
         "type": "go",
