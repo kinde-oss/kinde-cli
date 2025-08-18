@@ -99,11 +99,12 @@ func (v *Visitor) Visit(rootInstance *reflect.Value, f func(t Walker[reflect.Typ
 		log.Trace().Msgf("Visiting type: %s, prefix: `%s`", p.T1.Name(), p.T2)
 
 		t = p.T1
+		localInstance := p.OptionalSetter
 		if strings.HasPrefix(p.T1.Name(), "Opt") {
 			if mappingType, found := p.T1.FieldByName("Value"); found {
 				//overriding optional type Value to be mapped to flags
 				t = mappingType.Type
-				instance = indirect(p.OptionalSetter)
+				localInstance = indirect(p.OptionalSetter)
 			}
 		}
 
@@ -113,7 +114,7 @@ func (v *Visitor) Visit(rootInstance *reflect.Value, f func(t Walker[reflect.Typ
 			log.Trace().Msgf("Skipping non-struct type: %s", t.Name())
 			continue
 		}
-		adds := f(Walker[reflect.Type]{t, p.T2, instance})
+		adds := f(Walker[reflect.Type]{t, p.T2, localInstance})
 
 		if len(adds) > 0 {
 			toVisit = append(toVisit, adds...)
