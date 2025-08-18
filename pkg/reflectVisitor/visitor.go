@@ -52,15 +52,25 @@ func (v *Visitor) Visit(rootInstance *reflect.Value, f func(t Walker[reflect.Typ
 		if i.Value != nil && i.Value.IsValid() {
 			if i.Value.Kind() == reflect.Ptr {
 				val := i.Value.Elem()
+				if !val.IsValid() {
+					return i
+				}
 				i.Value = &val
 			}
-			boolSetter := i.Value.FieldByName("Set")
 
+			if i.Value.Kind() != reflect.Struct {
+				return i
+			}
+
+			boolSetter := i.Value.FieldByName("Set")
 			if !boolSetter.IsValid() {
 				return i
 			}
 
 			newInstance := i.Value.FieldByName("Value")
+			if !newInstance.IsValid() {
+				return i
+			}
 
 			return OptSetter{
 				Value: &newInstance,
