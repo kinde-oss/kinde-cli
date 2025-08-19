@@ -29,9 +29,10 @@ snapshot:
 #  - {}
 
 universal_binaries:
+  -
   - replace: true
-    ids:
-      - cli
+    id: cli
+    name_template: "kinde"
 
 notarize:
   macos:
@@ -108,10 +109,14 @@ nfpms:
 
 archives:
   - formats: tar.gz
+    files:
+      - license
     # this name template makes the OS and Arch compatible with the results of `uname`.
     name_template: >-
       {{ .ProjectName }}_
       {{- if eq .Os "darwin"}}mac-os
+      {{- else if eq .Os "linux"}}linux
+      {{- else if eq .Os "windows"}}windows
       {{- else }}{{- title .Os }}{{ end }}_
       {{- if eq .Arch "amd64" }}x86_64
       {{- else if eq .Arch "386" }}i386
