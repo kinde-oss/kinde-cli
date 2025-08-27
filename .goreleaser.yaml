@@ -144,6 +144,7 @@ homebrew_casks:
       email: support@kinde.com
     homepage: https://kinde.com
     description: Kinde CLI utility
+    binary: kinde
     completions:
       bash: "kinde-completion.bash"
       zsh: "kinde-completion.zsh"
