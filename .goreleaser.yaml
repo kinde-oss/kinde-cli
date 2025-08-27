@@ -146,11 +146,7 @@ homebrew_casks:
     homepage: https://kinde.com
     description: Kinde CLI utility
     binary: kinde
-    ids:
-      - cli
-    completions:
-      bash: "kinde-completion.bash"
-      zsh: "kinde-completion.zsh"
+
     hooks:
       post:
         install: |
