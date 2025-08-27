@@ -135,7 +135,8 @@ changelog:
       - "^test:"
 
 homebrew_casks:
-  - repository:
+  - name: kinde-cli
+    repository:
       owner: kinde-oss
       name: homebrew-kinde-cli
       token: "{{ .Env.GORELEASER_GITHUB_TOKEN }}" # This token can access the repo, but GITHUB_TOKEN cannot
@@ -145,6 +146,8 @@ homebrew_casks:
     homepage: https://kinde.com
     description: Kinde CLI utility
     binary: kinde
+    ids:
+      - cli
     completions:
       bash: "kinde-completion.bash"
       zsh: "kinde-completion.zsh"
