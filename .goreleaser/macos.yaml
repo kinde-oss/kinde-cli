@@ -18,7 +18,7 @@ builds:
       - darwin
     main: ./cmd/kinde
 checksum:
-  name_template: "{{ .ProjectName }}-checksums.txt"
+  name_template: "{{ .ProjectName }}_macos_checksums.txt"
 
 snapshot:
   version_template: "next"

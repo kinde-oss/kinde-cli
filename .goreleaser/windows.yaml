@@ -13,18 +13,40 @@ builds:
     binary: kinde
     env:
       - GO111MODULE=on
-      - CGO_ENABLED=1
-      - CC=x86_64-w64-mingw32-gcc
-      - CXX=x86_64-w64-mingw32-g++
+      - CGO_ENABLED=0
     goos:
       - windows
     main: ./cmd/kinde
 checksum:
-  name_template: "{{ .ProjectName }}-checksums.txt"
+  name_template: "{{ .ProjectName }}_windows_checksums.txt"
 
 snapshot:
   version_template: "next"
 
+
+nfpms:
+  - id: deb
+    package_name: kinde-cli
+    file_name_template: >-
+      {{ .PackageName }}_{{ .Os }}_{{ .Arch }}{{ with .Arm }}v{{ . }}{{ end }}{{ with .Mips }}_{{ . }}{{ end }}{{ if not (eq .Amd64 "v1") }}{{ .Amd64 }}{{ end }}
+    vendor: Kinde
+    homepage: https://kinde.com
+    maintainer: Kinde <support@kinde.com>
+    description: Kinde CLI utility
+    license: Apache 2.0
+    formats:
+      - deb
+  - id: rpm
+    package_name: kinde-cli
+    file_name_template: >-
+      {{ .PackageName }}_{{ .Os }}_{{ .Arch }}{{ with .Arm }}v{{ . }}{{ end }}{{ with .Mips }}_{{ . }}{{ end }}{{ if not (eq .Amd64 "v1") }}{{ .Amd64 }}{{ end }}
+    vendor: Kinde
+    homepage: https://kinde.com
+    maintainer: Kinde <support@kinde.com>
+    description: Kinde CLI utility
+    license: Apache 2.0
+    formats:
+      - rpm
 
 archives:
   - formats: tar.gz
