@@ -53,7 +53,7 @@ changelog:
 
 scoops:
   - repository:
-      owner: kinde
+      owner: kinde-oss
       name: scoop-kinde-cli
       token: "{{ .Env.GORELEASER_GITHUB_TOKEN }}" # This token can access the repo, but GITHUB_TOKEN cannot
     commit_author:
