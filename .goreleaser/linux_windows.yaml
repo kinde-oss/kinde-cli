@@ -16,6 +16,7 @@ builds:
       - CGO_ENABLED=0
     goos:
       - linux
+      - windows
     main: ./cmd/kinde
 checksum:
   name_template: "{{ .ProjectName }}-checksums.txt"
