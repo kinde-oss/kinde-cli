@@ -74,3 +74,29 @@ changelog:
     exclude:
       - "^docs:"
       - "^test:"
+
+
+homebrew_casks:
+  - name: kinde-cli
+    alternative_names:
+      - kinde-cli@{{ .Version }}
+      - kinde-cli@{{ .Major }}
+    directory: linux_casks
+    repository:
+      owner: kinde-oss
+      name: homebrew-kinde-cli
+      token: "{{ .Env.GORELEASER_GITHUB_TOKEN }}" # This token can access the repo, but GITHUB_TOKEN cannot
+    commit_author:
+      name: kinde-ci
+      email: support@kinde.com
+    homepage: https://kinde.com
+    description: Kinde CLI utility
+    binary: kinde
+
+    hooks:
+      post:
+        install: |
+          if OS.mac?
+            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/kinde"]
+          end
+    caveats: "Thank you for installing Kinde CLI, if this is your first time using the CLI, be sure to run `kinde login` first."

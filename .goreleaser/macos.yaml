@@ -107,6 +107,9 @@ changelog:
 
 homebrew_casks:
   - name: kinde-cli
+    alternative_names:
+      - kinde-cli@{{ .Version }}
+      - kinde-cli@{{ .Major }}
     repository:
       owner: kinde-oss
       name: homebrew-kinde-cli
