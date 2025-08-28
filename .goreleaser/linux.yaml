@@ -1,0 +1,76 @@
+version: 2
+
+before:
+  hooks:
+    # You may remove this if you don't use go modules.
+    - go mod tidy
+    # you may remove this if you don't need go generate
+    - go generate ./...
+
+builds:
+  - 
+    id: "cli"
+    binary: kinde
+    env:
+      - GO111MODULE=on
+      - CGO_ENABLED=0
+    goos:
+      - linux
+    main: ./cmd/kinde
+checksum:
+  name_template: "{{ .ProjectName }}-checksums.txt"
+
+snapshot:
+  version_template: "next"
+
+
+nfpms:
+  - id: deb
+    package_name: kinde-cli
+    file_name_template: >-
+      {{ .PackageName }}_{{ .Os }}_{{ .Arch }}{{ with .Arm }}v{{ . }}{{ end }}{{ with .Mips }}_{{ . }}{{ end }}{{ if not (eq .Amd64 "v1") }}{{ .Amd64 }}{{ end }}
+    vendor: Kinde
+    homepage: https://kinde.com
+    maintainer: Kinde <support@kinde.com>
+    description: Kinde CLI utility
+    license: Apache 2.0
+    formats:
+      - deb
+  - id: rpm
+    package_name: kinde-cli
+    file_name_template: >-
+      {{ .PackageName }}_{{ .Os }}_{{ .Arch }}{{ with .Arm }}v{{ . }}{{ end }}{{ with .Mips }}_{{ . }}{{ end }}{{ if not (eq .Amd64 "v1") }}{{ .Amd64 }}{{ end }}
+    vendor: Kinde
+    homepage: https://kinde.com
+    maintainer: Kinde <support@kinde.com>
+    description: Kinde CLI utility
+    license: Apache 2.0
+    formats:
+      - rpm
+
+archives:
+  - formats: tar.gz
+    files:
+      - license
+    # this name template makes the OS and Arch compatible with the results of `uname`.
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- if eq .Os "darwin"}}mac-os
+      {{- else if eq .Os "linux"}}linux
+      {{- else if eq .Os "windows"}}windows
+      {{- else }}{{- title .Os }}{{ end }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    # use zip for windows archives
+    format_overrides:
+      - goos: windows
+        formats: zip
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
