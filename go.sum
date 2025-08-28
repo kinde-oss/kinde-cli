@@ -61,8 +61,6 @@ github.com/inconshreveable/mousetrap v1.1.0 h1:wN+x4NVGpMsO7ErUn/mUI3vEoE6Jt13X2
 github.com/inconshreveable/mousetrap v1.1.0/go.mod h1:vpF70FUmC8bwa3OWnCshd2FqLfsEA9PFc4w1p2J65bw=
 github.com/jwalton/go-supportscolor v1.2.0 h1:g6Ha4u7Vm3LIsQ5wmeBpS4gazu0UP1DRDE8y6bre4H8=
 github.com/jwalton/go-supportscolor v1.2.0/go.mod h1:hFVUAZV2cWg+WFFC4v8pT2X/S2qUUBYMioBD9AINXGs=
-github.com/kinde-oss/kinde-go v0.1.1 h1:2kzvjNXbDYPoVXeF8c3Kz6ZXhDmcNdYDWZPJYO9IFlo=
-github.com/kinde-oss/kinde-go v0.1.1/go.mod h1:e2rGwxkFETGDsQvEbcOXEvJ7qVd2Sy78MYcq62wVkoM=
 github.com/kinde-oss/kinde-go v0.1.4 h1:8p8T/7HdIZZtWGKcb2PYcq7wcvZaGP+4qduMBkO25Z4=
 github.com/kinde-oss/kinde-go v0.1.4/go.mod h1:cJ929GugPuvSu1zBgOuuj6xJQp+vEAMsbdcTeetZ+Go=
 github.com/kr/pretty v0.3.1 h1:flRD4NNwYAUpkphVc1HcthR4KEIFJ65n8Mw5qdRn3LE=
