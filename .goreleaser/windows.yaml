@@ -24,30 +24,6 @@ snapshot:
   version_template: "next"
 
 
-nfpms:
-  - id: deb
-    package_name: kinde-cli
-    file_name_template: >-
-      {{ .PackageName }}_{{ .Os }}_{{ .Arch }}{{ with .Arm }}v{{ . }}{{ end }}{{ with .Mips }}_{{ . }}{{ end }}{{ if not (eq .Amd64 "v1") }}{{ .Amd64 }}{{ end }}
-    vendor: Kinde
-    homepage: https://kinde.com
-    maintainer: Kinde <support@kinde.com>
-    description: Kinde CLI utility
-    license: Apache 2.0
-    formats:
-      - deb
-  - id: rpm
-    package_name: kinde-cli
-    file_name_template: >-
-      {{ .PackageName }}_{{ .Os }}_{{ .Arch }}{{ with .Arm }}v{{ . }}{{ end }}{{ with .Mips }}_{{ . }}{{ end }}{{ if not (eq .Amd64 "v1") }}{{ .Amd64 }}{{ end }}
-    vendor: Kinde
-    homepage: https://kinde.com
-    maintainer: Kinde <support@kinde.com>
-    description: Kinde CLI utility
-    license: Apache 2.0
-    formats:
-      - rpm
-
 archives:
   - formats: tar.gz
     files:
