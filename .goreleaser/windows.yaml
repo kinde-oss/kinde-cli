@@ -50,3 +50,15 @@ changelog:
     exclude:
       - "^docs:"
       - "^test:"
+
+scoops:
+  - repository:
+      owner: kinde-oss
+      name: scoop-kinde-cli
+      token: "{{ .Env.GORELEASER_GITHUB_TOKEN }}" # This token can access the repo, but GITHUB_TOKEN cannot
+    commit_author:
+      name: kinde-ci
+      email: support@kinde.com
+    homepage: https://kinde.com
+    description: Kinde CLI utility
+    license: MIT
