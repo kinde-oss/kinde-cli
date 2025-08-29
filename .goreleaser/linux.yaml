@@ -76,6 +76,7 @@ changelog:
       - "^test:"
 
 furies:
-    account: "kinde"
+  - account: "kinde"
     ids:
       - cli
+    secret_name: FURY_TOKEN
