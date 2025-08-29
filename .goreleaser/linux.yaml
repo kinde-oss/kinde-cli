@@ -78,5 +78,6 @@ changelog:
 furies:
   - account: "kinde"
     ids:
-      - cli
+      - deb
+      - rpm
     secret_name: FURY_TOKEN
