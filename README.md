@@ -27,10 +27,21 @@ TODO:
 
 ### Installation
 
+#### macOS with Homebrew
+```bash
+brew tap kinde-oss/kinde-cli
+brew install kinde-cli
+```
+
+#### Windows with Scoop
+```bash
+scoop bucket add kinde https://github.com/kinde-oss/scoop-kinde-cli
+scoop install kinde-cli
+```
+#### Download pre-built binary
 Download a pre-built binary from [Releases](https://github.com/kinde-oss/kinde-cli/releases).
 
-Or install from source using `go`:
-
+#### Install from source using Go
 ```bash
 go install github.com/kinde-oss/kinde-cli/cmd/kinde@latest
 ```

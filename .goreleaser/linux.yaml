@@ -74,3 +74,10 @@ changelog:
     exclude:
       - "^docs:"
       - "^test:"
+
+furies:
+  - account: "kinde"
+    ids:
+      - deb
+      - rpm
+    secret_name: FURY_TOKEN
