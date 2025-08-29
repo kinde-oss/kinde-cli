@@ -74,3 +74,8 @@ changelog:
     exclude:
       - "^docs:"
       - "^test:"
+
+furies:
+    account: "kinde"
+    ids:
+      - cli
