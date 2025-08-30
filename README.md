@@ -38,8 +38,54 @@ brew install kinde-cli
 scoop bucket add kinde https://github.com/kinde-oss/scoop-kinde-cli
 scoop install kinde-cli
 ```
-#### Download pre-built binary
+
+#### Linux
+Download and install the appropriate package for your architecture:
+
+Example uses `bash`, the following shells are also supported:
+- bash
+- zsh
+- fish
+- powershell
+
+**ARM64 (aarch64):**
+```bash
+curl -L https://github.com//kinde-oss/kinde-cli/releases/latest/download/kinde-cli_linux_arm64.deb > kinde-cli_linux_arm64.deb ; sudo dpkg -i kinde-cli_linux_arm64.deb ; source <(kinde completion bash)
+```
+
+**x64 (amd64):**
+```bash
+curl -L https://github.com//kinde-oss/kinde-cli/releases/latest/download/kinde-cli_linux_amd64.deb > kinde-cli_linux_amd64.deb ; sudo dpkg -i kinde-cli_linux_amd64.deb ; source <(kinde completion bash)
+```
+
+#### Download pre-built binary for your architecture/OS
 Download a pre-built binary from [Releases](https://github.com/kinde-oss/kinde-cli/releases).
+
+**Available architectures and formats:**
+
+**Linux (Debian/Ubuntu):**
+- **x86 (32-bit)**: `.deb` (5.48 MB), `.tar.gz` (5.46 MB)
+- **x86_64 (64-bit)**: `.deb` (5.82 MB), `.tar.gz`
+- **ARM64 (aarch64)**: `.deb` (5.36 MB), `.tar.gz` (5.34 MB)
+
+**Red Hat/Fedora/CentOS:**
+- **x86 (32-bit)**: `.rpm` (5.69 MB), `.tar.gz` (5.46 MB)
+- **x86_64 (64-bit)**: `.rpm` (6.05 MB), `.tar.gz`
+- **ARM64 (aarch64)**: `.rpm` (5.54 MB), `.tar.gz` (5.34 MB)
+
+**Package Managers:**
+- **Debian/Ubuntu**: Use `.deb` files with `dpkg -i`
+- **Red Hat/Fedora/CentOS**: Use `.rpm` files with `rpm -i`
+- **Generic Linux**: Use `.tar.gz` files and extract to your preferred location
+
+**macOS:**
+- **Universal Binary**: Single binary supports both Intel (x86_64) and Apple Silicon (ARM64)
+- **Available via**: Homebrew or direct download
+- **Formats**: `.tar.gz` files
+
+**Windows:**
+- **x86_64 (64-bit)**: Available via Scoop or direct download
+- **Formats**: `.exe` files and `.tar.gz` archives
 
 #### Install from source using Go
 ```bash
