@@ -42,18 +42,15 @@ Management API scopes need to be granted to the application you are using to run
 
 	ops := map[string][]commandOperationPair[string, management_api.OperationName]{
 		"apis": {
-			{"add_application_scope", management_api.AddAPIApplicationScopeOperation},
+			{"get_api", management_api.GetAPIOperation},
 			{"add_scope", management_api.AddAPIScopeOperation},
 			{"add_apis", management_api.AddAPIsOperation},
-			{"add_logo", management_api.AddLogoOperation},
 			{"add_logout_redirect_urls", management_api.AddLogoutRedirectURLsOperation},
 			{"add_redirect_callback_urls", management_api.AddRedirectCallbackURLsOperation},
 			{"delete_api", management_api.DeleteAPIOperation},
-			{"delete_application_scope", management_api.DeleteAPIAppliationScopeOperation},
 			{"delete_scope", management_api.DeleteAPIScopeOperation},
 			{"delete_callback_urls", management_api.DeleteCallbackURLsOperation},
 			{"delete_logout_urls", management_api.DeleteLogoutURLsOperation},
-			{"get_api", management_api.GetAPIOperation},
 			{"get_scope", management_api.GetAPIScopeOperation},
 			{"get_scopes", management_api.GetAPIScopesOperation},
 			{"get_apis", management_api.GetAPIsOperation},
@@ -63,8 +60,6 @@ Management API scopes need to be granted to the application you are using to run
 			{"update_scope", management_api.UpdateAPIScopeOperation},
 			{"replace_logout_redirect_urls", management_api.ReplaceLogoutRedirectURLsOperation},
 			{"replace_redirect_callback_urls", management_api.ReplaceRedirectCallbackURLsOperation},
-			{"read_logo", management_api.ReadLogoOperation},
-			{"delete_logo", management_api.DeleteLogoOperation},
 		},
 		"api_keys": {
 			{"create", management_api.CreateApiKeyOperation},
@@ -84,6 +79,8 @@ Management API scopes need to be granted to the application you are using to run
 			{"update", management_api.UpdateApplicationOperation},
 			{"update_tokens", management_api.UpdateApplicationTokensOperation},
 			{"update_property", management_api.UpdateApplicationsPropertyOperation},
+			{"add_application_scope", management_api.AddAPIApplicationScopeOperation},
+			{"delete_application_scope", management_api.DeleteAPIAppliationScopeOperation},
 		},
 		"business": {
 			{"get", management_api.GetBusinessOperation},
@@ -197,6 +194,9 @@ Management API scopes need to be granted to the application you are using to run
 			{"update_feature_flag_override", management_api.UpdateEnvironementFeatureFlagOverrideOperation},
 			{"delete_feature_flag_override", management_api.DeleteEnvironementFeatureFlagOverrideOperation},
 			{"delete_feature_flag_overrides", management_api.DeleteEnvironementFeatureFlagOverridesOperation},
+			{"add_logo", management_api.AddLogoOperation},
+			{"read_logo", management_api.ReadLogoOperation},
+			{"delete_logo", management_api.DeleteLogoOperation},
 		},
 		"environment_variables": {
 			{"create", management_api.CreateEnvironmentVariableOperation},
@@ -459,7 +459,7 @@ func mapFlagsToInstance(t reflect.Type, flagSet *pflag.FlagSet) any {
 				case reflect.TypeOf(management_api.OptNilBool{}):
 					if flag != nil && flag.Changed {
 						if flagValue, err := flagSet.GetBool(flag.Name); err == nil {
-							set(management_api.NewOptBool(flagValue))
+							set(management_api.NewOptNilBool(flagValue))
 						}
 					}
 				case reflect.TypeOf(management_api.OptInt{}):
@@ -471,7 +471,7 @@ func mapFlagsToInstance(t reflect.Type, flagSet *pflag.FlagSet) any {
 				case reflect.TypeOf(management_api.OptNilInt{}):
 					if flag != nil && flag.Changed {
 						if flagValue, err := flagSet.GetInt(flag.Name); err == nil {
-							set(management_api.NewOptInt(flagValue))
+							set(management_api.NewOptNilInt(flagValue))
 						}
 					}
 				default:
