@@ -2,6 +2,8 @@ package config
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 
 	"github.com/kinde-oss/kinde-go/frameworks/cli"
 	"github.com/kinde-oss/kinde-go/jwt"
@@ -22,15 +24,21 @@ type (
 	}
 )
 
-func (env *Environment) getSession() (authorization_code.ISessionHooks, error) {
-	return cli.NewCliSession(fmt.Sprintf("%v_%v", CLI_NAME, env.DomainName))
+func (env *Environment) getCliSession() (authorization_code.ISessionHooks, error) {
+
+	chainFileName, err := env.keychainFileName("fff")
+	if err != nil {
+		return nil, err
+	}
+	cliSession, err := cli.NewCliSession(fmt.Sprintf("%v_%v", CLI_NAME, env.DomainName), cli.WithFileDir(chainFileName))
+	return cliSession, err
 
 }
 
 func (env *Environment) NewClientCredentialsFlow() (client_credentials.IClientCredentialsFlow, error) {
 	kindeDomain := fmt.Sprintf("https://%s", env.DomainName)
 
-	cliSession, err := env.getSession()
+	cliSession, err := env.getCliSession()
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to create session: %w", err)
@@ -63,7 +71,7 @@ func (env *Environment) NewDeviceAuthorizationFlow() (authorization_code.IDevice
 
 	kindeDomain := fmt.Sprintf("https://%s", env.DomainName)
 
-	cliSession, err := env.getSession()
+	cliSession, err := env.getCliSession()
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to create session: %w", err)
@@ -91,4 +99,25 @@ func (env *Environment) NewDeviceAuthorizationFlow() (authorization_code.IDevice
 		return nil, err
 	}
 	return deviceFlow, nil
+}
+
+func (c *Environment) keychainFileName(fileName string) (string, error) {
+	configLocation := os.Getenv("XDG_CONFIG_HOME")
+	if configLocation == "" {
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return "", err
+		}
+		configLocation = filepath.Join(home, ".config")
+	}
+	configLocation = filepath.Join(configLocation, CLI_NAME)
+
+	err := os.MkdirAll(configLocation, 0700)
+	if err != nil {
+		return "", err
+	}
+
+	configLocation = filepath.Join(configLocation, fileName)
+
+	return configLocation, nil
 }

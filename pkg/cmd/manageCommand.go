@@ -3,6 +3,11 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"io"
+	"mime"
+	"net/textproto"
+	"os"
+	"path"
 	"reflect"
 	"regexp"
 	"strings"
@@ -11,6 +16,7 @@ import (
 	visitor "github.com/kinde-oss/kinde-cli/pkg/reflectVisitor"
 	"github.com/kinde-oss/kinde-go/kinde"
 	"github.com/kinde-oss/kinde-go/kinde/management_api"
+	"github.com/ogen-go/ogen/http"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -302,6 +308,52 @@ func buildCobraCommand(ctx context.Context, op commandOperationPair[string, mana
 	return command, nil
 }
 
+func generateCommandFlags(t reflect.Type, command *cobra.Command) {
+
+	visitor.NewVisitor(t).
+		Visit(nil, func(p visitor.Walker[reflect.Type]) []visitor.Walker[reflect.Type] {
+			visits := []visitor.Walker[reflect.Type]{}
+			for i := range p.T1.NumField() {
+				field := p.T1.Field(i)
+				flagName := field.Tag.Get("json")
+
+				if flagName == "" {
+					flagName = toSnakeCase(field.Name)
+				}
+				if p.T2 != "" {
+					flagName = fmt.Sprintf("%v.%v", p.T2, flagName)
+				}
+
+				switch field.Type {
+				case reflect.TypeOf(management_api.OptNilBool{}), reflect.TypeOf(management_api.OptBool{}):
+					command.Flags().Bool(flagName, false, "")
+				case reflect.TypeOf(management_api.OptNilInt{}), reflect.TypeOf(management_api.OptInt{}):
+					command.Flags().Int(flagName, 0, "")
+				case reflect.TypeOf(management_api.OptString{}), reflect.TypeOf(management_api.OptNilString{}), reflect.TypeOf(""):
+					command.Flags().String(flagName, "", "")
+				case reflect.TypeOf(http.MultipartFile{}):
+					command.Flags().String(fmt.Sprintf("%s", flagName), "", "")
+				default:
+					resolvedFieldType := field.Type.String()
+					if field.Type.Kind() == reflect.String {
+						command.Flags().String(flagName, "", "")
+					} else if strings.HasPrefix(resolvedFieldType, "management_api.Opt") {
+						log.Trace().Msgf("%s - mapping type for field %s: %s", t.Name(), field.Name, field.Type.String())
+						var i reflect.Value
+						if p.OptionalSetter.Value != nil && p.OptionalSetter.Value.IsValid() {
+							i = p.OptionalSetter.Value.FieldByName(field.Name)
+						}
+						visits = append(visits, visitor.Walker[reflect.Type]{T1: field.Type, T2: flagName, OptionalSetter: visitor.OptSetter{Value: &i}})
+					} else {
+						log.Trace().Msgf("%s - skipping unsupported type for field %s: %s", t.Name(), field.Name, field.Type.String())
+					}
+				}
+			}
+			return visits
+		})
+
+}
+
 func callApiMethod(cmd *cobra.Command, env *config.Environment, op commandOperationPair[string, management_api.OperationName]) error {
 	log := log.Ctx(cmd.Context())
 	ctx := cmd.Context()
@@ -342,51 +394,13 @@ func callApiMethod(cmd *cobra.Command, env *config.Environment, op commandOperat
 			continue
 		}
 		resultInstance := result.Interface()
+		if error, ok := resultInstance.(error); ok {
+			return error
+		}
 		log.Info().Any("result", resultInstance).Msg("API call result")
 	}
 
 	return nil
-}
-
-func generateCommandFlags(t reflect.Type, command *cobra.Command) {
-
-	visitor.NewVisitor(t).
-		Visit(nil, func(p visitor.Walker[reflect.Type]) []visitor.Walker[reflect.Type] {
-			visits := []visitor.Walker[reflect.Type]{}
-			for i := range p.T1.NumField() {
-				field := p.T1.Field(i)
-				flagName := field.Tag.Get("json")
-
-				if flagName == "" {
-					flagName = toSnakeCase(field.Name)
-				}
-				if p.T2 != "" {
-					flagName = fmt.Sprintf("%v.%v", p.T2, flagName)
-				}
-
-				switch field.Type {
-				case reflect.TypeOf(management_api.OptNilBool{}), reflect.TypeOf(management_api.OptBool{}):
-					command.Flags().Bool(flagName, false, "")
-				case reflect.TypeOf(management_api.OptNilInt{}), reflect.TypeOf(management_api.OptInt{}):
-					command.Flags().Int(flagName, 0, "")
-				case reflect.TypeOf(management_api.OptString{}), reflect.TypeOf(management_api.OptNilString{}), reflect.TypeOf(""):
-					command.Flags().String(flagName, "", "")
-				default:
-					if strings.HasPrefix(field.Type.String(), "management_api.Opt") {
-						log.Trace().Msgf("%s - mapping type for field %s: %s", t.Name(), field.Name, field.Type.String())
-						var i reflect.Value
-						if p.OptionalSetter.Value != nil && p.OptionalSetter.Value.IsValid() {
-							i = p.OptionalSetter.Value.FieldByName(field.Name)
-						}
-						visits = append(visits, visitor.Walker[reflect.Type]{T1: field.Type, T2: flagName, OptionalSetter: visitor.OptSetter{Value: &i}})
-					} else {
-						log.Trace().Msgf("%s - skipping unsupported type for field %s: %s", t.Name(), field.Name, field.Type.String())
-					}
-				}
-			}
-			return visits
-		})
-
 }
 
 func mapFlagsToInstance(t reflect.Type, flagSet *pflag.FlagSet) any {
@@ -474,8 +488,38 @@ func mapFlagsToInstance(t reflect.Type, flagSet *pflag.FlagSet) any {
 							set(management_api.NewOptNilInt(flagValue))
 						}
 					}
+				case reflect.TypeOf(http.MultipartFile{}):
+					if flag != nil && flag.Changed {
+						if flagValue, err := flagSet.GetString(flag.Name); err == nil {
+							fileName := path.Base(flagValue)
+							mimeHeader := textproto.MIMEHeader{}
+							contentType := mime.TypeByExtension(path.Ext(fileName))
+							mimeHeader.Set("Content-Type", contentType)
+							v := http.MultipartFile{
+								Name:   fileName,
+								Header: mimeHeader,
+								File: func() io.Reader {
+									f, err := os.Open(flagValue)
+									if err != nil {
+										log.Error().Err(err).Msgf("Failed to open file: %s", flagValue)
+										return nil
+									}
+									return f
+								}(),
+							}
+
+							set(v)
+						}
+					}
 				default:
-					if strings.HasPrefix(field.Type.String(), "management_api.Opt") {
+					if field.Type.Kind() == reflect.String {
+						if flag != nil && flag.Changed {
+							if flagValue, err := flagSet.GetString(flag.Name); err == nil {
+								v := reflect.ValueOf(flagValue).Convert(field.Type).Interface() // Convert to the actual field type from string
+								set(v)
+							}
+						}
+					} else if strings.HasPrefix(field.Type.String(), "management_api.Opt") {
 						subProperty := instanceField
 						log.Trace().Msgf("%s - mapping type for field %s: %s: %s", t.Name(), field.Name, field.Type.String(), subProperty.Type().String())
 						additionalVisits = append(additionalVisits, visitor.Walker[reflect.Type]{T1: field.Type, T2: flagName, OptionalSetter: visitor.OptSetter{Value: &subProperty}})
