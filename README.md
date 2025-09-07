@@ -69,31 +69,7 @@ curl -L https://github.com//kinde-oss/kinde-cli/releases/latest/download/kinde-c
 #### Download pre-built binary for your architecture/OS
 Download a pre-built binary from [Releases](https://github.com/kinde-oss/kinde-cli/releases).
 
-**Available architectures and formats:**
-
-**Linux (Debian/Ubuntu):**
-- **x86 (32-bit)**: `.deb`, `.tar.gz`
-- **x86_64 (64-bit)**: `.deb`, `.tar.gz`
-- **ARM64 (aarch64)**: `.deb`, `.tar.gz`
-
-**Red Hat/Fedora/CentOS:**
-- **x86 (32-bit)**: `.rpm`, `.tar.gz`
-- **x86_64 (64-bit)**: `.rpm`, `.tar.gz`
-- **ARM64 (aarch64)**: `.rpm`, `.tar.gz`
-
-**Package Managers:**
-- **Debian/Ubuntu**: Use `.deb` files with `dpkg -i`
-- **Red Hat/Fedora/CentOS**: Use `.rpm` files with `rpm -i`
-- **Generic Linux**: Use `.tar.gz` files and extract to your preferred location
-
-**macOS:**
-- **Universal Binary**: Single binary supports both Intel (x86_64) and Apple Silicon (ARM64)
-- **Available via**: Homebrew or direct download
-- **Formats**: `.tar.gz` files
-
-**Windows:**
-- **x86_64 (64-bit)**: Available via Scoop or direct download
-- **Formats**: `.exe` files and `.tar.gz` archives
+**📋 Supported Architectures and Formats:** See [Installation Architectures](docs/installation-architectures.md) for comprehensive information about all supported operating systems, architectures, package formats, and installation methods.
 
 #### Install from source using Go
 ```bash
@@ -157,47 +133,31 @@ kinde help completion <bash|fish|powershell|ash>
 
 ### Management API sub-commands
 
-- api_keys
+| Subcommand | Description |
+|------------|-------------|
+| [api_keys](docs/manage-commands-reference.md#1-api-keys-management-api_keys) | Manage API keys |
+| [apis](docs/manage-commands-reference.md#2-apis-management-apis) | Manage APIs |
+| [applications](docs/manage-commands-reference.md#3-applications-management-applications) | Manage applications |
+| [billing](docs/manage-commands-reference.md#4-billing-management-billing) | Manage billing |
+| [business](docs/manage-commands-reference.md#5-business-management-business) | Manage business settings |
+| [categories](docs/manage-commands-reference.md#6-categories-management-categories) | Manage categories |
+| [connected_apps](docs/manage-commands-reference.md#7-connected-apps-management-connected_apps) | Manage connected applications |
+| [connections](docs/manage-commands-reference.md#8-connections-management-connections) | Manage connections |
+| [environment_variables](docs/manage-commands-reference.md#9-environment-variables-management-environment_variables) | Manage environment variables |
+| [environments](docs/manage-commands-reference.md#10-environments-management-environments) | Manage environments |
+| [events](docs/manage-commands-reference.md#11-events-management-events) | Manage events |
+| [feature_flags](docs/manage-commands-reference.md#12-feature-flags-management-feature_flags) | Manage feature flags |
+| [industries](docs/manage-commands-reference.md#13-industries-management-industries) | Manage industries |
+| [organizations](docs/manage-commands-reference.md#14-organizations-management-organizations) | Manage organizations |
+| [permissions](docs/manage-commands-reference.md#15-permissions-management-permissions) | Manage permissions |
+| [properties](docs/manage-commands-reference.md#16-properties-management-properties) | Manage properties |
+| [roles](docs/manage-commands-reference.md#17-roles-management-roles) | Manage roles |
+| [subscribers](docs/manage-commands-reference.md#18-subscribers-management-subscribers) | Manage subscribers |
+| [timezones](docs/manage-commands-reference.md#19-timezones-management-timezones) | Manage timezones |
+| [users](docs/subcommands/users.md) | Manage users |
+| [webhooks](docs/manage-commands-reference.md#21-webhooks-management-webhooks) | Manage webhooks |
 
-- apis
-
-- applications
-
-- billing
-
-- business
-
-- categories
-
-- connected_apps
-
-- connections
-
-- environment_variables
-
-- environments
-
-- events
-
-- feature_flags
-
-- industries
-
-- organizations
-
-- permissions
-
-- properties
-
-- roles
-
-- subscribers
-
-- timezones
-
-- [`users`](docs/subcommands/users.md)
-
-- webhooks
+**📖 Complete Reference:** See [Manage Commands Reference](docs/manage-commands-reference.md) for detailed documentation of all subcommands and their available operations.
 
 ## Configuration
 
@@ -248,6 +208,10 @@ Example:
 - CLI validates the token against public JWKS and requires internet connectivity.
 - Check your configuration file for errors.
 - Ensure your API credentials are valid. To use management API, please create an M2M application and grant it access to the management API, enable appropriate scopes to grant the specific level of access.
+- **Keychain Configuration**: You can configure keychain behavior using environment variables:
+  - `KINDE_KEYCHAIN_PASS` - Override the default keychain password
+  - `KINDE_LOG_LEVEL` - Set the logging level for the CLI
+- **Linux Keychain**: On Linux systems, the CLI uses filesystem-based keychain storage instead of system keychains. This design choice ensures compatibility with server environments and CI/CD pipelines where system keychain services may not be available or accessible.
 
 ## Contributing
 
