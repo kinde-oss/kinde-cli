@@ -6,6 +6,23 @@ The `kinde manage feature_flags` CLI provides various subcommands to manage feat
 
 Feature flags commands allow you to create, update, and manage feature flags in your Kinde environment. Feature flags enable you to control feature rollouts, A/B testing, and gradual feature releases.
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Available Commands](#available-commands)
+  - [create](#create)
+  - [delete](#delete)
+  - [update](#update)
+- [Common Usage Patterns](#common-usage-patterns)
+  - [Creating Feature Flags](#creating-feature-flags)
+  - [Managing Feature Flags](#managing-feature-flags)
+- [Feature Flag Types](#feature-flag-types)
+- [Override Levels](#override-levels)
+- [Best Practices](#best-practices)
+- [Common Use Cases](#common-use-cases)
+- [Troubleshooting](#troubleshooting)
+- [Related Commands](#related-commands)
+
 ## Available Commands
 
 ### `create`

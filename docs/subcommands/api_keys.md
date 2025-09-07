@@ -6,6 +6,23 @@ The `kinde manage api_keys` CLI provides various subcommands to manage API key o
 
 API keys are used for authentication and authorization in Kinde applications. This command group allows you to create, manage, and verify API keys for your Kinde environment.
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Available Commands](#available-commands)
+  - [create](#create)
+  - [delete](#delete)
+  - [get](#get)
+  - [get_all](#get_all)
+  - [rotate](#rotate)
+  - [verify](#verify)
+- [Common Usage Patterns](#common-usage-patterns)
+  - [Creating API Keys for Different Scopes](#creating-api-keys-for-different-scopes)
+  - [Managing API Keys](#managing-api-keys)
+- [Security Best Practices](#security-best-practices)
+- [Troubleshooting](#troubleshooting)
+- [Related Commands](#related-commands)
+
 ## Available Commands
 
 ### `create`

@@ -6,6 +6,36 @@ The `kinde manage apis` CLI provides various subcommands to manage API operation
 
 APIs in Kinde represent the backend services that your applications can access. This command group allows you to create, configure, and manage APIs, including their scopes, callback URLs, and logout redirect URLs.
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Available Commands](#available-commands)
+  - [add_apis](#add_apis)
+  - [add_logout_redirect_urls](#add_logout_redirect_urls)
+  - [add_redirect_callback_urls](#add_redirect_callback_urls)
+  - [add_scope](#add_scope)
+  - [delete_api](#delete_api)
+  - [delete_callback_urls](#delete_callback_urls)
+  - [delete_logout_urls](#delete_logout_urls)
+  - [delete_scope](#delete_scope)
+  - [get_api](#get_api)
+  - [get_apis](#get_apis)
+  - [get_callback_urls](#get_callback_urls)
+  - [get_logout_urls](#get_logout_urls)
+  - [get_scope](#get_scope)
+  - [get_scopes](#get_scopes)
+  - [replace_logout_redirect_urls](#replace_logout_redirect_urls)
+  - [replace_redirect_callback_urls](#replace_redirect_callback_urls)
+  - [update_applications](#update_applications)
+  - [update_scope](#update_scope)
+- [Common Usage Patterns](#common-usage-patterns)
+  - [Setting Up a New API](#setting-up-a-new-api)
+  - [Managing Application URLs](#managing-application-urls)
+  - [API Management](#api-management)
+- [Best Practices](#best-practices)
+- [Troubleshooting](#troubleshooting)
+- [Related Commands](#related-commands)
+
 ## Available Commands
 
 ### `add_apis`

@@ -6,6 +6,29 @@ The `kinde manage connections` CLI provides various subcommands to manage authen
 
 Connections commands allow you to manage authentication connections (like social logins, SAML, etc.) in your Kinde environment. These operations are used to configure how users can authenticate with your applications.
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Available Commands](#available-commands)
+  - [create](#create)
+  - [delete](#delete)
+  - [enable](#enable)
+  - [enable_org](#enable_org)
+  - [get](#get)
+  - [get_all](#get_all)
+  - [remove](#remove)
+  - [remove_org](#remove_org)
+  - [replace](#replace)
+  - [update](#update)
+- [Common Usage Patterns](#common-usage-patterns)
+  - [Setting Up Authentication Connections](#setting-up-authentication-connections)
+  - [Managing Connection Access](#managing-connection-access)
+  - [Connection Management](#connection-management)
+- [Connection Types](#connection-types)
+- [Best Practices](#best-practices)
+- [Troubleshooting](#troubleshooting)
+- [Related Commands](#related-commands)
+
 ## Available Commands
 
 ### `create`

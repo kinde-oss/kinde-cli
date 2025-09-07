@@ -6,6 +6,22 @@ The `kinde manage environment_variables` CLI provides various subcommands to man
 
 Environment variables commands allow you to manage configuration variables in your Kinde environment. These operations are used to store and manage application configuration, secrets, and other environment-specific settings.
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Available Commands](#available-commands)
+  - [create](#create)
+  - [delete](#delete)
+  - [get](#get)
+  - [get_all](#get_all)
+  - [update](#update)
+- [Common Usage Patterns](#common-usage-patterns)
+  - [Managing Environment Variables](#managing-environment-variables)
+- [Best Practices](#best-practices)
+- [Security Considerations](#security-considerations)
+- [Troubleshooting](#troubleshooting)
+- [Related Commands](#related-commands)
+
 ## Available Commands
 
 ### `create`

@@ -6,6 +6,18 @@ The `kinde manage business` CLI provides various subcommands to manage business 
 
 Business commands allow you to manage business settings and configuration in your Kinde environment. These operations are typically used for configuring business-level settings and preferences.
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Available Commands](#available-commands)
+  - [get](#get)
+  - [update](#update)
+- [Common Usage Patterns](#common-usage-patterns)
+  - [Managing Business Settings](#managing-business-settings)
+- [Best Practices](#best-practices)
+- [Troubleshooting](#troubleshooting)
+- [Related Commands](#related-commands)
+
 ## Available Commands
 
 ### `get`

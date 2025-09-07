@@ -6,6 +6,30 @@ The `kinde manage applications` CLI provides various subcommands to manage appli
 
 Applications in Kinde represent your client applications that integrate with Kinde for authentication and authorization. This command group allows you to create, configure, and manage applications, including their scopes, properties, and token settings.
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Available Commands](#available-commands)
+  - [add_application_scope](#add_application_scope)
+  - [create](#create)
+  - [delete](#delete)
+  - [delete_application_scope](#delete_application_scope)
+  - [get](#get)
+  - [get_all](#get_all)
+  - [get_connections](#get_connections)
+  - [get_property_values](#get_property_values)
+  - [update](#update)
+  - [update_property](#update_property)
+  - [update_tokens](#update_tokens)
+- [Common Usage Patterns](#common-usage-patterns)
+  - [Creating and Configuring a New Application](#creating-and-configuring-a-new-application)
+  - [Managing Application Scopes](#managing-application-scopes)
+  - [Application Management](#application-management)
+- [Application Types](#application-types)
+- [Token Configuration Best Practices](#token-configuration-best-practices)
+- [Troubleshooting](#troubleshooting)
+- [Related Commands](#related-commands)
+
 ## Available Commands
 
 ### `add_application_scope`

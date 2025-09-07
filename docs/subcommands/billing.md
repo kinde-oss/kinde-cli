@@ -6,6 +6,21 @@ The `kinde manage billing` CLI provides various subcommands to manage billing op
 
 Billing commands allow you to manage billing agreements, usage records, and entitlements in your Kinde environment. These operations are typically used for subscription management and usage tracking.
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Available Commands](#available-commands)
+  - [create_agreement](#create_agreement)
+  - [create_meter_usage_record](#create_meter_usage_record)
+  - [get_agreements](#get_agreements)
+  - [get_entitlements](#get_entitlements)
+- [Common Usage Patterns](#common-usage-patterns)
+  - [Managing Billing Agreements](#managing-billing-agreements)
+  - [Usage Tracking](#usage-tracking)
+- [Best Practices](#best-practices)
+- [Troubleshooting](#troubleshooting)
+- [Related Commands](#related-commands)
+
 ## Available Commands
 
 ### `create_agreement`

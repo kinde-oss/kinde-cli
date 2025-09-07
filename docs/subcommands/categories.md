@@ -6,6 +6,19 @@ The `kinde manage categories` CLI provides various subcommands to manage categor
 
 Categories commands allow you to manage categorization systems in your Kinde environment. These operations are typically used for organizing and classifying resources.
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Available Commands](#available-commands)
+  - [create](#create)
+  - [get_all](#get_all)
+  - [update](#update)
+- [Common Usage Patterns](#common-usage-patterns)
+  - [Managing Categories](#managing-categories)
+- [Best Practices](#best-practices)
+- [Troubleshooting](#troubleshooting)
+- [Related Commands](#related-commands)
+
 ## Available Commands
 
 ### `create`

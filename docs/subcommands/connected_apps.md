@@ -6,6 +6,19 @@ The `kinde manage connected_apps` CLI provides various subcommands to manage con
 
 Connected apps commands allow you to manage third-party application integrations in your Kinde environment. These operations are typically used for OAuth integrations and external service connections.
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Available Commands](#available-commands)
+  - [get_auth_url](#get_auth_url)
+  - [get_token](#get_token)
+  - [revoke_token](#revoke_token)
+- [Common Usage Patterns](#common-usage-patterns)
+  - [Managing Connected Apps](#managing-connected-apps)
+- [Best Practices](#best-practices)
+- [Troubleshooting](#troubleshooting)
+- [Related Commands](#related-commands)
+
 ## Available Commands
 
 ### `get_auth_url`

@@ -6,6 +6,46 @@ The `kinde manage users` CLI provides various subcommands to manage user operati
 
 Users commands allow you to manage user accounts, identities, authentication, and user-specific settings in your Kinde environment. These operations are used for user lifecycle management, authentication configuration, and user data management.
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Available Commands](#available-commands)
+  - [create](#create)
+  - [create_identity](#create_identity)
+  - [delete](#delete)
+  - [delete_identity](#delete_identity)
+  - [delete_sessions](#delete_sessions)
+  - [get_all](#get_all)
+  - [get_data](#get_data)
+  - [get_identities](#get_identities)
+  - [get_mfa](#get_mfa)
+  - [get_property_values](#get_property_values)
+  - [get_sessions](#get_sessions)
+  - [refresh_claims](#refresh_claims)
+  - [replace_mfa](#replace_mfa)
+  - [reset_mfa](#reset_mfa)
+  - [reset_mfa_all](#reset_mfa_all)
+  - [search](#search)
+  - [set_password](#set_password)
+  - [update](#update)
+  - [update_feature_flag_override](#update_feature_flag_override)
+  - [update_identity](#update_identity)
+  - [update_properties](#update_properties)
+  - [update_property](#update_property)
+- [Common Usage Patterns](#common-usage-patterns)
+  - [User Lifecycle Management](#user-lifecycle-management)
+  - [Identity Management](#identity-management)
+  - [User Search and Filtering](#user-search-and-filtering)
+  - [MFA Management](#mfa-management)
+  - [Session Management](#session-management)
+  - [Password Management](#password-management)
+  - [Property Management](#property-management)
+  - [Feature Flag Management](#feature-flag-management)
+- [Best Practices](#best-practices)
+- [Security Considerations](#security-considerations)
+- [Troubleshooting](#troubleshooting)
+- [Related Commands](#related-commands)
+
 ## Available Commands
 
 ### `create`

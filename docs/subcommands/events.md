@@ -6,6 +6,18 @@ The `kinde manage events` CLI provides various subcommands to manage events in K
 
 Events commands allow you to retrieve and manage events in your Kinde environment. These operations are used to access audit logs, user activities, and system events.
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Available Commands](#available-commands)
+  - [get](#get)
+  - [get_types](#get_types)
+- [Common Usage Patterns](#common-usage-patterns)
+  - [Event Management](#event-management)
+- [Best Practices](#best-practices)
+- [Troubleshooting](#troubleshooting)
+- [Related Commands](#related-commands)
+
 ## Available Commands
 
 ### `get`
