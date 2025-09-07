@@ -302,9 +302,9 @@ Manage subscribers for webhooks and notifications. Subscribers receive event not
 
 | Command | Description |
 |---------|-------------|
-| `create` | Create a new subscriber for webhook notifications |
-| `get` | Retrieve detailed information about a specific subscriber |
-| `get_all` | List all subscribers in your environment |
+| [`create`](subcommands/subscribers.md#create) | Create a new subscriber for webhook notifications |
+| [`get`](subcommands/subscribers.md#get) | Retrieve detailed information about a specific subscriber |
+| [`get_all`](subcommands/subscribers.md#get_all) | List all subscribers in your environment |
 
 **Usage:** `kinde manage subscribers [command] [options]`
 
@@ -314,7 +314,7 @@ Retrieve available timezone information for configuring user and organization se
 
 | Command | Description |
 |---------|-------------|
-| `get_all` | Retrieve all available timezones |
+| [`get_all`](subcommands/timezones.md#get_all) | Retrieve all available timezones |
 
 **Usage:** `kinde manage timezones [command] [options]`
 
@@ -355,10 +355,10 @@ Manage webhooks for receiving real-time notifications about events in your Kinde
 
 | Command | Description |
 |---------|-------------|
-| `create` | Create a new webhook endpoint for event notifications |
-| `delete` | Delete a webhook endpoint permanently |
-| `get_all` | List all webhook endpoints in your environment |
-| `update` | Update webhook endpoint settings and configuration |
+| [`create`](subcommands/webhooks.md#create) | Create a new webhook endpoint for event notifications |
+| [`delete`](subcommands/webhooks.md#delete) | Delete a webhook endpoint permanently |
+| [`get_all`](subcommands/webhooks.md#get_all) | List all webhook endpoints in your environment |
+| [`update`](subcommands/webhooks.md#update) | Update webhook endpoint settings and configuration |
 
 **Usage:** `kinde manage webhooks [command] [options]`
 
