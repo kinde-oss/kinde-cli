@@ -163,14 +163,14 @@ Manage environment-specific settings, feature flags, and branding. These operati
 
 | Command | Description |
 |---------|-------------|
-| `add_logo` | Upload and set a logo for the environment |
-| `delete_feature_flag_override` | Remove a specific feature flag override |
-| `delete_feature_flag_overrides` | Remove all feature flag overrides for the environment |
-| `delete_logo` | Remove the environment logo |
-| `get` | Retrieve environment details and configuration |
-| `get_feature_flags` | List all feature flags and their environment-level overrides |
-| `read_logo` | Retrieve the environment logo |
-| `update_feature_flag_override` | Set or update a feature flag override for the environment |
+| [`add_logo`](subcommands/environments.md#add_logo) | Upload and set a logo for the environment |
+| [`delete_feature_flag_override`](subcommands/environments.md#delete_feature_flag_override) | Remove a specific feature flag override |
+| [`delete_feature_flag_overrides`](subcommands/environments.md#delete_feature_flag_overrides) | Remove all feature flag overrides for the environment |
+| [`delete_logo`](subcommands/environments.md#delete_logo) | Remove the environment logo |
+| [`get`](subcommands/environments.md#get) | Retrieve environment details and configuration |
+| [`get_feature_flags`](subcommands/environments.md#get_feature_flags) | List all feature flags and their environment-level overrides |
+| [`read_logo`](subcommands/environments.md#read_logo) | Retrieve the environment logo |
+| [`update_feature_flag_override`](subcommands/environments.md#update_feature_flag_override) | Set or update a feature flag override for the environment |
 
 **Usage:** `kinde manage environments [command] [options]`
 
