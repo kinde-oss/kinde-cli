@@ -157,47 +157,29 @@ kinde help completion <bash|fish|powershell|ash>
 
 ### Management API sub-commands
 
-- api_keys
-
-- apis
-
-- applications
-
-- billing
-
-- business
-
-- categories
-
-- connected_apps
-
-- connections
-
-- environment_variables
-
-- environments
-
-- events
-
-- feature_flags
-
-- industries
-
-- organizations
-
-- permissions
-
-- properties
-
-- roles
-
-- subscribers
-
-- timezones
-
-- [`users`](docs/subcommands/users.md)
-
-- webhooks
+| Subcommand | Description |
+|------------|-------------|
+| api_keys | Manage API keys |
+| apis | Manage APIs |
+| applications | Manage applications |
+| billing | Manage billing |
+| business | Manage business settings |
+| categories | Manage categories |
+| connected_apps | Manage connected applications |
+| connections | Manage connections |
+| environment_variables | Manage environment variables |
+| environments | Manage environments |
+| events | Manage events |
+| feature_flags | Manage feature flags |
+| industries | Manage industries |
+| organizations | Manage organizations |
+| permissions | Manage permissions |
+| properties | Manage properties |
+| roles | Manage roles |
+| subscribers | Manage subscribers |
+| timezones | Manage timezones |
+| [users](docs/subcommands/users.md) | Manage users |
+| webhooks | Manage webhooks |
 
 ## Configuration
 
