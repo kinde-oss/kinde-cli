@@ -269,10 +269,10 @@ Manage custom properties for users, organizations, and applications. Properties 
 
 | Command | Description |
 |---------|-------------|
-| `create` | Create a new custom property with type and validation rules |
-| `delete` | Delete a custom property permanently |
-| `get_all` | List all custom properties in your environment |
-| `update` | Update property settings including type and validation rules |
+| [`create`](subcommands/properties.md#create) | Create a new custom property with type and validation rules |
+| [`delete`](subcommands/properties.md#delete) | Delete a custom property permanently |
+| [`get_all`](subcommands/properties.md#get_all) | List all custom properties in your environment |
+| [`update`](subcommands/properties.md#update) | Update property settings including type and validation rules |
 
 **Usage:** `kinde manage properties [command] [options]`
 
