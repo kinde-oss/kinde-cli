@@ -80,11 +80,6 @@ The Kinde CLI is available for multiple operating systems and architectures, pro
 - **Latest Version**: Always available for all supported architectures
 - **Checksums**: Provided for verification of download integrity
 
-### Package Managers
-- **Homebrew (macOS)**: `brew install kinde-cli`
-- **Scoop (Windows)**: `scoop install kinde-cli`
-- **APT (Linux)**: Official APT repository available
-
 ## Verification and Security
 
 ### Checksum Verification
@@ -97,19 +92,12 @@ Each release includes checksums for all architecture variants to ensure download
 
 ## Installation Recommendations
 
-### For Development
-- Use package managers (Homebrew, Scoop, APT) for easy updates
-- Prefer official repositories for automatic dependency management
-
-### For Production
-- Download specific versions from GitHub releases
-- Verify checksums before installation
-- Use .tar.gz for portable deployments
-
-### For CI/CD
-- Use .tar.gz archives for cross-platform compatibility
-- Pin to specific versions for reproducible builds
-- Verify checksums in automated pipelines
+### General Guidelines
+- Use package managers (Homebrew, Scoop, APT) for easy updates and automatic dependency management
+- Download specific versions from GitHub releases for reproducible deployments
+- Verify checksums before installation to ensure integrity and authenticity
+- Use .tar.gz archives for portable deployments and cross-platform compatibility
+- Pin to specific versions for reproducible versions and consistent environments
 
 ## Troubleshooting
 
