@@ -104,7 +104,7 @@ func (env *Environment) NewDeviceAuthorizationFlow() (authorization_code.IDevice
 
 func (c *Environment) keychainFolderName(fileName string) (string, error) {
 
-	fileName = fmt.Sprintf("kc_%s", normalizeServiceName(fileName)) 
+	fileName = fmt.Sprintf("kc_%s", normalizeServiceName(fileName))
 
 	configLocation := os.Getenv("XDG_CONFIG_HOME")
 	if configLocation == "" {
@@ -116,12 +116,17 @@ func (c *Environment) keychainFolderName(fileName string) (string, error) {
 	}
 	configLocation = filepath.Join(configLocation, CLI_NAME)
 
-	err := os.MkdirAll(configLocation, 0700)
-	if err != nil {
+	// Ensure the base CLI_NAME directory exists
+	if err := os.MkdirAll(configLocation, 0700); err != nil {
 		return "", err
 	}
 
 	configLocation = filepath.Join(configLocation, fileName)
+
+	// Ensure per‐domain dir exists too
+	if err := os.MkdirAll(configLocation, 0700); err != nil {
+		return "", err
+	}
 
 	return configLocation, nil
 }

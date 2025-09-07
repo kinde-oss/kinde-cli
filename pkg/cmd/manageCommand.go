@@ -1,13 +1,13 @@
 package cmd
 
 import (
+	"bytes"
 	"context"
 	"fmt"
-	"io"
 	"mime"
 	"net/textproto"
 	"os"
-	"path"
+	"path/filepath"
 	"reflect"
 	"regexp"
 	"strings"
@@ -491,26 +491,28 @@ func mapFlagsToInstance(t reflect.Type, flagSet *pflag.FlagSet) any {
 				case reflect.TypeOf(http.MultipartFile{}):
 					if flag != nil && flag.Changed {
 						if flagValue, err := flagSet.GetString(flag.Name); err == nil {
-							fileName := path.Base(flagValue)
+							fileName := filepath.Base(flagValue)
 							mimeHeader := textproto.MIMEHeader{}
-							contentType := mime.TypeByExtension(path.Ext(fileName))
+							contentType := mime.TypeByExtension(filepath.Ext(fileName))
+							if contentType == "" {
+								contentType = "application/octet-stream"
+							}
 							mimeHeader.Set("Content-Type", contentType)
+							data, err := os.ReadFile(flagValue)
+							if err != nil {
+								log.Error().Err(err).Msgf("Failed to read file: %s", flagValue)
+								break
+							}
 							v := http.MultipartFile{
 								Name:   fileName,
 								Header: mimeHeader,
-								File: func() io.Reader {
-									f, err := os.Open(flagValue)
-									if err != nil {
-										log.Error().Err(err).Msgf("Failed to open file: %s", flagValue)
-										return nil
-									}
-									return f
-								}(),
+								File:   bytes.NewReader(data),
 							}
 
 							set(v)
 						}
 					}
+
 				default:
 					if field.Type.Kind() == reflect.String {
 						if flag != nil && flag.Changed {
