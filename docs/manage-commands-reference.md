@@ -282,17 +282,17 @@ Manage roles that group permissions and can be assigned to users. Roles provide 
 
 | Command | Description |
 |---------|-------------|
-| `add_scope` | Add an API scope to a role |
-| `create` | Create a new role with name and description |
-| `delete` | Delete a role permanently |
-| `delete_scope` | Remove an API scope from a role |
-| `get` | Retrieve detailed information about a specific role |
-| `get_all` | List all roles in your environment |
-| `get_permissions` | List all permissions assigned to a role |
-| `get_scopes` | List all API scopes assigned to a role |
-| `remove_permission` | Remove a permission from a role |
-| `update` | Update role name or description |
-| `update_permissions` | Update the permissions assigned to a role |
+| [`add_scope`](subcommands/roles.md#add_scope) | Add an API scope to a role |
+| [`create`](subcommands/roles.md#create) | Create a new role with name and description |
+| [`delete`](subcommands/roles.md#delete) | Delete a role permanently |
+| [`delete_scope`](subcommands/roles.md#delete_scope) | Remove an API scope from a role |
+| [`get`](subcommands/roles.md#get) | Retrieve detailed information about a specific role |
+| [`get_all`](subcommands/roles.md#get_all) | List all roles in your environment |
+| [`get_permissions`](subcommands/roles.md#get_permissions) | List all permissions assigned to a role |
+| [`get_scopes`](subcommands/roles.md#get_scopes) | List all API scopes assigned to a role |
+| [`remove_permission`](subcommands/roles.md#remove_permission) | Remove a permission from a role |
+| [`update`](subcommands/roles.md#update) | Update role name or description |
+| [`update_permissions`](subcommands/roles.md#update_permissions) | Update the permissions assigned to a role |
 
 **Usage:** `kinde manage roles [command] [options]`
 
