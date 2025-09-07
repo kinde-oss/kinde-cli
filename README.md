@@ -69,31 +69,7 @@ curl -L https://github.com//kinde-oss/kinde-cli/releases/latest/download/kinde-c
 #### Download pre-built binary for your architecture/OS
 Download a pre-built binary from [Releases](https://github.com/kinde-oss/kinde-cli/releases).
 
-**Available architectures and formats:**
-
-**Linux (Debian/Ubuntu):**
-- **x86 (32-bit)**: `.deb`, `.tar.gz`
-- **x86_64 (64-bit)**: `.deb`, `.tar.gz`
-- **ARM64 (aarch64)**: `.deb`, `.tar.gz`
-
-**Red Hat/Fedora/CentOS:**
-- **x86 (32-bit)**: `.rpm`, `.tar.gz`
-- **x86_64 (64-bit)**: `.rpm`, `.tar.gz`
-- **ARM64 (aarch64)**: `.rpm`, `.tar.gz`
-
-**Package Managers:**
-- **Debian/Ubuntu**: Use `.deb` files with `dpkg -i`
-- **Red Hat/Fedora/CentOS**: Use `.rpm` files with `rpm -i`
-- **Generic Linux**: Use `.tar.gz` files and extract to your preferred location
-
-**macOS:**
-- **Universal Binary**: Single binary supports both Intel (x86_64) and Apple Silicon (ARM64)
-- **Available via**: Homebrew or direct download
-- **Formats**: `.tar.gz` files
-
-**Windows:**
-- **x86_64 (64-bit)**: Available via Scoop or direct download
-- **Formats**: `.exe` files and `.tar.gz` archives
+**📋 Supported Architectures and Formats:** See [Installation Architectures](docs/installation-architectures.md) for comprehensive information about all supported operating systems, architectures, package formats, and installation methods.
 
 #### Install from source using Go
 ```bash
