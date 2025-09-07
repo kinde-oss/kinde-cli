@@ -16,8 +16,6 @@ This is a work in progress. APIs may change without notice or be missing.
 - Secure by default. Kinde business cannot be managed via the CLI until a new M2M application is created with the management API authorized and the select scopes granted.
 
 TODO:
-- [x] Client-credentials authentication
-- [x] Management API top-level sub-commands and flags
 - [x] Online token verification
   - [ ] Offline token verification
 - [x] Support for user tokens and account API
