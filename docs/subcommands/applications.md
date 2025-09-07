@@ -6,6 +6,10 @@ The `kinde manage applications` CLI provides various subcommands to manage appli
 
 Applications in Kinde represent your client applications that integrate with Kinde for authentication and authorization. This command group allows you to create, configure, and manage applications, including their scopes, properties, and token settings.
 
+**Global Flags:**
+- `--domain value` - Kinde domain (environment) to work against
+- `-h, --help` - Show help information
+
 ## Table of Contents
 
 - [Overview](#overview)
@@ -45,10 +49,6 @@ kinde manage applications add_application_scope [flags]
 - `--apiid string` - API ID
 - `--application_id string` - Application ID
 - `--scope_id string` - Scope ID to add
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -68,10 +68,6 @@ kinde manage applications create [flags]
 - `--name string` - Name of the application
 - `--org_code string` - Organization code
 - `--type string` - Application type
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -89,10 +85,6 @@ kinde manage applications delete [flags]
 
 **Flags:**
 - `--application_id string` - Application ID to delete
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -112,10 +104,6 @@ kinde manage applications delete_application_scope [flags]
 - `--apiid string` - API ID
 - `--application_id string` - Application ID
 - `--scope_id string` - Scope ID to remove
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -133,10 +121,6 @@ kinde manage applications get [flags]
 
 **Flags:**
 - `--application_id string` - Application ID to retrieve
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -155,10 +139,6 @@ kinde manage applications get_all [flags]
 **Flags:**
 - `--next_token string` - Token for pagination
 - `--page_size int` - Number of results to return per page
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Examples:**
 ```bash
@@ -183,10 +163,6 @@ kinde manage applications get_connections [flags]
 
 **Flags:**
 - `--application_id string` - Application ID
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -204,10 +180,6 @@ kinde manage applications get_property_values [flags]
 
 **Flags:**
 - `--application_id string` - Application ID
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -229,10 +201,6 @@ kinde manage applications update [flags]
 - `--language_key string` - Language key
 - `--login_uri string` - Login URI
 - `--name string` - Application name
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -251,10 +219,6 @@ kinde manage applications update_property [flags]
 **Flags:**
 - `--application_id string` - Application ID
 - `--property_key string` - Property key to update
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -277,10 +241,6 @@ kinde manage applications update_tokens [flags]
 - `--id_token_lifetime int` - ID token lifetime in seconds
 - `--is_hasura_mapping_enabled` - Enable Hasura mapping
 - `--refresh_token_lifetime int` - Refresh token lifetime in seconds
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash

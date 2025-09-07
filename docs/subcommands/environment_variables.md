@@ -6,6 +6,10 @@ The `kinde manage environment_variables` CLI provides various subcommands to man
 
 Environment variables commands allow you to manage configuration variables in your Kinde environment. These operations are used to store and manage application configuration, secrets, and other environment-specific settings.
 
+**Global Flags:**
+- `--domain value` - Kinde domain (environment) to work against
+- `-h, --help` - Show help information
+
 ## Table of Contents
 
 - [Overview](#overview)
@@ -37,10 +41,6 @@ kinde manage environment_variables create [flags]
 - `--is_secret` - Mark the variable as secret (encrypted)
 - `--key string` - Variable key/name
 - `--value string` - Variable value
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Examples:**
 ```bash
@@ -62,10 +62,6 @@ kinde manage environment_variables delete [flags]
 
 **Flags:**
 - `--variable_id string` - Variable ID to delete
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -83,10 +79,6 @@ kinde manage environment_variables get [flags]
 
 **Flags:**
 - `--variable_id string` - Variable ID to retrieve
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -103,10 +95,6 @@ kinde manage environment_variables get_all [flags]
 ```
 
 **Flags:**
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -127,10 +115,6 @@ kinde manage environment_variables update [flags]
 - `--key string` - New variable key/name
 - `--value string` - New variable value
 - `--variable_id string` - Variable ID to update
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash

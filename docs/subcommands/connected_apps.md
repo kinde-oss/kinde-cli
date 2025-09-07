@@ -6,6 +6,10 @@ The `kinde manage connected_apps` CLI provides various subcommands to manage con
 
 Connected apps commands allow you to manage third-party application integrations in your Kinde environment. These operations are typically used for OAuth integrations and external service connections.
 
+**Global Flags:**
+- `--domain value` - Kinde domain (environment) to work against
+- `-h, --help` - Show help information
+
 ## Table of Contents
 
 - [Overview](#overview)
@@ -31,10 +35,6 @@ kinde manage connected_apps get_auth_url [flags]
 ```
 
 **Flags:**
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -51,10 +51,6 @@ kinde manage connected_apps get_token [flags]
 ```
 
 **Flags:**
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -71,10 +67,6 @@ kinde manage connected_apps revoke_token [flags]
 ```
 
 **Flags:**
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash

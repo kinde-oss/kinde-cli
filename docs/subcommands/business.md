@@ -6,6 +6,10 @@ The `kinde manage business` CLI provides various subcommands to manage business 
 
 Business commands allow you to manage business settings and configuration in your Kinde environment. These operations are typically used for configuring business-level settings and preferences.
 
+**Global Flags:**
+- `--domain value` - Kinde domain (environment) to work against
+- `-h, --help` - Show help information
+
 ## Table of Contents
 
 - [Overview](#overview)
@@ -30,10 +34,6 @@ kinde manage business get [flags]
 ```
 
 **Flags:**
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -50,10 +50,6 @@ kinde manage business update [flags]
 ```
 
 **Flags:**
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash

@@ -6,6 +6,10 @@ The `kinde manage events` CLI provides various subcommands to manage events in K
 
 Events commands allow you to retrieve and manage events in your Kinde environment. These operations are used to access audit logs, user activities, and system events.
 
+**Global Flags:**
+- `--domain value` - Kinde domain (environment) to work against
+- `-h, --help` - Show help information
+
 ## Table of Contents
 
 - [Overview](#overview)
@@ -31,10 +35,6 @@ kinde manage events get [flags]
 
 **Flags:**
 - `--event_id string` - Event ID to retrieve
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -51,10 +51,6 @@ kinde manage events get_types [flags]
 ```
 
 **Flags:**
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash

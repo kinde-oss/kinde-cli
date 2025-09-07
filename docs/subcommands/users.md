@@ -6,6 +6,10 @@ The `kinde manage users` CLI provides various subcommands to manage user operati
 
 Users commands allow you to manage user accounts, identities, authentication, and user-specific settings in your Kinde environment. These operations are used for user lifecycle management, authentication configuration, and user data management.
 
+**Global Flags:**
+- `--domain value` - Kinde domain (environment) to work against
+- `-h, --help` - Show help information
+
 ## Table of Contents
 
 - [Overview](#overview)
@@ -63,10 +67,6 @@ kinde manage users create [flags]
 - `--profile.given_name string` - User's given name
 - `--profile.picture string` - User's profile picture URL
 - `--provided_id string` - External user ID
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -87,10 +87,6 @@ kinde manage users create_identity [flags]
 - `--phone_country_id string` - Phone country ID
 - `--user_id string` - User ID
 - `--value string` - Identity value (email, phone, etc.)
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -109,10 +105,6 @@ kinde manage users delete [flags]
 **Flags:**
 - `--id string` - User ID to delete
 - `--is_delete_profile` - Delete user profile as well
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -130,10 +122,6 @@ kinde manage users delete_identity [flags]
 
 **Flags:**
 - `--identity_id string` - Identity ID to delete
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -151,10 +139,6 @@ kinde manage users delete_sessions [flags]
 
 **Flags:**
 - `--user_id string` - User ID
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -179,10 +163,6 @@ kinde manage users get_all [flags]
 - `--phone string` - Filter by user phone number
 - `--user_id string` - Filter by user ID
 - `--username string` - Filter by username
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Examples:**
 ```bash
@@ -214,10 +194,6 @@ kinde manage users get_data [flags]
 **Flags:**
 - `--expand string` - Specify related resources to expand in the response
 - `--id string` - User ID
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -237,10 +213,6 @@ kinde manage users get_identities [flags]
 - `--ending_before string` - Token for pagination (end before this identity)
 - `--starting_after string` - Token for pagination (start after this identity)
 - `--user_id string` - User ID
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -258,10 +230,6 @@ kinde manage users get_mfa [flags]
 
 **Flags:**
 - `--user_id string` - User ID
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -279,10 +247,6 @@ kinde manage users get_property_values [flags]
 
 **Flags:**
 - `--user_id string` - User ID
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -300,10 +264,6 @@ kinde manage users get_sessions [flags]
 
 **Flags:**
 - `--user_id string` - User ID
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -321,10 +281,6 @@ kinde manage users refresh_claims [flags]
 
 **Flags:**
 - `--user_id string` - User ID
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -342,10 +298,6 @@ kinde manage users replace_mfa [flags]
 
 **Flags:**
 - `--policy string` - MFA policy
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -364,10 +316,6 @@ kinde manage users reset_mfa [flags]
 **Flags:**
 - `--factor_id string` - MFA factor ID
 - `--user_id string` - User ID
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -385,10 +333,6 @@ kinde manage users reset_mfa_all [flags]
 
 **Flags:**
 - `--user_id string` - User ID (optional, for specific user)
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -410,10 +354,6 @@ kinde manage users search [flags]
 - `--page_size int` - Number of results to return per page
 - `--query string` - Search query
 - `--starting_after string` - Token for pagination (start after this user)
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -434,10 +374,6 @@ kinde manage users set_password [flags]
 - `--is_temporary_password` - Mark as temporary password
 - `--salt string` - Password salt
 - `--user_id string` - User ID
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -461,10 +397,6 @@ kinde manage users update [flags]
 - `--is_suspended` - Suspend the user
 - `--picture string` - User's profile picture URL
 - `--provided_id string` - External user ID
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -484,10 +416,6 @@ kinde manage users update_feature_flag_override [flags]
 - `--feature_flag_key string` - Feature flag key
 - `--user_id string` - User ID
 - `--value string` - Override value
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -506,10 +434,6 @@ kinde manage users update_identity [flags]
 **Flags:**
 - `--identity_id string` - Identity ID to update
 - `--is_primary` - Mark as primary identity
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -527,10 +451,6 @@ kinde manage users update_properties [flags]
 
 **Flags:**
 - `--user_id string` - User ID
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -550,10 +470,6 @@ kinde manage users update_property [flags]
 - `--property_key string` - Property key to update
 - `--user_id string` - User ID
 - `--value string` - New property value
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash

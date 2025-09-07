@@ -6,6 +6,10 @@ The `kinde manage apis` CLI provides various subcommands to manage API operation
 
 APIs in Kinde represent the backend services that your applications can access. This command group allows you to create, configure, and manage APIs, including their scopes, callback URLs, and logout redirect URLs.
 
+**Global Flags:**
+- `--domain value` - Kinde domain (environment) to work against
+- `-h, --help` - Show help information
+
 ## Table of Contents
 
 - [Overview](#overview)
@@ -50,10 +54,6 @@ kinde manage apis add_apis [flags]
 **Flags:**
 - `--audience string` - The audience identifier for the API
 - `--name string` - Name of the API
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -71,10 +71,6 @@ kinde manage apis add_logout_redirect_urls [flags]
 
 **Flags:**
 - `--app_id string` - Application ID
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -92,10 +88,6 @@ kinde manage apis add_redirect_callback_urls [flags]
 
 **Flags:**
 - `--app_id string` - Application ID
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -115,10 +107,6 @@ kinde manage apis add_scope [flags]
 - `--apiid string` - API ID
 - `--description string` - Description of the scope
 - `--key string` - Scope key/identifier
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -136,10 +124,6 @@ kinde manage apis delete_api [flags]
 
 **Flags:**
 - `--apiid string` - API ID to delete
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -158,10 +142,6 @@ kinde manage apis delete_callback_urls [flags]
 **Flags:**
 - `--app_id string` - Application ID
 - `--urls string` - URLs to delete (comma-separated)
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -180,10 +160,6 @@ kinde manage apis delete_logout_urls [flags]
 **Flags:**
 - `--app_id string` - Application ID
 - `--urls string` - URLs to delete (comma-separated)
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -202,10 +178,6 @@ kinde manage apis delete_scope [flags]
 **Flags:**
 - `--apiid string` - API ID
 - `--scope_id string` - Scope ID to delete
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -223,10 +195,6 @@ kinde manage apis get_api [flags]
 
 **Flags:**
 - `--apiid string` - API ID to retrieve
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -243,10 +211,6 @@ kinde manage apis get_apis [flags]
 ```
 
 **Flags:**
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -264,10 +228,6 @@ kinde manage apis get_callback_urls [flags]
 
 **Flags:**
 - `--app_id string` - Application ID
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -285,10 +245,6 @@ kinde manage apis get_logout_urls [flags]
 
 **Flags:**
 - `--app_id string` - Application ID
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -307,10 +263,6 @@ kinde manage apis get_scope [flags]
 **Flags:**
 - `--apiid string` - API ID
 - `--scope_id string` - Scope ID to retrieve
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -328,10 +280,6 @@ kinde manage apis get_scopes [flags]
 
 **Flags:**
 - `--apiid string` - API ID
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -349,10 +297,6 @@ kinde manage apis replace_logout_redirect_urls [flags]
 
 **Flags:**
 - `--app_id string` - Application ID
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -370,10 +314,6 @@ kinde manage apis replace_redirect_callback_urls [flags]
 
 **Flags:**
 - `--app_id string` - Application ID
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -391,10 +331,6 @@ kinde manage apis update_applications [flags]
 
 **Flags:**
 - `--apiid string` - API ID
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -414,10 +350,6 @@ kinde manage apis update_scope [flags]
 - `--apiid string` - API ID
 - `--description string` - New description for the scope
 - `--scope_id string` - Scope ID to update
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash

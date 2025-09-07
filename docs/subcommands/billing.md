@@ -6,6 +6,10 @@ The `kinde manage billing` CLI provides various subcommands to manage billing op
 
 Billing commands allow you to manage billing agreements, usage records, and entitlements in your Kinde environment. These operations are typically used for subscription management and usage tracking.
 
+**Global Flags:**
+- `--domain value` - Kinde domain (environment) to work against
+- `-h, --help` - Show help information
+
 ## Table of Contents
 
 - [Overview](#overview)
@@ -37,10 +41,6 @@ kinde manage billing create_agreement [flags]
 - `--is_invoice_now` - Invoice immediately
 - `--is_prorate` - Enable prorating
 - `--plan_code string` - Plan code for the agreement
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -57,10 +57,6 @@ kinde manage billing create_meter_usage_record [flags]
 ```
 
 **Flags:**
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -77,10 +73,6 @@ kinde manage billing get_agreements [flags]
 ```
 
 **Flags:**
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -97,10 +89,6 @@ kinde manage billing get_entitlements [flags]
 ```
 
 **Flags:**
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash

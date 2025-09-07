@@ -6,6 +6,10 @@ The `kinde manage categories` CLI provides various subcommands to manage categor
 
 Categories commands allow you to manage categorization systems in your Kinde environment. These operations are typically used for organizing and classifying resources.
 
+**Global Flags:**
+- `--domain value` - Kinde domain (environment) to work against
+- `-h, --help` - Show help information
+
 ## Table of Contents
 
 - [Overview](#overview)
@@ -31,10 +35,6 @@ kinde manage categories create [flags]
 ```
 
 **Flags:**
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -51,10 +51,6 @@ kinde manage categories get_all [flags]
 ```
 
 **Flags:**
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -71,10 +67,6 @@ kinde manage categories update [flags]
 ```
 
 **Flags:**
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash

@@ -6,6 +6,10 @@ The `kinde manage api_keys` CLI provides various subcommands to manage API key o
 
 API keys are used for authentication and authorization in Kinde applications. This command group allows you to create, manage, and verify API keys for your Kinde environment.
 
+**Global Flags:**
+- `--domain value` - Kinde domain (environment) to work against
+- `-h, --help` - Show help information
+
 ## Table of Contents
 
 - [Overview](#overview)
@@ -39,10 +43,6 @@ kinde manage api_keys create [flags]
 - `--name string` - Name for the API key
 - `--org_code string` - Organization code
 - `--user_id string` - User ID
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -60,10 +60,6 @@ kinde manage api_keys delete [flags]
 
 **Flags:**
 - `--key_id string` - ID of the API key to delete
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -81,10 +77,6 @@ kinde manage api_keys get [flags]
 
 **Flags:**
 - `--key_id string` - ID of the API key to retrieve
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -105,10 +97,6 @@ kinde manage api_keys get_all [flags]
 - `--page_size int` - Number of results to return per page
 - `--starting_after string` - Token for pagination (start after this key)
 - `--user_id string` - Filter by user ID
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Examples:**
 ```bash
@@ -136,10 +124,6 @@ kinde manage api_keys rotate [flags]
 
 **Flags:**
 - `--key_id string` - ID of the API key to rotate
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -159,10 +143,6 @@ kinde manage api_keys verify [flags]
 
 **Flags:**
 - `--api_key string` - The API key to verify
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash

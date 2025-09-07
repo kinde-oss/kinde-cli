@@ -6,6 +6,10 @@ The `kinde manage feature_flags` CLI provides various subcommands to manage feat
 
 Feature flags commands allow you to create, update, and manage feature flags in your Kinde environment. Feature flags enable you to control feature rollouts, A/B testing, and gradual feature releases.
 
+**Global Flags:**
+- `--domain value` - Kinde domain (environment) to work against
+- `-h, --help` - Show help information
+
 ## Table of Contents
 
 - [Overview](#overview)
@@ -40,10 +44,6 @@ kinde manage feature_flags create [flags]
 - `--key string` - Unique key for the feature flag
 - `--name string` - Name of the feature flag
 - `--type string` - Type of the feature flag (bool, str, int)
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Examples:**
 ```bash
@@ -68,10 +68,6 @@ kinde manage feature_flags delete [flags]
 
 **Flags:**
 - `--feature_flag_key string` - Feature flag key to delete
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -94,10 +90,6 @@ kinde manage feature_flags update [flags]
 - `--feature_flag_key string` - Feature flag key to update
 - `--name string` - New name
 - `--type string` - New type
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash

@@ -6,6 +6,10 @@ The `kinde manage connections` CLI provides various subcommands to manage authen
 
 Connections commands allow you to manage authentication connections (like social logins, SAML, etc.) in your Kinde environment. These operations are used to configure how users can authenticate with your applications.
 
+**Global Flags:**
+- `--domain value` - Kinde domain (environment) to work against
+- `-h, --help` - Show help information
+
 ## Table of Contents
 
 - [Overview](#overview)
@@ -45,10 +49,6 @@ kinde manage connections create [flags]
 - `--name string` - Name of the connection
 - `--options.type string` - Connection type
 - `--organization_code string` - Organization code
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -66,10 +66,6 @@ kinde manage connections delete [flags]
 
 **Flags:**
 - `--connection_id string` - Connection ID to delete
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -88,10 +84,6 @@ kinde manage connections enable [flags]
 **Flags:**
 - `--application_id string` - Application ID
 - `--connection_id string` - Connection ID to enable
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -110,10 +102,6 @@ kinde manage connections enable_org [flags]
 **Flags:**
 - `--connection_id string` - Connection ID to enable
 - `--organization_code string` - Organization code
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -131,10 +119,6 @@ kinde manage connections get [flags]
 
 **Flags:**
 - `--connection_id string` - Connection ID to retrieve
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -155,10 +139,6 @@ kinde manage connections get_all [flags]
 - `--home_realm_domain string` - Filter by home realm domain
 - `--page_size int` - Number of results to return per page
 - `--starting_after string` - Token for pagination (start after this connection)
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Examples:**
 ```bash
@@ -184,10 +164,6 @@ kinde manage connections remove [flags]
 **Flags:**
 - `--application_id string` - Application ID
 - `--connection_id string` - Connection ID to remove
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -206,10 +182,6 @@ kinde manage connections remove_org [flags]
 **Flags:**
 - `--connection_id string` - Connection ID to remove
 - `--organization_code string` - Organization code
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -230,10 +202,6 @@ kinde manage connections replace [flags]
 - `--display_name string` - New display name
 - `--name string` - New name
 - `--options.type string` - New connection type
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
@@ -254,10 +222,6 @@ kinde manage connections update [flags]
 - `--display_name string` - New display name
 - `--name string` - New name
 - `--options.type string` - New connection type
-- `-h, --help` - Show help information
-
-**Global Flags:**
-- `--domain value` - Kinde domain (environment) to work against
 
 **Example:**
 ```bash
