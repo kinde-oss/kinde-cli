@@ -38,6 +38,16 @@ scoop install kinde-cli
 ```
 
 #### Linux
+
+##### APT Repository (Recommended for Debian/Ubuntu)
+```bash
+curl -s https://pkg.kinde.com/apt/gpg.key | gpg --dearmor | sudo tee /usr/share/keyrings/kinde.gpg
+sudo sh -c 'echo "deb [signed-by=/usr/share/keyrings/kinde.gpg] https://pkg.kinde.com/apt/ * *" > /etc/apt/sources.list.d/kinde.list'
+sudo apt update
+sudo apt install kinde-cli
+```
+
+##### Manual Package Installation
 Download and install the appropriate package for your architecture:
 
 Example uses `bash`, the following shells are also supported:
