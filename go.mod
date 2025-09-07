@@ -4,7 +4,7 @@ go 1.24.4
 
 toolchain go1.24.5
 
-require github.com/kinde-oss/kinde-go v0.1.6
+require github.com/kinde-oss/kinde-go v0.1.7
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
