@@ -41,28 +41,40 @@
         "request": "launch",
         "mode": "auto",
         "program": "${workspaceFolder}/cmd/kinde",
-        "args": ["login", "--domain", "${input:kinde_domain}"]
+        "args": ["login", "--domain", "${input:kinde_domain}"],
+        "env": {
+            "KINDE_KEYCHAIN_PASS": "test_pass"
+        }
     },{
         "name": "kinde login (client_id)",
         "type": "go",
         "request": "launch",
         "mode": "auto",
         "program": "${workspaceFolder}/cmd/kinde",
-        "args": ["login", "--client_id", "${input:kinde_client_id}", "--client_secret", "${input:kinde_client_secret}", "--domain", "${input:kinde_domain}"]
+        "args": ["login", "--client_id", "${input:kinde_client_id}", "--client_secret", "${input:kinde_client_secret}", "--domain", "${input:kinde_domain}"],
+        "env": {
+            "KINDE_KEYCHAIN_PASS": "test_pass"
+        }
     },{
         "name": "kinde whoami",
         "type": "go",
         "request": "launch",
         "mode": "auto",
         "program": "${workspaceFolder}/cmd/kinde",
-        "args": ["whoami"]
+        "args": ["whoami"],
+        "env": {
+            "KINDE_KEYCHAIN_PASS": "test_pass"
+        }
     },{
         "name": "kinde logout",
         "type": "go",
         "request": "launch",
         "mode": "auto",
         "program": "${workspaceFolder}/cmd/kinde",
-        "args": ["logout" ]
+        "args": ["logout" ],
+        "env": {
+            "KINDE_KEYCHAIN_PASS": "test_pass"
+        }
     },{
         "name": "kinde build",
         "type": "go",
@@ -76,7 +88,10 @@
         "request": "launch",
         "mode": "auto",
         "program": "${workspaceFolder}/cmd/kinde",
-        "args": ["manage", "business", "get"]
+        "args": ["manage", "business", "get"],
+        "env": {
+            "KINDE_KEYCHAIN_PASS": "test_pass"
+        }
     },{
         "name": "kinde manage user create",
         "type": "go",
@@ -85,7 +100,8 @@
         "program": "${workspaceFolder}/cmd/kinde",
         "args": ["manage", "users", "create", "--provided_id", "test_id", "--profile.family_name", "test_user"],
         "env": {
-            "KINDE_LOG_LEVEL": "info"
+            "KINDE_LOG_LEVEL": "info",
+            "KINDE_KEYCHAIN_PASS": "test_pass"
         }
     },{
         "name": "kinde manage user get_all",
@@ -93,13 +109,30 @@
         "request": "launch",
         "mode": "auto",
         "program": "${workspaceFolder}/cmd/kinde",
-        "args": ["manage", "users", "get_all", "--page_size", "2"]
+        "args": ["manage", "users", "get_all", "--page_size", "2"],
+        "env": {
+            "KINDE_KEYCHAIN_PASS": "test_pass"
+        }
+    },{
+        "name": "kinde manage environments add_logo",
+        "type": "go",
+        "request": "launch",
+        "mode": "auto",
+        "program": "${workspaceFolder}/cmd/kinde",
+        "args": ["manage", "environments", "add_logo", "--logo", "/home/evgeny/Documents/logo.png", "--type", "dark"],
+        "env": {
+            "KINDE_LOG_LEVEL": "debug",
+            "KINDE_KEYCHAIN_PASS": "test_pass"
+        }
     },{
         "name": "kinde manage ff create",
         "type": "go",
         "request": "launch",
         "mode": "auto",
         "program": "${workspaceFolder}/cmd/kinde",
-        "args": ["manage", "feature_flags", "create", "--name", "ev flag", "--key", "ev_key1", "--allow_override_level", "env", "--type", "str"]
+        "args": ["manage", "feature_flags", "create", "--name", "ev flag", "--key", "ev_key1", "--allow_override_level", "env", "--type", "str"],
+        "env": {
+            "KINDE_KEYCHAIN_PASS": "test_pass"
+        }
     }]
 }

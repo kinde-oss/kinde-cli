@@ -16,8 +16,6 @@ This is a work in progress. APIs may change without notice or be missing.
 - Secure by default. Kinde business cannot be managed via the CLI until a new M2M application is created with the management API authorized and the select scopes granted.
 
 TODO:
-- [x] Client-credentials authentication
-- [x] Management API top-level sub-commands and flags
 - [x] Online token verification
   - [ ] Offline token verification
 - [x] Support for user tokens and account API
@@ -40,6 +38,16 @@ scoop install kinde-cli
 ```
 
 #### Linux
+
+##### APT Repository (Recommended for Debian/Ubuntu)
+```bash
+curl -s https://pkg.kinde.com/apt/gpg.key | gpg --dearmor | sudo tee /usr/share/keyrings/kinde.gpg
+sudo sh -c 'echo "deb [signed-by=/usr/share/keyrings/kinde.gpg] https://pkg.kinde.com/apt/ * *" > /etc/apt/sources.list.d/kinde.list'
+sudo apt update
+sudo apt install kinde-cli
+```
+
+##### Manual Package Installation
 Download and install the appropriate package for your architecture:
 
 Example uses `bash`, the following shells are also supported:
@@ -64,14 +72,14 @@ Download a pre-built binary from [Releases](https://github.com/kinde-oss/kinde-c
 **Available architectures and formats:**
 
 **Linux (Debian/Ubuntu):**
-- **x86 (32-bit)**: `.deb` (5.48 MB), `.tar.gz` (5.46 MB)
-- **x86_64 (64-bit)**: `.deb` (5.82 MB), `.tar.gz`
-- **ARM64 (aarch64)**: `.deb` (5.36 MB), `.tar.gz` (5.34 MB)
+- **x86 (32-bit)**: `.deb`, `.tar.gz`
+- **x86_64 (64-bit)**: `.deb`, `.tar.gz`
+- **ARM64 (aarch64)**: `.deb`, `.tar.gz`
 
 **Red Hat/Fedora/CentOS:**
-- **x86 (32-bit)**: `.rpm` (5.69 MB), `.tar.gz` (5.46 MB)
-- **x86_64 (64-bit)**: `.rpm` (6.05 MB), `.tar.gz`
-- **ARM64 (aarch64)**: `.rpm` (5.54 MB), `.tar.gz` (5.34 MB)
+- **x86 (32-bit)**: `.rpm`, `.tar.gz`
+- **x86_64 (64-bit)**: `.rpm`, `.tar.gz`
+- **ARM64 (aarch64)**: `.rpm`, `.tar.gz`
 
 **Package Managers:**
 - **Debian/Ubuntu**: Use `.deb` files with `dpkg -i`
