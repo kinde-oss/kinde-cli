@@ -203,7 +203,7 @@ Retrieve available industry classifications for categorizing your business or or
 
 | Command | Description |
 |---------|-------------|
-| `get_all` | Retrieve all available industry classifications |
+| [`get_all`](subcommands/industries.md#get_all) | Retrieve all available industry classifications |
 
 **Usage:** `kinde manage industries [command] [options]`
 
