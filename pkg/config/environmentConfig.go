@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/kinde-oss/kinde-go/frameworks/cli"
 	"github.com/kinde-oss/kinde-go/jwt"
@@ -26,7 +27,7 @@ type (
 
 func (env *Environment) getCliSession() (authorization_code.ISessionHooks, error) {
 
-	chainFileName, err := env.keychainFileName("fff")
+	chainFileName, err := env.keychainFolderName(env.DomainName)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +102,10 @@ func (env *Environment) NewDeviceAuthorizationFlow() (authorization_code.IDevice
 	return deviceFlow, nil
 }
 
-func (c *Environment) keychainFileName(fileName string) (string, error) {
+func (c *Environment) keychainFolderName(fileName string) (string, error) {
+
+	fileName = fmt.Sprintf("kc_%s", normalizeServiceName(fileName)) 
+
 	configLocation := os.Getenv("XDG_CONFIG_HOME")
 	if configLocation == "" {
 		home, err := os.UserHomeDir()
@@ -120,4 +124,13 @@ func (c *Environment) keychainFileName(fileName string) (string, error) {
 	configLocation = filepath.Join(configLocation, fileName)
 
 	return configLocation, nil
+}
+
+func normalizeServiceName(name string) string {
+	// Replace special characters and spaces that could cause issues in keychain
+	normalized := strings.ReplaceAll(name, "/", "_")
+	normalized = strings.ReplaceAll(normalized, ":", "_")
+	normalized = strings.ReplaceAll(normalized, ".", "_")
+	normalized = strings.ReplaceAll(normalized, " ", "_")
+	return normalized
 }

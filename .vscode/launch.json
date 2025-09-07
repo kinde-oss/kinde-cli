@@ -71,7 +71,10 @@
         "request": "launch",
         "mode": "auto",
         "program": "${workspaceFolder}/cmd/kinde",
-        "args": ["logout" ]
+        "args": ["logout" ],
+        "env": {
+            "KINDE_KEYCHAIN_PASS": "test_pass"
+        }
     },{
         "name": "kinde build",
         "type": "go",
