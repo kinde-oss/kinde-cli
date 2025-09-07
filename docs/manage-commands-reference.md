@@ -213,40 +213,40 @@ Manage organizations, their users, permissions, and settings. Organizations repr
 
 | Command | Description |
 |---------|-------------|
-| `add_logo` | Upload and set a logo for the organization |
-| `add_user_api_scope` | Grant API scope access to a user within the organization |
-| `add_users` | Add users to the organization |
-| `create` | Create a new organization |
-| `create_user_permission` | Create a custom permission for users in the organization |
-| `create_user_role` | Create a custom role for users in the organization |
-| `delete` | Delete an organization and all its data |
-| `delete_feature_flag_override` | Remove a specific feature flag override for the organization |
-| `delete_feature_flag_overrides` | Remove all feature flag overrides for the organization |
-| `delete_handle` | Delete the organization handle |
-| `delete_logo` | Remove the organization logo |
-| `delete_user_api_scope` | Remove API scope access from a user |
-| `delete_user_permission` | Delete a custom permission from the organization |
-| `delete_user_role` | Delete a custom role from the organization |
-| `get` | Retrieve detailed information about a specific organization |
-| `get_all` | List all organizations with pagination and filtering |
-| `get_connections` | Retrieve authentication connections available to the organization |
-| `get_feature_flags` | List feature flags and their organization-level overrides |
-| `get_property_values` | Retrieve custom property values for the organization |
-| `get_user_mfa` | Get MFA settings for users in the organization |
-| `get_user_permissions` | List permissions available to users in the organization |
-| `get_user_roles` | List roles available to users in the organization |
-| `get_users` | List all users in the organization |
-| `read_logo` | Retrieve the organization logo |
-| `remove_user` | Remove a user from the organization |
-| `replace_mfa` | Replace MFA settings for the organization |
-| `reset_user_mfa` | Reset MFA for a specific user in the organization |
-| `reset_user_mfa_all` | Reset MFA for all users in the organization |
-| `update` | Update organization settings and configuration |
-| `update_feature_flag_override` | Set or update a feature flag override for the organization |
-| `update_properties` | Update multiple custom properties for the organization |
-| `update_property` | Update a specific custom property for the organization |
-| `update_sessions` | Update session settings for the organization |
-| `update_users` | Update user settings within the organization |
+| [`add_logo`](subcommands/organizations.md#add_logo) | Upload and set a logo for the organization |
+| [`add_user_api_scope`](subcommands/organizations.md#add_user_api_scope) | Grant API scope access to a user within the organization |
+| [`add_users`](subcommands/organizations.md#add_users) | Add users to the organization |
+| [`create`](subcommands/organizations.md#create) | Create a new organization |
+| [`create_user_permission`](subcommands/organizations.md#create_user_permission) | Create a custom permission for users in the organization |
+| [`create_user_role`](subcommands/organizations.md#create_user_role) | Create a custom role for users in the organization |
+| [`delete`](subcommands/organizations.md#delete) | Delete an organization and all its data |
+| [`delete_feature_flag_override`](subcommands/organizations.md#delete_feature_flag_override) | Remove a specific feature flag override for the organization |
+| [`delete_feature_flag_overrides`](subcommands/organizations.md#delete_feature_flag_overrides) | Remove all feature flag overrides for the organization |
+| [`delete_handle`](subcommands/organizations.md#delete_handle) | Delete the organization handle |
+| [`delete_logo`](subcommands/organizations.md#delete_logo) | Remove the organization logo |
+| [`delete_user_api_scope`](subcommands/organizations.md#delete_user_api_scope) | Remove API scope access from a user |
+| [`delete_user_permission`](subcommands/organizations.md#delete_user_permission) | Delete a custom permission from the organization |
+| [`delete_user_role`](subcommands/organizations.md#delete_user_role) | Delete a custom role from the organization |
+| [`get`](subcommands/organizations.md#get) | Retrieve detailed information about a specific organization |
+| [`get_all`](subcommands/organizations.md#get_all) | List all organizations with pagination and filtering |
+| [`get_connections`](subcommands/organizations.md#get_connections) | Retrieve authentication connections available to the organization |
+| [`get_feature_flags`](subcommands/organizations.md#get_feature_flags) | List feature flags and their organization-level overrides |
+| [`get_property_values`](subcommands/organizations.md#get_property_values) | Retrieve custom property values for the organization |
+| [`get_user_mfa`](subcommands/organizations.md#get_user_mfa) | Get MFA settings for users in the organization |
+| [`get_user_permissions`](subcommands/organizations.md#get_user_permissions) | List permissions available to users in the organization |
+| [`get_user_roles`](subcommands/organizations.md#get_user_roles) | List roles available to users in the organization |
+| [`get_users`](subcommands/organizations.md#get_users) | List all users in the organization |
+| [`read_logo`](subcommands/organizations.md#read_logo) | Retrieve the organization logo |
+| [`remove_user`](subcommands/organizations.md#remove_user) | Remove a user from the organization |
+| [`replace_mfa`](subcommands/organizations.md#replace_mfa) | Replace MFA settings for the organization |
+| [`reset_user_mfa`](subcommands/organizations.md#reset_user_mfa) | Reset MFA for a specific user in the organization |
+| [`reset_user_mfa_all`](subcommands/organizations.md#reset_user_mfa_all) | Reset MFA for all users in the organization |
+| [`update`](subcommands/organizations.md#update) | Update organization settings and configuration |
+| [`update_feature_flag_override`](subcommands/organizations.md#update_feature_flag_override) | Set or update a feature flag override for the organization |
+| [`update_properties`](subcommands/organizations.md#update_properties) | Update multiple custom properties for the organization |
+| [`update_property`](subcommands/organizations.md#update_property) | Update a specific custom property for the organization |
+| [`update_sessions`](subcommands/organizations.md#update_sessions) | Update session settings for the organization |
+| [`update_users`](subcommands/organizations.md#update_users) | Update user settings within the organization |
 
 **Usage:** `kinde manage organizations [command] [options]`
 
