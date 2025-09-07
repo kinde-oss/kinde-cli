@@ -20,12 +20,12 @@ Manage API keys operations in Kinde.
 
 | Command | Description |
 |---------|-------------|
-| `create` | Manage create operation |
-| `delete` | Manage delete operation |
-| `get` | Manage get operation |
-| `get_all` | Manage get_all operation |
-| `rotate` | Manage rotate operation |
-| `verify` | Manage verify operation |
+| [`create`](subcommands/api_keys.md#create) | Create a new API key |
+| [`delete`](subcommands/api_keys.md#delete) | Delete an existing API key |
+| [`get`](subcommands/api_keys.md#get) | Retrieve details of a specific API key |
+| [`get_all`](subcommands/api_keys.md#get_all) | Retrieve all API keys with optional filtering |
+| [`rotate`](subcommands/api_keys.md#rotate) | Rotate (regenerate) an existing API key |
+| [`verify`](subcommands/api_keys.md#verify) | Verify the validity of an API key |
 
 **Usage:** `kinde manage api_keys [command] [options]`
 
@@ -35,24 +35,24 @@ Manage APIs operations in Kinde.
 
 | Command | Description |
 |---------|-------------|
-| `add_apis` | Manage add_apis operation |
-| `add_logout_redirect_urls` | Manage add_logout_redirect_urls operation |
-| `add_redirect_callback_urls` | Manage add_redirect_callback_urls operation |
-| `add_scope` | Manage add_scope operation |
-| `delete_api` | Manage delete_api operation |
-| `delete_callback_urls` | Manage delete_callback_urls operation |
-| `delete_logout_urls` | Manage delete_logout_urls operation |
-| `delete_scope` | Manage delete_scope operation |
-| `get_api` | Manage get_api operation |
-| `get_apis` | Manage get_apis operation |
-| `get_callback_urls` | Manage get_callback_urls operation |
-| `get_logout_urls` | Manage get_logout_urls operation |
-| `get_scope` | Manage get_scope operation |
-| `get_scopes` | Manage get_scopes operation |
-| `replace_logout_redirect_urls` | Manage replace_logout_redirect_urls operation |
-| `replace_redirect_callback_urls` | Manage replace_redirect_callback_urls operation |
-| `update_applications` | Manage update_applications operation |
-| `update_scope` | Manage update_scope operation |
+| [`add_apis`](subcommands/apis.md#add_apis) | Add a new API to your Kinde environment |
+| [`add_logout_redirect_urls`](subcommands/apis.md#add_logout_redirect_urls) | Add logout redirect URLs to an application |
+| [`add_redirect_callback_urls`](subcommands/apis.md#add_redirect_callback_urls) | Add redirect callback URLs to an application |
+| [`add_scope`](subcommands/apis.md#add_scope) | Add a new scope to an API |
+| [`delete_api`](subcommands/apis.md#delete_api) | Delete an API from your Kinde environment |
+| [`delete_callback_urls`](subcommands/apis.md#delete_callback_urls) | Delete callback URLs from an application |
+| [`delete_logout_urls`](subcommands/apis.md#delete_logout_urls) | Delete logout URLs from an application |
+| [`delete_scope`](subcommands/apis.md#delete_scope) | Delete a scope from an API |
+| [`get_api`](subcommands/apis.md#get_api) | Retrieve details of a specific API |
+| [`get_apis`](subcommands/apis.md#get_apis) | Retrieve all APIs in your Kinde environment |
+| [`get_callback_urls`](subcommands/apis.md#get_callback_urls) | Retrieve callback URLs for an application |
+| [`get_logout_urls`](subcommands/apis.md#get_logout_urls) | Retrieve logout URLs for an application |
+| [`get_scope`](subcommands/apis.md#get_scope) | Retrieve details of a specific scope |
+| [`get_scopes`](subcommands/apis.md#get_scopes) | Retrieve all scopes for an API |
+| [`replace_logout_redirect_urls`](subcommands/apis.md#replace_logout_redirect_urls) | Replace all logout redirect URLs for an application |
+| [`replace_redirect_callback_urls`](subcommands/apis.md#replace_redirect_callback_urls) | Replace all redirect callback URLs for an application |
+| [`update_applications`](subcommands/apis.md#update_applications) | Update applications associated with an API |
+| [`update_scope`](subcommands/apis.md#update_scope) | Update an existing scope |
 
 **Usage:** `kinde manage apis [command] [options]`
 
@@ -62,17 +62,17 @@ Manage applications operations in Kinde.
 
 | Command | Description |
 |---------|-------------|
-| `add_application_scope` | Manage add_application_scope operation |
-| `create` | Manage create operation |
-| `delete` | Manage delete operation |
-| `delete_application_scope` | Manage delete_application_scope operation |
-| `get` | Manage get operation |
-| `get_all` | Manage get_all operation |
-| `get_connections` | Manage get_connections operation |
-| `get_property_values` | Manage get_property_values operation |
-| `update` | Manage update operation |
-| `update_property` | Manage update_property operation |
-| `update_tokens` | Manage update_tokens operation |
+| [`add_application_scope`](subcommands/applications.md#add_application_scope) | Add a scope to an application |
+| [`create`](subcommands/applications.md#create) | Create a new application |
+| [`delete`](subcommands/applications.md#delete) | Delete an application |
+| [`delete_application_scope`](subcommands/applications.md#delete_application_scope) | Remove a scope from an application |
+| [`get`](subcommands/applications.md#get) | Retrieve details of a specific application |
+| [`get_all`](subcommands/applications.md#get_all) | Retrieve all applications with optional pagination |
+| [`get_connections`](subcommands/applications.md#get_connections) | Retrieve connections for an application |
+| [`get_property_values`](subcommands/applications.md#get_property_values) | Retrieve property values for an application |
+| [`update`](subcommands/applications.md#update) | Update an application's basic settings |
+| [`update_property`](subcommands/applications.md#update_property) | Update a specific property for an application |
+| [`update_tokens`](subcommands/applications.md#update_tokens) | Update token settings for an application |
 
 **Usage:** `kinde manage applications [command] [options]`
 
@@ -82,10 +82,10 @@ Manage billing operations in Kinde.
 
 | Command | Description |
 |---------|-------------|
-| `create_agreement` | Manage create_agreement operation |
-| `create_meter_usage_record` | Manage create_meter_usage_record operation |
-| `get_agreements` | Manage get_agreements operation |
-| `get_entitlements` | Manage get_entitlements operation |
+| [`create_agreement`](subcommands/billing.md#create_agreement) | Create a new billing agreement |
+| [`create_meter_usage_record`](subcommands/billing.md#create_meter_usage_record) | Create a meter usage record for billing tracking |
+| [`get_agreements`](subcommands/billing.md#get_agreements) | Retrieve billing agreements |
+| [`get_entitlements`](subcommands/billing.md#get_entitlements) | Retrieve billing entitlements |
 
 **Usage:** `kinde manage billing [command] [options]`
 
@@ -95,8 +95,8 @@ Manage business operations in Kinde.
 
 | Command | Description |
 |---------|-------------|
-| `get` | Manage get operation |
-| `update` | Manage update operation |
+| [`get`](subcommands/business.md#get) | Retrieve business settings and configuration |
+| [`update`](subcommands/business.md#update) | Update business settings and configuration |
 
 **Usage:** `kinde manage business [command] [options]`
 
@@ -106,9 +106,9 @@ Manage categories operations in Kinde.
 
 | Command | Description |
 |---------|-------------|
-| `create` | Manage create operation |
-| `get_all` | Manage get_all operation |
-| `update` | Manage update operation |
+| [`create`](subcommands/categories.md#create) | Create a new category |
+| [`get_all`](subcommands/categories.md#get_all) | Retrieve all categories |
+| [`update`](subcommands/categories.md#update) | Update an existing category |
 
 **Usage:** `kinde manage categories [command] [options]`
 
@@ -118,9 +118,9 @@ Manage connected applications operations in Kinde.
 
 | Command | Description |
 |---------|-------------|
-| `get_auth_url` | Manage get_auth_url operation |
-| `get_token` | Manage get_token operation |
-| `revoke_token` | Manage revoke_token operation |
+| [`get_auth_url`](subcommands/connected_apps.md#get_auth_url) | Get the authorization URL for a connected app |
+| [`get_token`](subcommands/connected_apps.md#get_token) | Get an access token for a connected app |
+| [`revoke_token`](subcommands/connected_apps.md#revoke_token) | Revoke an access token for a connected app |
 
 **Usage:** `kinde manage connected_apps [command] [options]`
 
@@ -130,16 +130,16 @@ Manage connections operations in Kinde.
 
 | Command | Description |
 |---------|-------------|
-| `create` | Manage create operation |
-| `delete` | Manage delete operation |
-| `enable` | Manage enable operation |
-| `enable_org` | Manage enable_org operation |
-| `get` | Manage get operation |
-| `get_all` | Manage get_all operation |
-| `remove` | Manage remove operation |
-| `remove_org` | Manage remove_org operation |
-| `replace` | Manage replace operation |
-| `update` | Manage update operation |
+| [`create`](subcommands/connections.md#create) | Create a new authentication connection |
+| [`delete`](subcommands/connections.md#delete) | Delete an authentication connection |
+| [`enable`](subcommands/connections.md#enable) | Enable a connection for an application |
+| [`enable_org`](subcommands/connections.md#enable_org) | Enable a connection for an organization |
+| [`get`](subcommands/connections.md#get) | Retrieve details of a specific connection |
+| [`get_all`](subcommands/connections.md#get_all) | Retrieve all connections with optional filtering |
+| [`remove`](subcommands/connections.md#remove) | Remove a connection from an application |
+| [`remove_org`](subcommands/connections.md#remove_org) | Remove a connection from an organization |
+| [`replace`](subcommands/connections.md#replace) | Replace connection settings |
+| [`update`](subcommands/connections.md#update) | Update connection settings |
 
 **Usage:** `kinde manage connections [command] [options]`
 
@@ -149,11 +149,11 @@ Manage environment variables operations in Kinde.
 
 | Command | Description |
 |---------|-------------|
-| `create` | Manage create operation |
-| `delete` | Manage delete operation |
-| `get` | Manage get operation |
-| `get_all` | Manage get_all operation |
-| `update` | Manage update operation |
+| [`create`](subcommands/environment_variables.md#create) | Create a new environment variable |
+| [`delete`](subcommands/environment_variables.md#delete) | Delete an environment variable |
+| [`get`](subcommands/environment_variables.md#get) | Retrieve details of a specific environment variable |
+| [`get_all`](subcommands/environment_variables.md#get_all) | Retrieve all environment variables |
+| [`update`](subcommands/environment_variables.md#update) | Update an existing environment variable |
 
 **Usage:** `kinde manage environment_variables [command] [options]`
 
@@ -180,8 +180,8 @@ Manage events operations in Kinde.
 
 | Command | Description |
 |---------|-------------|
-| `get` | Manage get operation |
-| `get_types` | Manage get_types operation |
+| [`get`](subcommands/events.md#get) | Retrieve details of a specific event |
+| [`get_types`](subcommands/events.md#get_types) | Retrieve all available event types |
 
 **Usage:** `kinde manage events [command] [options]`
 
@@ -191,9 +191,9 @@ Manage feature flags operations in Kinde.
 
 | Command | Description |
 |---------|-------------|
-| `create` | Manage create operation |
-| `delete` | Manage delete operation |
-| `update` | Manage update operation |
+| [`create`](subcommands/feature_flags.md#create) | Create a new feature flag |
+| [`delete`](subcommands/feature_flags.md#delete) | Delete a feature flag |
+| [`update`](subcommands/feature_flags.md#update) | Update an existing feature flag |
 
 **Usage:** `kinde manage feature_flags [command] [options]`
 
@@ -324,28 +324,28 @@ Manage users operations in Kinde.
 
 | Command | Description |
 |---------|-------------|
-| `create` | Manage create operation |
-| `create_identity` | Manage create_identity operation |
-| `delete` | Manage delete operation |
-| `delete_identity` | Manage delete_identity operation |
-| `delete_sessions` | Manage delete_sessions operation |
-| `get_all` | Manage get_all operation |
-| `get_data` | Manage get_data operation |
-| `get_identities` | Manage get_identities operation |
-| `get_mfa` | Manage get_mfa operation |
-| `get_property_values` | Manage get_property_values operation |
-| `get_sessions` | Manage get_sessions operation |
-| `refresh_claims` | Manage refresh_claims operation |
-| `replace_mfa` | Manage replace_mfa operation |
-| `reset_mfa` | Manage reset_mfa operation |
-| `reset_mfa_all` | Manage reset_mfa_all operation |
-| `search` | Manage search operation |
-| `set_password` | Manage set_password operation |
-| `update` | Manage update operation |
-| `update_feature_flag_override` | Manage update_feature_flag_override operation |
-| `update_identity` | Manage update_identity operation |
-| `update_properties` | Manage update_properties operation |
-| `update_property` | Manage update_property operation |
+| [`create`](subcommands/users.md#create) | Create a new user |
+| [`create_identity`](subcommands/users.md#create_identity) | Add a new identity to a user |
+| [`delete`](subcommands/users.md#delete) | Delete a user |
+| [`delete_identity`](subcommands/users.md#delete_identity) | Remove an identity from a user |
+| [`delete_sessions`](subcommands/users.md#delete_sessions) | Delete all sessions for a user |
+| [`get_all`](subcommands/users.md#get_all) | Retrieve all users with optional filtering |
+| [`get_data`](subcommands/users.md#get_data) | Get detailed data for a user |
+| [`get_identities`](subcommands/users.md#get_identities) | List all identities associated with a user |
+| [`get_mfa`](subcommands/users.md#get_mfa) | Get multi-factor authentication settings for a user |
+| [`get_property_values`](subcommands/users.md#get_property_values) | Get values of specific properties for a user |
+| [`get_sessions`](subcommands/users.md#get_sessions) | List active sessions for a user |
+| [`refresh_claims`](subcommands/users.md#refresh_claims) | Refresh authentication claims for a user |
+| [`replace_mfa`](subcommands/users.md#replace_mfa) | Replace multi-factor authentication settings for a user |
+| [`reset_mfa`](subcommands/users.md#reset_mfa) | Reset multi-factor authentication for a user |
+| [`reset_mfa_all`](subcommands/users.md#reset_mfa_all) | Reset multi-factor authentication for all users |
+| [`search`](subcommands/users.md#search) | Search for users by criteria |
+| [`set_password`](subcommands/users.md#set_password) | Set or update a user's password |
+| [`update`](subcommands/users.md#update) | Update user details |
+| [`update_feature_flag_override`](subcommands/users.md#update_feature_flag_override) | Update feature flag overrides for a user |
+| [`update_identity`](subcommands/users.md#update_identity) | Update an identity for a user |
+| [`update_properties`](subcommands/users.md#update_properties) | Update multiple properties for a user |
+| [`update_property`](subcommands/users.md#update_property) | Update a specific property for a user |
 
 **Usage:** `kinde manage users [command] [options]`
 
