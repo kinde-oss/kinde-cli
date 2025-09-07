@@ -19,6 +19,7 @@ Connected apps commands allow you to manage third-party application integrations
   - [revoke_token](#revoke_token)
 - [Common Usage Patterns](#common-usage-patterns)
   - [Managing Connected Apps](#managing-connected-apps)
+  - [Complete OAuth Flow](#complete-oauth-flow)
 - [Best Practices](#best-practices)
 - [Troubleshooting](#troubleshooting)
 - [Related Commands](#related-commands)
@@ -27,7 +28,7 @@ Connected apps commands allow you to manage third-party application integrations
 
 ### `get_auth_url`
 
-Get the authorization URL for a connected app.
+Get the authorization URL for a connected app to initiate OAuth flow.
 
 **Usage:**
 ```bash
@@ -35,15 +36,23 @@ kinde manage connected_apps get_auth_url [flags]
 ```
 
 **Flags:**
+- `--key_code_ref string` - Key code reference for the connected app
+- `--org_code string` - Organization code for the authorization
+- `--override_callback_url string` - Override the default callback URL
+- `--user_id string` - User ID for the authorization
 
 **Example:**
 ```bash
-kinde manage connected_apps get_auth_url
+# Get auth URL for a specific user and organization
+kinde manage connected_apps get_auth_url --user_id "user_123" --org_code "my-org" --key_code_ref "app_key_456"
+
+# Get auth URL with custom callback
+kinde manage connected_apps get_auth_url --key_code_ref "app_key_456" --override_callback_url "https://myapp.com/callback"
 ```
 
 ### `get_token`
 
-Get an access token for a connected app.
+Get an access token for a connected app after successful authorization.
 
 **Usage:**
 ```bash
@@ -51,15 +60,17 @@ kinde manage connected_apps get_token [flags]
 ```
 
 **Flags:**
+- `--session_id string` - Session ID from the authorization flow
 
 **Example:**
 ```bash
-kinde manage connected_apps get_token
+# Get token using session ID from authorization
+kinde manage connected_apps get_token --session_id "session_123456"
 ```
 
 ### `revoke_token`
 
-Revoke an access token for a connected app.
+Revoke an access token for a connected app to invalidate it.
 
 **Usage:**
 ```bash
@@ -67,10 +78,12 @@ kinde manage connected_apps revoke_token [flags]
 ```
 
 **Flags:**
+- `--session_id string` - Session ID associated with the token to revoke
 
 **Example:**
 ```bash
-kinde manage connected_apps revoke_token
+# Revoke token using session ID
+kinde manage connected_apps revoke_token --session_id "session_123456"
 ```
 
 ## Common Usage Patterns
@@ -79,13 +92,26 @@ kinde manage connected_apps revoke_token
 
 ```bash
 # Get authorization URL for OAuth flow
-kinde manage connected_apps get_auth_url
+kinde manage connected_apps get_auth_url --key_code_ref "app_key_456" --user_id "user_123" --org_code "my-org"
 
 # Get access token after authorization
-kinde manage connected_apps get_token
+kinde manage connected_apps get_token --session_id "session_123456"
 
 # Revoke access token when no longer needed
-kinde manage connected_apps revoke_token
+kinde manage connected_apps revoke_token --session_id "session_123456"
+```
+
+### Complete OAuth Flow
+
+```bash
+# 1. Get authorization URL for user
+kinde manage connected_apps get_auth_url --key_code_ref "app_key_456" --user_id "user_123" --org_code "my-org"
+
+# 2. After user authorizes, get the session ID and exchange for token
+kinde manage connected_apps get_token --session_id "session_123456"
+
+# 3. When done, revoke the token
+kinde manage connected_apps revoke_token --session_id "session_123456"
 ```
 
 ## Best Practices
