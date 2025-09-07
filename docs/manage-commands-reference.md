@@ -18,13 +18,14 @@ The `kinde manage` command provides access to the Kinde Management API, allowing
 
 Manage API keys operations in Kinde.
 
-**Available Commands:**
-- `create` - Manage create operation
-- `delete` - Manage delete operation
-- `get` - Manage get operation
-- `get_all` - Manage get_all operation
-- `rotate` - Manage rotate operation
-- `verify` - Manage verify operation
+| Command | Description |
+|---------|-------------|
+| `create` | Manage create operation |
+| `delete` | Manage delete operation |
+| `get` | Manage get operation |
+| `get_all` | Manage get_all operation |
+| `rotate` | Manage rotate operation |
+| `verify` | Manage verify operation |
 
 **Usage:** `kinde manage api_keys [command] [options]`
 
@@ -32,25 +33,26 @@ Manage API keys operations in Kinde.
 
 Manage APIs operations in Kinde.
 
-**Available Commands:**
-- `add_apis` - Manage add_apis operation
-- `add_logout_redirect_urls` - Manage add_logout_redirect_urls operation
-- `add_redirect_callback_urls` - Manage add_redirect_callback_urls operation
-- `add_scope` - Manage add_scope operation
-- `delete_api` - Manage delete_api operation
-- `delete_callback_urls` - Manage delete_callback_urls operation
-- `delete_logout_urls` - Manage delete_logout_urls operation
-- `delete_scope` - Manage delete_scope operation
-- `get_api` - Manage get_api operation
-- `get_apis` - Manage get_apis operation
-- `get_callback_urls` - Manage get_callback_urls operation
-- `get_logout_urls` - Manage get_logout_urls operation
-- `get_scope` - Manage get_scope operation
-- `get_scopes` - Manage get_scopes operation
-- `replace_logout_redirect_urls` - Manage replace_logout_redirect_urls operation
-- `replace_redirect_callback_urls` - Manage replace_redirect_callback_urls operation
-- `update_applications` - Manage update_applications operation
-- `update_scope` - Manage update_scope operation
+| Command | Description |
+|---------|-------------|
+| `add_apis` | Manage add_apis operation |
+| `add_logout_redirect_urls` | Manage add_logout_redirect_urls operation |
+| `add_redirect_callback_urls` | Manage add_redirect_callback_urls operation |
+| `add_scope` | Manage add_scope operation |
+| `delete_api` | Manage delete_api operation |
+| `delete_callback_urls` | Manage delete_callback_urls operation |
+| `delete_logout_urls` | Manage delete_logout_urls operation |
+| `delete_scope` | Manage delete_scope operation |
+| `get_api` | Manage get_api operation |
+| `get_apis` | Manage get_apis operation |
+| `get_callback_urls` | Manage get_callback_urls operation |
+| `get_logout_urls` | Manage get_logout_urls operation |
+| `get_scope` | Manage get_scope operation |
+| `get_scopes` | Manage get_scopes operation |
+| `replace_logout_redirect_urls` | Manage replace_logout_redirect_urls operation |
+| `replace_redirect_callback_urls` | Manage replace_redirect_callback_urls operation |
+| `update_applications` | Manage update_applications operation |
+| `update_scope` | Manage update_scope operation |
 
 **Usage:** `kinde manage apis [command] [options]`
 
@@ -58,18 +60,19 @@ Manage APIs operations in Kinde.
 
 Manage applications operations in Kinde.
 
-**Available Commands:**
-- `add_application_scope` - Manage add_application_scope operation
-- `create` - Manage create operation
-- `delete` - Manage delete operation
-- `delete_application_scope` - Manage delete_application_scope operation
-- `get` - Manage get operation
-- `get_all` - Manage get_all operation
-- `get_connections` - Manage get_connections operation
-- `get_property_values` - Manage get_property_values operation
-- `update` - Manage update operation
-- `update_property` - Manage update_property operation
-- `update_tokens` - Manage update_tokens operation
+| Command | Description |
+|---------|-------------|
+| `add_application_scope` | Manage add_application_scope operation |
+| `create` | Manage create operation |
+| `delete` | Manage delete operation |
+| `delete_application_scope` | Manage delete_application_scope operation |
+| `get` | Manage get operation |
+| `get_all` | Manage get_all operation |
+| `get_connections` | Manage get_connections operation |
+| `get_property_values` | Manage get_property_values operation |
+| `update` | Manage update operation |
+| `update_property` | Manage update_property operation |
+| `update_tokens` | Manage update_tokens operation |
 
 **Usage:** `kinde manage applications [command] [options]`
 
@@ -77,11 +80,12 @@ Manage applications operations in Kinde.
 
 Manage billing operations in Kinde.
 
-**Available Commands:**
-- `create_agreement` - Manage create_agreement operation
-- `create_meter_usage_record` - Manage create_meter_usage_record operation
-- `get_agreements` - Manage get_agreements operation
-- `get_entitlements` - Manage get_entitlements operation
+| Command | Description |
+|---------|-------------|
+| `create_agreement` | Manage create_agreement operation |
+| `create_meter_usage_record` | Manage create_meter_usage_record operation |
+| `get_agreements` | Manage get_agreements operation |
+| `get_entitlements` | Manage get_entitlements operation |
 
 **Usage:** `kinde manage billing [command] [options]`
 
@@ -89,9 +93,10 @@ Manage billing operations in Kinde.
 
 Manage business operations in Kinde.
 
-**Available Commands:**
-- `get` - Manage get operation
-- `update` - Manage update operation
+| Command | Description |
+|---------|-------------|
+| `get` | Manage get operation |
+| `update` | Manage update operation |
 
 **Usage:** `kinde manage business [command] [options]`
 
@@ -99,10 +104,11 @@ Manage business operations in Kinde.
 
 Manage categories operations in Kinde.
 
-**Available Commands:**
-- `create` - Manage create operation
-- `get_all` - Manage get_all operation
-- `update` - Manage update operation
+| Command | Description |
+|---------|-------------|
+| `create` | Manage create operation |
+| `get_all` | Manage get_all operation |
+| `update` | Manage update operation |
 
 **Usage:** `kinde manage categories [command] [options]`
 
@@ -110,10 +116,11 @@ Manage categories operations in Kinde.
 
 Manage connected applications operations in Kinde.
 
-**Available Commands:**
-- `get_auth_url` - Manage get_auth_url operation
-- `get_token` - Manage get_token operation
-- `revoke_token` - Manage revoke_token operation
+| Command | Description |
+|---------|-------------|
+| `get_auth_url` | Manage get_auth_url operation |
+| `get_token` | Manage get_token operation |
+| `revoke_token` | Manage revoke_token operation |
 
 **Usage:** `kinde manage connected_apps [command] [options]`
 
@@ -121,17 +128,18 @@ Manage connected applications operations in Kinde.
 
 Manage connections operations in Kinde.
 
-**Available Commands:**
-- `create` - Manage create operation
-- `delete` - Manage delete operation
-- `enable` - Manage enable operation
-- `enable_org` - Manage enable_org operation
-- `get` - Manage get operation
-- `get_all` - Manage get_all operation
-- `remove` - Manage remove operation
-- `remove_org` - Manage remove_org operation
-- `replace` - Manage replace operation
-- `update` - Manage update operation
+| Command | Description |
+|---------|-------------|
+| `create` | Manage create operation |
+| `delete` | Manage delete operation |
+| `enable` | Manage enable operation |
+| `enable_org` | Manage enable_org operation |
+| `get` | Manage get operation |
+| `get_all` | Manage get_all operation |
+| `remove` | Manage remove operation |
+| `remove_org` | Manage remove_org operation |
+| `replace` | Manage replace operation |
+| `update` | Manage update operation |
 
 **Usage:** `kinde manage connections [command] [options]`
 
@@ -139,12 +147,13 @@ Manage connections operations in Kinde.
 
 Manage environment variables operations in Kinde.
 
-**Available Commands:**
-- `create` - Manage create operation
-- `delete` - Manage delete operation
-- `get` - Manage get operation
-- `get_all` - Manage get_all operation
-- `update` - Manage update operation
+| Command | Description |
+|---------|-------------|
+| `create` | Manage create operation |
+| `delete` | Manage delete operation |
+| `get` | Manage get operation |
+| `get_all` | Manage get_all operation |
+| `update` | Manage update operation |
 
 **Usage:** `kinde manage environment_variables [command] [options]`
 
@@ -152,15 +161,16 @@ Manage environment variables operations in Kinde.
 
 Manage environments operations in Kinde.
 
-**Available Commands:**
-- `add_logo` - Manage add_logo operation
-- `delete_feature_flag_override` - Manage delete_feature_flag_override operation
-- `delete_feature_flag_overrides` - Manage delete_feature_flag_overrides operation
-- `delete_logo` - Manage delete_logo operation
-- `get` - Manage get operation
-- `get_feature_flags` - Manage get_feature_flags operation
-- `read_logo` - Manage read_logo operation
-- `update_feature_flag_override` - Manage update_feature_flag_override operation
+| Command | Description |
+|---------|-------------|
+| `add_logo` | Manage add_logo operation |
+| `delete_feature_flag_override` | Manage delete_feature_flag_override operation |
+| `delete_feature_flag_overrides` | Manage delete_feature_flag_overrides operation |
+| `delete_logo` | Manage delete_logo operation |
+| `get` | Manage get operation |
+| `get_feature_flags` | Manage get_feature_flags operation |
+| `read_logo` | Manage read_logo operation |
+| `update_feature_flag_override` | Manage update_feature_flag_override operation |
 
 **Usage:** `kinde manage environments [command] [options]`
 
@@ -168,9 +178,10 @@ Manage environments operations in Kinde.
 
 Manage events operations in Kinde.
 
-**Available Commands:**
-- `get` - Manage get operation
-- `get_types` - Manage get_types operation
+| Command | Description |
+|---------|-------------|
+| `get` | Manage get operation |
+| `get_types` | Manage get_types operation |
 
 **Usage:** `kinde manage events [command] [options]`
 
@@ -178,10 +189,11 @@ Manage events operations in Kinde.
 
 Manage feature flags operations in Kinde.
 
-**Available Commands:**
-- `create` - Manage create operation
-- `delete` - Manage delete operation
-- `update` - Manage update operation
+| Command | Description |
+|---------|-------------|
+| `create` | Manage create operation |
+| `delete` | Manage delete operation |
+| `update` | Manage update operation |
 
 **Usage:** `kinde manage feature_flags [command] [options]`
 
@@ -189,8 +201,9 @@ Manage feature flags operations in Kinde.
 
 Manage industries operations in Kinde.
 
-**Available Commands:**
-- `get_all` - Manage get_all operation
+| Command | Description |
+|---------|-------------|
+| `get_all` | Manage get_all operation |
 
 **Usage:** `kinde manage industries [command] [options]`
 
@@ -198,41 +211,42 @@ Manage industries operations in Kinde.
 
 Manage organizations operations in Kinde.
 
-**Available Commands:**
-- `add_logo` - Manage add_logo operation
-- `add_user_api_scope` - Manage add_user_api_scope operation
-- `add_users` - Manage add_users operation
-- `create` - Manage create operation
-- `create_user_permission` - Manage create_user_permission operation
-- `create_user_role` - Manage create_user_role operation
-- `delete` - Manage delete operation
-- `delete_feature_flag_override` - Manage delete_feature_flag_override operation
-- `delete_feature_flag_overrides` - Manage delete_feature_flag_overrides operation
-- `delete_handle` - Manage delete_handle operation
-- `delete_logo` - Manage delete_logo operation
-- `delete_user_api_scope` - Manage delete_user_api_scope operation
-- `delete_user_permission` - Manage delete_user_permission operation
-- `delete_user_role` - Manage delete_user_role operation
-- `get` - Manage get operation
-- `get_all` - Manage get_all operation
-- `get_connections` - Manage get_connections operation
-- `get_feature_flags` - Manage get_feature_flags operation
-- `get_property_values` - Manage get_property_values operation
-- `get_user_mfa` - Manage get_user_mfa operation
-- `get_user_permissions` - Manage get_user_permissions operation
-- `get_user_roles` - Manage get_user_roles operation
-- `get_users` - Manage get_users operation
-- `read_logo` - Manage read_logo operation
-- `remove_user` - Manage remove_user operation
-- `replace_mfa` - Manage replace_mfa operation
-- `reset_user_mfa` - Manage reset_user_mfa operation
-- `reset_user_mfa_all` - Manage reset_user_mfa_all operation
-- `update` - Manage update operation
-- `update_feature_flag_override` - Manage update_feature_flag_override operation
-- `update_properties` - Manage update_properties operation
-- `update_property` - Manage update_property operation
-- `update_sessions` - Manage update_sessions operation
-- `update_users` - Manage update_users operation
+| Command | Description |
+|---------|-------------|
+| `add_logo` | Manage add_logo operation |
+| `add_user_api_scope` | Manage add_user_api_scope operation |
+| `add_users` | Manage add_users operation |
+| `create` | Manage create operation |
+| `create_user_permission` | Manage create_user_permission operation |
+| `create_user_role` | Manage create_user_role operation |
+| `delete` | Manage delete operation |
+| `delete_feature_flag_override` | Manage delete_feature_flag_override operation |
+| `delete_feature_flag_overrides` | Manage delete_feature_flag_overrides operation |
+| `delete_handle` | Manage delete_handle operation |
+| `delete_logo` | Manage delete_logo operation |
+| `delete_user_api_scope` | Manage delete_user_api_scope operation |
+| `delete_user_permission` | Manage delete_user_permission operation |
+| `delete_user_role` | Manage delete_user_role operation |
+| `get` | Manage get operation |
+| `get_all` | Manage get_all operation |
+| `get_connections` | Manage get_connections operation |
+| `get_feature_flags` | Manage get_feature_flags operation |
+| `get_property_values` | Manage get_property_values operation |
+| `get_user_mfa` | Manage get_user_mfa operation |
+| `get_user_permissions` | Manage get_user_permissions operation |
+| `get_user_roles` | Manage get_user_roles operation |
+| `get_users` | Manage get_users operation |
+| `read_logo` | Manage read_logo operation |
+| `remove_user` | Manage remove_user operation |
+| `replace_mfa` | Manage replace_mfa operation |
+| `reset_user_mfa` | Manage reset_user_mfa operation |
+| `reset_user_mfa_all` | Manage reset_user_mfa_all operation |
+| `update` | Manage update operation |
+| `update_feature_flag_override` | Manage update_feature_flag_override operation |
+| `update_properties` | Manage update_properties operation |
+| `update_property` | Manage update_property operation |
+| `update_sessions` | Manage update_sessions operation |
+| `update_users` | Manage update_users operation |
 
 **Usage:** `kinde manage organizations [command] [options]`
 
@@ -240,11 +254,12 @@ Manage organizations operations in Kinde.
 
 Manage permissions operations in Kinde.
 
-**Available Commands:**
-- `create` - Manage create operation
-- `delete` - Manage delete operation
-- `get_all` - Manage get_all operation
-- `update` - Manage update operation
+| Command | Description |
+|---------|-------------|
+| `create` | Manage create operation |
+| `delete` | Manage delete operation |
+| `get_all` | Manage get_all operation |
+| `update` | Manage update operation |
 
 **Usage:** `kinde manage permissions [command] [options]`
 
@@ -252,11 +267,12 @@ Manage permissions operations in Kinde.
 
 Manage properties operations in Kinde.
 
-**Available Commands:**
-- `create` - Manage create operation
-- `delete` - Manage delete operation
-- `get_all` - Manage get_all operation
-- `update` - Manage update operation
+| Command | Description |
+|---------|-------------|
+| `create` | Manage create operation |
+| `delete` | Manage delete operation |
+| `get_all` | Manage get_all operation |
+| `update` | Manage update operation |
 
 **Usage:** `kinde manage properties [command] [options]`
 
@@ -264,18 +280,19 @@ Manage properties operations in Kinde.
 
 Manage roles operations in Kinde.
 
-**Available Commands:**
-- `add_scope` - Manage add_scope operation
-- `create` - Manage create operation
-- `delete` - Manage delete operation
-- `delete_scope` - Manage delete_scope operation
-- `get` - Manage get operation
-- `get_all` - Manage get_all operation
-- `get_permissions` - Manage get_permissions operation
-- `get_scopes` - Manage get_scopes operation
-- `remove_permission` - Manage remove_permission operation
-- `update` - Manage update operation
-- `update_permissions` - Manage update_permissions operation
+| Command | Description |
+|---------|-------------|
+| `add_scope` | Manage add_scope operation |
+| `create` | Manage create operation |
+| `delete` | Manage delete operation |
+| `delete_scope` | Manage delete_scope operation |
+| `get` | Manage get operation |
+| `get_all` | Manage get_all operation |
+| `get_permissions` | Manage get_permissions operation |
+| `get_scopes` | Manage get_scopes operation |
+| `remove_permission` | Manage remove_permission operation |
+| `update` | Manage update operation |
+| `update_permissions` | Manage update_permissions operation |
 
 **Usage:** `kinde manage roles [command] [options]`
 
@@ -283,10 +300,11 @@ Manage roles operations in Kinde.
 
 Manage subscribers operations in Kinde.
 
-**Available Commands:**
-- `create` - Manage create operation
-- `get` - Manage get operation
-- `get_all` - Manage get_all operation
+| Command | Description |
+|---------|-------------|
+| `create` | Manage create operation |
+| `get` | Manage get operation |
+| `get_all` | Manage get_all operation |
 
 **Usage:** `kinde manage subscribers [command] [options]`
 
@@ -294,8 +312,9 @@ Manage subscribers operations in Kinde.
 
 Manage timezones operations in Kinde.
 
-**Available Commands:**
-- `get_all` - Manage get_all operation
+| Command | Description |
+|---------|-------------|
+| `get_all` | Manage get_all operation |
 
 **Usage:** `kinde manage timezones [command] [options]`
 
@@ -303,29 +322,30 @@ Manage timezones operations in Kinde.
 
 Manage users operations in Kinde.
 
-**Available Commands:**
-- `create` - Manage create operation
-- `create_identity` - Manage create_identity operation
-- `delete` - Manage delete operation
-- `delete_identity` - Manage delete_identity operation
-- `delete_sessions` - Manage delete_sessions operation
-- `get_all` - Manage get_all operation
-- `get_data` - Manage get_data operation
-- `get_identities` - Manage get_identities operation
-- `get_mfa` - Manage get_mfa operation
-- `get_property_values` - Manage get_property_values operation
-- `get_sessions` - Manage get_sessions operation
-- `refresh_claims` - Manage refresh_claims operation
-- `replace_mfa` - Manage replace_mfa operation
-- `reset_mfa` - Manage reset_mfa operation
-- `reset_mfa_all` - Manage reset_mfa_all operation
-- `search` - Manage search operation
-- `set_password` - Manage set_password operation
-- `update` - Manage update operation
-- `update_feature_flag_override` - Manage update_feature_flag_override operation
-- `update_identity` - Manage update_identity operation
-- `update_properties` - Manage update_properties operation
-- `update_property` - Manage update_property operation
+| Command | Description |
+|---------|-------------|
+| `create` | Manage create operation |
+| `create_identity` | Manage create_identity operation |
+| `delete` | Manage delete operation |
+| `delete_identity` | Manage delete_identity operation |
+| `delete_sessions` | Manage delete_sessions operation |
+| `get_all` | Manage get_all operation |
+| `get_data` | Manage get_data operation |
+| `get_identities` | Manage get_identities operation |
+| `get_mfa` | Manage get_mfa operation |
+| `get_property_values` | Manage get_property_values operation |
+| `get_sessions` | Manage get_sessions operation |
+| `refresh_claims` | Manage refresh_claims operation |
+| `replace_mfa` | Manage replace_mfa operation |
+| `reset_mfa` | Manage reset_mfa operation |
+| `reset_mfa_all` | Manage reset_mfa_all operation |
+| `search` | Manage search operation |
+| `set_password` | Manage set_password operation |
+| `update` | Manage update operation |
+| `update_feature_flag_override` | Manage update_feature_flag_override operation |
+| `update_identity` | Manage update_identity operation |
+| `update_properties` | Manage update_properties operation |
+| `update_property` | Manage update_property operation |
 
 **Usage:** `kinde manage users [command] [options]`
 
@@ -333,11 +353,12 @@ Manage users operations in Kinde.
 
 Manage webhooks operations in Kinde.
 
-**Available Commands:**
-- `create` - Manage create operation
-- `delete` - Manage delete operation
-- `get_all` - Manage get_all operation
-- `update` - Manage update operation
+| Command | Description |
+|---------|-------------|
+| `create` | Manage create operation |
+| `delete` | Manage delete operation |
+| `get_all` | Manage get_all operation |
+| `update` | Manage update operation |
 
 **Usage:** `kinde manage webhooks [command] [options]`
 
