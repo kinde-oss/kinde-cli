@@ -256,10 +256,10 @@ Manage permissions that define what actions users and applications can perform. 
 
 | Command | Description |
 |---------|-------------|
-| `create` | Create a new permission with name and description |
-| `delete` | Delete a permission permanently |
-| `get_all` | List all permissions in your environment |
-| `update` | Update permission name or description |
+| [`create`](subcommands/permissions.md#create) | Create a new permission with name and description |
+| [`delete`](subcommands/permissions.md#delete) | Delete a permission permanently |
+| [`get_all`](subcommands/permissions.md#get_all) | List all permissions in your environment |
+| [`update`](subcommands/permissions.md#update) | Update permission name or description |
 
 **Usage:** `kinde manage permissions [command] [options]`
 
