@@ -64,14 +64,14 @@ Download a pre-built binary from [Releases](https://github.com/kinde-oss/kinde-c
 **Available architectures and formats:**
 
 **Linux (Debian/Ubuntu):**
-- **x86 (32-bit)**: `.deb` (5.48 MB), `.tar.gz` (5.46 MB)
-- **x86_64 (64-bit)**: `.deb` (5.82 MB), `.tar.gz`
-- **ARM64 (aarch64)**: `.deb` (5.36 MB), `.tar.gz` (5.34 MB)
+- **x86 (32-bit)**: `.deb`, `.tar.gz`
+- **x86_64 (64-bit)**: `.deb`, `.tar.gz`
+- **ARM64 (aarch64)**: `.deb`, `.tar.gz`
 
 **Red Hat/Fedora/CentOS:**
-- **x86 (32-bit)**: `.rpm` (5.69 MB), `.tar.gz` (5.46 MB)
-- **x86_64 (64-bit)**: `.rpm` (6.05 MB), `.tar.gz`
-- **ARM64 (aarch64)**: `.rpm` (5.54 MB), `.tar.gz` (5.34 MB)
+- **x86 (32-bit)**: `.rpm`, `.tar.gz`
+- **x86_64 (64-bit)**: `.rpm`, `.tar.gz`
+- **ARM64 (aarch64)**: `.rpm`, `.tar.gz`
 
 **Package Managers:**
 - **Debian/Ubuntu**: Use `.deb` files with `dpkg -i`
