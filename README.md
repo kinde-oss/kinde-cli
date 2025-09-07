@@ -208,6 +208,10 @@ Example:
 - CLI validates the token against public JWKS and requires internet connectivity.
 - Check your configuration file for errors.
 - Ensure your API credentials are valid. To use management API, please create an M2M application and grant it access to the management API, enable appropriate scopes to grant the specific level of access.
+- **Keychain Configuration**: You can configure keychain behavior using environment variables:
+  - `KINDE_KEYCHAIN_PASS` - Override the default keychain password
+  - `KINDE_LOG_LEVEL` - Set the logging level for the CLI
+- **Linux Keychain**: On Linux systems, the CLI uses filesystem-based keychain storage instead of system keychains. This design choice ensures compatibility with server environments and CI/CD pipelines where system keychain services may not be available or accessible.
 
 ## Contributing
 
