@@ -25,7 +25,7 @@ type (
 	}
 )
 
-func (env *Environment) getCliSession() (authorization_code.ISessionHooks, error) {
+func (env *Environment) getCliSession() (cli.ICliSession, error) {
 
 	chainFileName, err := env.keychainFolderName(env.DomainName)
 	if err != nil {
@@ -45,6 +45,12 @@ func (env *Environment) NewClientCredentialsFlow() (client_credentials.IClientCr
 		return nil, fmt.Errorf("failed to create session: %w", err)
 	}
 
+	// Try to get client secret from session first, fallback to config if not found
+	clientSecret := env.ClientSecret
+	if secretFromSession, err := env.GetClientSecretFromSession(); err == nil && secretFromSession != "" {
+		clientSecret = secretFromSession
+	}
+
 	opts := []client_credentials.Option{
 		client_credentials.WithSessionHooks(cliSession),
 		client_credentials.WithAudience(fmt.Sprintf("%s/api", kindeDomain)),
@@ -58,7 +64,7 @@ func (env *Environment) NewClientCredentialsFlow() (client_credentials.IClientCr
 	deviceFlow, err := client_credentials.NewClientCredentialsFlow(
 		kindeDomain,
 		env.ClientID,
-		env.ClientSecret,
+		clientSecret,
 		opts...,
 	)
 	if err != nil {
@@ -138,4 +144,62 @@ func normalizeServiceName(name string) string {
 	normalized = strings.ReplaceAll(normalized, ".", "_")
 	normalized = strings.ReplaceAll(normalized, " ", "_")
 	return normalized
+}
+
+// RedactSecret returns a redacted version of the secret for display purposes
+func RedactSecret(secret string) string {
+	if secret == "" {
+		return ""
+	}
+	if len(secret) <= 8 {
+		return "****"
+	}
+	return secret[:4] + "****" + secret[len(secret)-4:]
+}
+
+// StoreClientSecretInSession stores the client secret in the CLI session
+func (env *Environment) StoreClientSecretInSession(secret string) error {
+	cliSession, err := env.getCliSession()
+	if err != nil {
+		return fmt.Errorf("failed to get CLI session: %w", err)
+	}
+
+	// Store the secret in the session using a key
+	err = cliSession.SetKey("client_secret", []byte(secret))
+	if err != nil {
+		return fmt.Errorf("failed to store client secret in session: %w", err)
+	}
+
+	return nil
+}
+
+// GetClientSecretFromSession retrieves the client secret from the CLI session
+func (env *Environment) GetClientSecretFromSession() (string, error) {
+	cliSession, err := env.getCliSession()
+	if err != nil {
+		return "", fmt.Errorf("failed to get CLI session: %w", err)
+	}
+
+	secretBytes, err := cliSession.GetKey("client_secret")
+	if err != nil {
+		return "", fmt.Errorf("failed to retrieve client secret from session: %w", err)
+	}
+
+	return string(secretBytes), nil
+}
+
+// ClearClientSecretFromSession removes the client secret from the CLI session
+func (env *Environment) ClearClientSecretFromSession() error {
+	cliSession, err := env.getCliSession()
+	if err != nil {
+		return fmt.Errorf("failed to get CLI session: %w", err)
+	}
+
+	// Try to remove the secret from the session using DeleteKey
+	err = cliSession.DeleteKey("client_secret")
+	if err != nil {
+		return fmt.Errorf("failed to remove client secret from session: %w", err)
+	}
+
+	return nil
 }

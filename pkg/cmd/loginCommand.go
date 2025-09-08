@@ -44,9 +44,9 @@ func newLoginCmd() *loginCmd {
 func (c *loginCmd) runLogin(cmd *cobra.Command, args []string) error {
 
 	log := log.Ctx(cmd.Context())
-	config := config.FromContext[config.Config](cmd.Context())
+	cfg := config.FromContext[config.Config](cmd.Context())
 
-	env := config.GetEnvironment()
+	env := cfg.GetEnvironment()
 
 	if env == nil {
 		return fmt.Errorf("no environment configured. Please specify --domain")
@@ -58,6 +58,18 @@ func (c *loginCmd) runLogin(cmd *cobra.Command, args []string) error {
 
 	if env.ClientSecret != "" {
 		log.Debug().Str("client_id", env.ClientID).Msg("Using client credentials flow")
+
+		// Store the client secret in the session
+		if err := env.StoreClientSecretInSession(env.ClientSecret); err != nil {
+			return fmt.Errorf("failed to store client secret in session: %w", err)
+		}
+
+		// Redact the secret in the config for user reference
+		redactedSecret := config.RedactSecret(env.ClientSecret)
+		cfg.SetEnvironment(func(e *config.Environment) {
+			e.ClientSecret = redactedSecret
+		})
+
 		clientCredentialsFlow, err := env.NewClientCredentialsFlow()
 		if err != nil {
 			return err
