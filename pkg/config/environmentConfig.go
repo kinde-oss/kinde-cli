@@ -25,7 +25,7 @@ type (
 	}
 )
 
-func (env *Environment) getCliSession() (authorization_code.ISessionHooks, error) {
+func (env *Environment) getCliSession() (cli.ICliSession, error) {
 
 	chainFileName, err := env.keychainFolderName(env.DomainName)
 	if err != nil {
