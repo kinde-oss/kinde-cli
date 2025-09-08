@@ -121,7 +121,8 @@
         "program": "${workspaceFolder}/cmd/kinde",
         "args": ["manage", "environments", "add_logo", "--logo", "/home/evgeny/Documents/logo.png", "--type", "dark"],
         "env": {
-            "KINDE_LOG_LEVEL": "debug",
+            "KINDE_LOG_LEVEL": "info",
+            "KINDE_STRUCTURED_LOG": "false",
             "KINDE_KEYCHAIN_PASS": "test_pass"
         }
     },{

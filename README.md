@@ -209,8 +209,9 @@ Example:
 - Check your configuration file for errors.
 - Ensure your API credentials are valid. To use management API, please create an M2M application and grant it access to the management API, enable appropriate scopes to grant the specific level of access.
 - **Keychain Configuration**: You can configure keychain behavior using environment variables:
-  - `KINDE_KEYCHAIN_PASS` - Override the default keychain password
+  - `KINDE_KEYCHAIN_PASS` - Override the default keychain password when user interaction is not possible
   - `KINDE_LOG_LEVEL` - Set the logging level for the CLI
+  - `KINDE_STRUCTURED_LOG` - Enable JSON-only output for CI/CD or automated processing (default: `false`, set to `true` to enable)
 - **Linux Keychain**: On Linux systems, the CLI uses filesystem-based keychain storage instead of system keychains. This design choice ensures compatibility with server environments and CI/CD pipelines where system keychain services may not be available or accessible.
 
 ## Contributing
