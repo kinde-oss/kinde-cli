@@ -187,3 +187,19 @@ func (env *Environment) GetClientSecretFromSession() (string, error) {
 
 	return string(secretBytes), nil
 }
+
+// ClearClientSecretFromSession removes the client secret from the CLI session
+func (env *Environment) ClearClientSecretFromSession() error {
+	cliSession, err := env.getCliSession()
+	if err != nil {
+		return fmt.Errorf("failed to get CLI session: %w", err)
+	}
+
+	// Try to remove the secret from the session using DeleteKey
+	err = cliSession.DeleteKey("client_secret")
+	if err != nil {
+		return fmt.Errorf("failed to remove client secret from session: %w", err)
+	}
+
+	return nil
+}
