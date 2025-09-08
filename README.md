@@ -59,7 +59,8 @@ sudo apt install kinde-cli
 
 **Update:**
 ```bash
-apt update; apt install --only-upgrade kinde-cli
+apt update
+apt install --only-upgrade kinde-cli
 ```
 
 ##### Manual Package Installation
