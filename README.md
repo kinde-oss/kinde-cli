@@ -31,10 +31,20 @@ brew tap kinde-oss/kinde-cli
 brew install kinde-cli
 ```
 
+**Update:**
+```bash
+brew upgrade kinde-cli
+```
+
 #### Windows with Scoop
 ```bash
 scoop bucket add kinde https://github.com/kinde-oss/scoop-kinde-cli
 scoop install kinde-cli
+```
+
+**Update:**
+```bash
+scoop update kinde-cli
 ```
 
 #### Linux
@@ -45,6 +55,11 @@ curl -s https://pkg.kinde.com/apt/gpg.key | gpg --dearmor | sudo tee /usr/share/
 sudo sh -c 'echo "deb [signed-by=/usr/share/keyrings/kinde.gpg] https://pkg.kinde.com/apt/ * *" > /etc/apt/sources.list.d/kinde.list'
 sudo apt update
 sudo apt install kinde-cli
+```
+
+**Update:**
+```bash
+apt update; apt install --only-upgrade kinde-cli
 ```
 
 ##### Manual Package Installation
@@ -124,8 +139,24 @@ kinde help completion <bash|fish|powershell|ash>
   - Multi-tenancy is supported via `--domain <your Kinde business domain>`
 - `logout` – Remove authentication credentials.
 - `whoami` – Show current authenticated token details.
+- `version` – Show current version and check for updates.
 - `manage` - provides access to management API
 - `help` – Show help for commands.
+
+### Version Check
+
+The `version` command displays your current Kinde CLI version and automatically checks for updates against the latest GitHub releases:
+
+```bash
+kinde version
+```
+
+This command will:
+- Display the current installed version
+- Check the latest release from the GitHub repository
+- Compare versions using semantic versioning
+- Show whether an update is available or if you're using the latest version
+- Handle development builds and pre-release versions appropriately
 
 ### Flags
 
