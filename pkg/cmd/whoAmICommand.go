@@ -35,16 +35,20 @@ func (c *whoAmICmd) runWhoAmI(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	log.Info().Str("domain", config.GetEnvironment().DomainName).Msg("Checking authentication status")
+
 	if isAuthenticated, err := deviceFlow.IsAuthenticated(cmd.Context()); !isAuthenticated {
 		if err != nil {
-			log.Debug().Err(err).Msg("failed to check authentication status")
+			log.Error().Err(err).Msg("Failed to check authentication status")
+			return nil
+		} else {
+			return fmt.Errorf("You are not logged in. Please run 'login' command first")
 		}
-		return fmt.Errorf("you are not logged in. Please run 'login' command first")
 	}
 
 	token, err := deviceFlow.GetToken(cmd.Context())
 	if err != nil {
-		return fmt.Errorf("failed to get token: %w", err)
+		return fmt.Errorf("Failed to get token: %w", err)
 	}
 
 	log.Info().Any("token_claims", token.GetClaims()).Str("client_id", config.GetEnvironment().ClientID).Msgf("Authenticated")
