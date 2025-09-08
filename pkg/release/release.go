@@ -33,7 +33,11 @@ func IsNeedingUpdate() {
 	if err != nil {
 		return
 	}
-	latest := *rep.TagName
+	latest := rep.GetTagName()
+	if latest == "" {
+		fmt.Println("Latest release tag not found; cannot check for updates")
+		return
+	}
 
 	// Parse versions using semver
 	currentVersion, err := semver.NewVersion(strings.TrimPrefix(Version, "v"))
