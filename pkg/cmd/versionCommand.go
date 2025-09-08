@@ -27,7 +27,7 @@ func newVersionCmd() *versionCmd {
 /_/ |_|/_//_/ /_/ \__,_/ \___/      
 `)
 				fmt.Println()
-				fmt.Printf("version %v\n", release.Version)
+				fmt.Printf("Version %v\n", release.Version)
 				release.IsNeedingUpdate()
 			},
 		},
