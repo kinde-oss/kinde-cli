@@ -4,9 +4,12 @@ go 1.24.4
 
 toolchain go1.24.5
 
-require github.com/kinde-oss/kinde-go v0.1.7
+require (
+	github.com/kinde-oss/kinde-go v0.1.7
+)
 
 require (
+	github.com/Masterminds/semver/v3 v3.4.0
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dlclark/regexp2 v1.11.5 // indirect
 	github.com/fatih/color v1.18.0 // indirect
