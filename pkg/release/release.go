@@ -9,7 +9,7 @@ import (
 
 	"github.com/Masterminds/semver/v3"
 	"github.com/briandowns/spinner"
-	"github.com/google/go-github/v28/github"
+	"github.com/google/go-github/v80/github"
 )
 
 var (
