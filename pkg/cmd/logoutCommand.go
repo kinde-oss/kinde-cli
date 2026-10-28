@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/kinde-oss/kinde-cli/pkg/config"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
@@ -31,7 +29,7 @@ func (c *logoutCmd) runLogout(cmd *cobra.Command, args []string) error {
 
 	env := config.GetEnvironment()
 	if env == nil {
-		return fmt.Errorf("no environment configured")
+		return errNoEnvironment
 	}
 
 	// Clear client secret from session if it exists (for client credentials flow)

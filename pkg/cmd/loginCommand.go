@@ -49,11 +49,11 @@ func (c *loginCmd) runLogin(cmd *cobra.Command, args []string) error {
 	env := cfg.GetEnvironment()
 
 	if env == nil {
-		return fmt.Errorf("no environment configured. Please specify --domain")
+		return errNoEnvironment
 	}
 
 	if env.DomainName == "" {
-		return fmt.Errorf("no environment configured. Please run 'kinde login'")
+		return errNoEnvironment
 	}
 
 	if env.ClientSecret != "" {

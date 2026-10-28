@@ -33,7 +33,7 @@ type (
 	}
 )
 
-func newManageCmd(ctx context.Context) *manageCmd {
+func newManageCmd(ctx context.Context) (*manageCmd, error) {
 
 	manageCmd := &manageCmd{}
 
@@ -261,8 +261,7 @@ Management API scopes need to be granted to the application you are using to run
 		for _, op := range operations {
 			generatedcommand, err := buildCobraCommand(ctx, op)
 			if err != nil {
-				log.Error().Err(err).Msg("Failed to build command")
-				return nil
+				return nil, fmt.Errorf("failed to build command %s %s: %w", group, op.commandName, err)
 			}
 			groupCmd.AddCommand(generatedcommand)
 		}
@@ -270,7 +269,7 @@ Management API scopes need to be granted to the application you are using to run
 		manageCmd.cmd.AddCommand(groupCmd)
 	}
 
-	return manageCmd
+	return manageCmd, nil
 }
 
 func buildCobraCommand(ctx context.Context, op commandOperationPair[string, management_api.OperationName]) (*cobra.Command, error) {
@@ -290,7 +289,7 @@ func buildCobraCommand(ctx context.Context, op commandOperationPair[string, mana
 		Long:  fmt.Sprintf("Manage %s operation in Kinde", op.commandName),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if env == nil {
-				return fmt.Errorf("no environment configured. Please run 'kinde login'")
+				return errNoEnvironment
 			}
 			return callApiMethod(cmd, env, op)
 		},

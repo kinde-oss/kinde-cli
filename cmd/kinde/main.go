@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"os"
 	"time"
 
 	"github.com/kinde-oss/kinde-cli/pkg/cmd"
@@ -15,6 +17,12 @@ var (
 )
 
 func main() {
+	os.Exit(run())
+}
+
+// run holds the program logic so its deferred calls complete before os.Exit,
+// which would otherwise skip them.
+func run() int {
 
 	release.Version = version
 	release.Commit = commit
@@ -22,5 +30,10 @@ func main() {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	cmd.Execute(ctx)
+
+	if err := cmd.Execute(ctx, os.Args[1:]); err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		return 1
+	}
+	return 0
 }

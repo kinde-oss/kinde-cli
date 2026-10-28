@@ -57,7 +57,11 @@ func NewConfig() (IConfig, error) {
 	config := &Config{
 		Environments: make(map[string]Environment),
 	}
-	if isRead, err := config.readConfig(); isRead && err == nil {
+	isRead, err := config.readConfig()
+	if err != nil {
+		return nil, err
+	}
+	if isRead {
 		config.SwitchEnvironment(config.CurrentEnvironment)
 	}
 	return config, nil
@@ -156,7 +160,7 @@ func (c *Config) readConfig() (bool, error) {
 
 	err = json.Unmarshal(buf, c)
 	if err != nil {
-		return false, fmt.Errorf("failed to unmarshal config: %w", err)
+		return false, fmt.Errorf("config file %s is not valid JSON: %w", configFileLocation, err)
 	}
 
 	return true, nil
