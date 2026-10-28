@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"log/slog"
 
 	"github.com/jwalton/go-supportscolor"
@@ -13,6 +15,8 @@ import (
 	"github.com/kinde-oss/kinde-cli/pkg/release"
 	"github.com/spf13/cobra"
 )
+
+var errNoEnvironment = errors.New("no Kinde domain configured. Run 'kinde login --domain <your Kinde domain>'")
 
 func init() {
 	cobra.OnInitialize()
@@ -28,7 +32,9 @@ func init() {
 	slog.SetDefault(cli_log.GetSlogAdapter(log.Logger))
 }
 
-func Execute(ctx context.Context) {
+// Execute runs the CLI with the given arguments (excluding the program name)
+// and returns any error so the caller can set the exit code.
+func Execute(ctx context.Context, args []string) error {
 
 	rootCmd := &cobra.Command{
 		Use:           "kinde",
@@ -39,24 +45,28 @@ func Execute(ctx context.Context) {
 		Short:         "Kinde CLI",
 		Long:          "The official command-line for Kinde.",
 	}
+	rootCmd.SetArgs(args)
 
 	cfg, err := config.NewConfig()
+	if err != nil {
+		return fmt.Errorf("failed to load configuration: %w", err)
+	}
 	ctx = config.Ctx(ctx, cfg)
 
 	rootCmd.PersistentFlags().Func("domain", "Kinde domain (environment) to work against.", func(val string) error {
 		return cfg.SwitchEnvironment(val)
 	})
 
+	manageCmd, err := newManageCmd(ctx)
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to initialize configuration")
-		return
+		return err
 	}
 
 	rootCmd.AddCommand(newVersionCmd().cmd)
 	rootCmd.AddCommand(newLoginCmd().cmd)
 	rootCmd.AddCommand(newLogoutCmd().cmd)
 	rootCmd.AddCommand(newWhoAmI().cmd)
-	rootCmd.AddCommand(newManageCmd(ctx).cmd)
+	rootCmd.AddCommand(manageCmd.cmd)
 
 	cfg.PersistConfig()
 
@@ -67,11 +77,11 @@ func Execute(ctx context.Context) {
 		return nil
 	}
 
-	if err := rootCmd.ExecuteContext(ctx); err != nil {
-		log.Error().Err(err).Msg("Command execution failed")
-	}
+	runErr := rootCmd.ExecuteContext(ctx)
 
 	if err := cfg.PersistConfig(); err != nil {
-		log.Error().Err(err).Msg("Failed to persist configuration")
+		return errors.Join(runErr, fmt.Errorf("failed to save configuration: %w", err))
 	}
+
+	return runErr
 }
