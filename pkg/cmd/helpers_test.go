@@ -19,6 +19,10 @@ func newTestCLI(t *testing.T) *testCLI {
 	t.Helper()
 	dir := t.TempDir()
 	t.Setenv("XDG_CONFIG_HOME", dir)
+	// Ignore any Kinde settings in the developer's own shell.
+	for _, name := range []string{config.EnvDomain, config.EnvM2MClientID, config.EnvM2MClientSecret} {
+		t.Setenv(name, "")
+	}
 	t.Cleanup(config.UseFileSessionStore("test-password"))
 	return &testCLI{t: t, configDir: dir}
 }

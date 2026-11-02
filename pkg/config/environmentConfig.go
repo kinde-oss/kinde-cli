@@ -132,8 +132,33 @@ func (env *Environment) SaveM2MSecret(clientSecret string) error {
 	return nil
 }
 
-// M2MClientCredentialsFlow returns a flow for the saved M2M login.
+// m2mCredentialsFromEnv returns M2M credentials set through environment
+// variables. ok is false when neither variable is set.
+func m2mCredentialsFromEnv() (clientID, clientSecret string, ok bool, err error) {
+	clientID = os.Getenv(EnvM2MClientID)
+	clientSecret = os.Getenv(EnvM2MClientSecret)
+	switch {
+	case clientID == "" && clientSecret == "":
+		return "", "", false, nil
+	case clientID == "" || clientSecret == "":
+		return "", "", false, fmt.Errorf("%s and %s must both be set", EnvM2MClientID, EnvM2MClientSecret)
+	}
+	return clientID, clientSecret, true, nil
+}
+
+// M2MClientCredentialsFlow returns a flow for the M2M credentials in the
+// environment if set, otherwise for the saved M2M login. Environment
+// credentials never touch the session store, so they work on machines without
+// a keychain, such as CI runners.
 func (env *Environment) M2MClientCredentialsFlow() (client_credentials.IClientCredentialsFlow, error) {
+	clientID, clientSecret, ok, err := m2mCredentialsFromEnv()
+	if err != nil {
+		return nil, err
+	}
+	if ok {
+		return env.newClientCredentialsFlow(clientID, clientSecret)
+	}
+
 	if env.M2M == nil {
 		return nil, ErrNoM2MLogin
 	}

@@ -40,11 +40,13 @@ func (c *logoutCmd) runLogout(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	if err := cfg.SetEnvironment(func(e *config.Environment) {
-		e.M2M = nil
-		e.User = nil
-	}); err != nil {
-		return err
+	if env.M2M != nil || env.User != nil {
+		if err := cfg.SetEnvironment(func(e *config.Environment) {
+			e.M2M = nil
+			e.User = nil
+		}); err != nil {
+			return err
+		}
 	}
 
 	log.Info().Str("domain", env.DomainName).Msg("Logged out")

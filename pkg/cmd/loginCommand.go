@@ -71,8 +71,9 @@ func (c *loginCmd) loginM2M(cmd *cobra.Command, cfg *config.Config, env *config.
 	}); err != nil {
 		return err
 	}
+	cfg.SetDefaultDomain(env.DomainName)
 
-	log.Info().Msgf("Authenticated using client_credentials")
+	log.Info().Str("domain", env.DomainName).Msgf("Authenticated using client_credentials")
 	return nil
 }
 
@@ -111,7 +112,8 @@ func (c *loginCmd) loginUser(cmd *cobra.Command, cfg *config.Config, env *config
 	}); err != nil {
 		return err
 	}
+	cfg.SetDefaultDomain(env.DomainName)
 
-	log.Info().Msgf("Authenticated as %v", token.GetSubject())
+	log.Info().Str("domain", env.DomainName).Msgf("Authenticated as %v", token.GetSubject())
 	return nil
 }

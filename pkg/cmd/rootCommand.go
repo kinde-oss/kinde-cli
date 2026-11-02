@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"os"
 
 	"github.com/rs/zerolog"
 	log "github.com/rs/zerolog/log"
@@ -55,11 +56,11 @@ func Execute(ctx context.Context, args []string, ios *iostreams.IOStreams) error
 	}
 	ctx = config.Ctx(ctx, cfg)
 
-	rootCmd.PersistentFlags().Func("domain", "Kinde domain (environment) to work against.", func(val string) error {
-		return cfg.SwitchEnvironment(val)
-	})
+	var domainFlag string
+	rootCmd.PersistentFlags().StringVar(&domainFlag, "domain", "",
+		fmt.Sprintf("Kinde domain to use for this command (default: the domain you last logged in to; or set %s)", config.EnvDomain))
 
-	manageCmd, err := newManageCmd(ctx)
+	manageCmd, err := newManageCmd()
 	if err != nil {
 		return err
 	}
@@ -70,9 +71,20 @@ func Execute(ctx context.Context, args []string, ios *iostreams.IOStreams) error
 	rootCmd.AddCommand(newWhoAmI().cmd)
 	rootCmd.AddCommand(manageCmd.cmd)
 
-	cfg.PersistConfig()
-
+	// Runs after flags are parsed and before the command, so every command sees
+	// the domain chosen for this run. Precedence: --domain, then KINDE_DOMAIN,
+	// then the saved default.
 	rootCmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
+		domain := domainFlag
+		if domain == "" {
+			domain = os.Getenv(config.EnvDomain)
+		}
+		if domain != "" {
+			if err := cfg.UseDomain(domain); err != nil {
+				return err
+			}
+		}
+
 		if err, isValid := cfg.Validate(); !isValid {
 			log.Error().Err(err).Msg("Issues with configuration")
 		}
@@ -81,7 +93,7 @@ func Execute(ctx context.Context, args []string, ios *iostreams.IOStreams) error
 
 	runErr := rootCmd.ExecuteContext(ctx)
 
-	if err := cfg.PersistConfig(); err != nil {
+	if err := cfg.SaveIfChanged(); err != nil {
 		return errors.Join(runErr, fmt.Errorf("failed to save configuration: %w", err))
 	}
 

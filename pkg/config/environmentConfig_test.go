@@ -2,6 +2,8 @@ package config
 
 import (
 	"encoding/json"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -12,7 +14,23 @@ import (
 func useTestSessionStore(t *testing.T) {
 	t.Helper()
 	t.Setenv("XDG_CONFIG_HOME", t.TempDir())
+	t.Setenv(EnvM2MClientID, "")
+	t.Setenv(EnvM2MClientSecret, "")
 	t.Cleanup(UseFileSessionStore("test-password"))
+}
+
+func TestM2MCredentialsFromEnv_SkipSessionStore(t *testing.T) {
+	useTestSessionStore(t)
+	t.Setenv(EnvM2MClientID, "abc")
+	t.Setenv(EnvM2MClientSecret, "s3cret")
+	env := &Environment{DomainName: "mybiz.kinde.com"}
+
+	_, err := env.M2MClientCredentialsFlow()
+	require.NoError(t, err, "environment credentials should work without a saved login")
+
+	storeDir := filepath.Join(os.Getenv("XDG_CONFIG_HOME"), CLI_NAME, "kc_mybiz_kinde_com_m2m")
+	_, err = os.Stat(storeDir)
+	assert.True(t, os.IsNotExist(err), "environment credentials must not open the session store")
 }
 
 func TestIdentitiesHaveSeparateSessionStores(t *testing.T) {

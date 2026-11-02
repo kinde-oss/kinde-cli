@@ -30,11 +30,17 @@ func (c *testCLI) writeConfig(env config.Environment) {
 // readConfig returns the saved environment for testDomain.
 func (c *testCLI) readConfig() config.Environment {
 	c.t.Helper()
+	return c.readFullConfig().Environments[testDomain]
+}
+
+// readFullConfig returns the whole saved config file.
+func (c *testCLI) readFullConfig() config.Config {
+	c.t.Helper()
 	buf, err := os.ReadFile(filepath.Join(c.configDir, "kinde", "config.json"))
 	require.NoError(c.t, err)
 	var cfg config.Config
 	require.NoError(c.t, json.Unmarshal(buf, &cfg))
-	return cfg.Environments[testDomain]
+	return cfg
 }
 
 func TestLogin_ClientSecretRequiresClientID(t *testing.T) {

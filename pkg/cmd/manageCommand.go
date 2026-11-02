@@ -34,7 +34,7 @@ type (
 	}
 )
 
-func newManageCmd(ctx context.Context) (*manageCmd, error) {
+func newManageCmd() (*manageCmd, error) {
 
 	manageCmd := &manageCmd{}
 
@@ -260,7 +260,7 @@ Management API scopes need to be granted to the application you are using to run
 		}
 
 		for _, op := range operations {
-			generatedcommand, err := buildCobraCommand(ctx, op)
+			generatedcommand, err := buildCobraCommand(op)
 			if err != nil {
 				return nil, fmt.Errorf("failed to build command %s %s: %w", group, op.commandName, err)
 			}
@@ -273,11 +273,7 @@ Management API scopes need to be granted to the application you are using to run
 	return manageCmd, nil
 }
 
-func buildCobraCommand(ctx context.Context, op commandOperationPair[string, management_api.OperationName]) (*cobra.Command, error) {
-	config := config.FromContext[config.Config](ctx)
-
-	env := config.GetEnvironment()
-
+func buildCobraCommand(op commandOperationPair[string, management_api.OperationName]) (*cobra.Command, error) {
 	apiMethod, found := reflect.TypeOf(&management_api.Client{}).MethodByName(op.operation)
 	if !found {
 		return nil, fmt.Errorf("operation %s not found in management API", op.operation)
@@ -289,6 +285,8 @@ func buildCobraCommand(ctx context.Context, op commandOperationPair[string, mana
 		Short: fmt.Sprintf("Manage %s operation", op.commandName),
 		Long:  fmt.Sprintf("Manage %s operation in Kinde", op.commandName),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			// Read the environment when the command runs, after --domain is applied.
+			env := config.FromContext[config.Config](cmd.Context()).GetEnvironment()
 			if env == nil {
 				return errNoEnvironment
 			}
@@ -360,7 +358,8 @@ func callApiMethod(cmd *cobra.Command, env *config.Environment, op commandOperat
 
 	clientCredentials, err := env.M2MClientCredentialsFlow()
 	if errors.Is(err, config.ErrNoM2MLogin) {
-		return fmt.Errorf("%w. Management commands need an M2M application: run 'kinde login --client_id <id> --client_secret <secret>'", err)
+		return fmt.Errorf("%w (%s). Management commands need an M2M application: run 'kinde login --client_id <id> --client_secret <secret>', or set %s and %s",
+			err, env.DomainName, config.EnvM2MClientID, config.EnvM2MClientSecret)
 	}
 	if err != nil {
 		return fmt.Errorf("failed to create client credentials flow: %w", err)
