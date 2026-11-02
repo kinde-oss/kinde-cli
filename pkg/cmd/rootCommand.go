@@ -17,6 +17,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const authGroupID = "auth"
+
 var errNoEnvironment = errors.New("no Kinde domain configured. Run 'kinde login --domain <your Kinde domain>'")
 
 // Execute runs the CLI with the given arguments (excluding the program name)
@@ -60,16 +62,21 @@ func Execute(ctx context.Context, args []string, ios *iostreams.IOStreams) error
 	rootCmd.PersistentFlags().StringVar(&domainFlag, "domain", "",
 		fmt.Sprintf("Kinde domain to use for this command (default: the domain you last logged in to; or set %s)", config.EnvDomain))
 
-	manageCmd, err := newManageCmd()
+	resourceCmds, err := newResourceCommands()
 	if err != nil {
 		return err
 	}
 
+	rootCmd.AddGroup(
+		&cobra.Group{ID: authGroupID, Title: "Authentication:"},
+		&cobra.Group{ID: resourceGroupID, Title: "Management API (needs an M2M login):"},
+	)
+	for _, authCmd := range []*cobra.Command{newLoginCmd(ios).cmd, newLogoutCmd().cmd, newWhoAmI().cmd} {
+		authCmd.GroupID = authGroupID
+		rootCmd.AddCommand(authCmd)
+	}
+	rootCmd.AddCommand(resourceCmds...)
 	rootCmd.AddCommand(newVersionCmd(ios).cmd)
-	rootCmd.AddCommand(newLoginCmd(ios).cmd)
-	rootCmd.AddCommand(newLogoutCmd().cmd)
-	rootCmd.AddCommand(newWhoAmI().cmd)
-	rootCmd.AddCommand(manageCmd.cmd)
 
 	// Runs after flags are parsed and before the command, so every command sees
 	// the domain chosen for this run. Precedence: --domain, then KINDE_DOMAIN,

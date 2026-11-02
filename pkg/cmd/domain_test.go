@@ -27,7 +27,7 @@ func newLoggedInCLI(t *testing.T) *testCLI {
 func TestDomainFlag_AppliesToThisRunOnly(t *testing.T) {
 	cli := newLoggedInCLI(t)
 
-	_, _, err := cli.run("--domain", otherDomain, "manage", "business", "get")
+	_, _, err := cli.run("--domain", otherDomain, "business", "get")
 
 	assert.ErrorIs(t, err, config.ErrNoM2MLogin, "the command should run against --domain")
 	saved := cli.readFullConfig()
@@ -39,7 +39,7 @@ func TestKindeDomainEnv_AppliesToThisRunOnly(t *testing.T) {
 	cli := newLoggedInCLI(t)
 	t.Setenv(config.EnvDomain, "https://Other.kinde.com/")
 
-	_, _, err := cli.run("manage", "business", "get")
+	_, _, err := cli.run("business", "get")
 
 	assert.ErrorIs(t, err, config.ErrNoM2MLogin, "the command should run against KINDE_DOMAIN")
 	assert.Equal(t, testDomain, cli.readFullConfig().CurrentEnvironment)
@@ -49,7 +49,7 @@ func TestDomainFlag_TakesPrecedenceOverEnv(t *testing.T) {
 	cli := newLoggedInCLI(t)
 	t.Setenv(config.EnvDomain, testDomain)
 
-	_, _, err := cli.run("--domain", otherDomain, "manage", "business", "get")
+	_, _, err := cli.run("--domain", otherDomain, "business", "get")
 
 	assert.ErrorIs(t, err, config.ErrNoM2MLogin, "--domain should win over KINDE_DOMAIN")
 }
@@ -83,7 +83,7 @@ func TestManage_EnvCredentialsMustBothBeSet(t *testing.T) {
 	t.Setenv(config.EnvDomain, testDomain)
 	t.Setenv(config.EnvM2MClientID, "abc")
 
-	_, _, err := cli.run("manage", "business", "get")
+	_, _, err := cli.run("business", "get")
 
 	assert.ErrorContains(t, err, config.EnvM2MClientSecret)
 }

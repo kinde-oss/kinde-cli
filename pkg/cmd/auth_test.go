@@ -78,7 +78,7 @@ func TestManage_RequiresM2MLogin(t *testing.T) {
 	cli := newTestCLI(t)
 	cli.writeConfig(config.Environment{User: &config.UserLogin{}})
 
-	_, _, err := cli.run("manage", "business", "get")
+	_, _, err := cli.run("business", "get")
 
 	assert.ErrorIs(t, err, config.ErrNoM2MLogin, "a browser login must not be used for management commands")
 	assert.ErrorContains(t, err, "kinde login --client_id")

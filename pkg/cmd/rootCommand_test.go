@@ -16,7 +16,7 @@ func TestExecute_ReturnsErrors(t *testing.T) {
 	}{
 		{"unknown command", []string{"bogus"}},
 		{"unknown flag", []string{"--bogus"}},
-		{"manage without login", []string{"manage", "business", "get"}},
+		{"manage without login", []string{"business", "get"}},
 		{"whoami without login", []string{"whoami"}},
 	}
 
