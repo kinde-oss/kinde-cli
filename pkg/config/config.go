@@ -3,6 +3,7 @@ package config
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -34,6 +35,9 @@ type (
 
 func (i *Config) SetEnvironment(f func(e *Environment)) error {
 	env := i.GetEnvironment()
+	if env == nil {
+		return errors.New("no Kinde domain selected")
+	}
 	f(env)
 	i.Environments[i.CurrentEnvironment] = *env
 	return nil

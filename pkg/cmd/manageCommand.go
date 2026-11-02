@@ -3,6 +3,7 @@ package cmd
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"mime"
 	"net/textproto"
@@ -357,7 +358,10 @@ func callApiMethod(cmd *cobra.Command, env *config.Environment, op commandOperat
 	log := log.Ctx(cmd.Context())
 	ctx := cmd.Context()
 
-	clientCredentials, err := env.NewClientCredentialsFlow()
+	clientCredentials, err := env.M2MClientCredentialsFlow()
+	if errors.Is(err, config.ErrNoM2MLogin) {
+		return fmt.Errorf("%w. Management commands need an M2M application: run 'kinde login --client_id <id> --client_secret <secret>'", err)
+	}
 	if err != nil {
 		return fmt.Errorf("failed to create client credentials flow: %w", err)
 	}

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/kinde-oss/kinde-cli/pkg/config"
@@ -28,14 +29,17 @@ func newWhoAmI() *whoAmICmd {
 
 func (c *whoAmICmd) runWhoAmI(cmd *cobra.Command, args []string) error {
 	log := log.Ctx(cmd.Context())
-	config := config.FromContext[config.Config](cmd.Context())
+	cfg := config.FromContext[config.Config](cmd.Context())
 
-	env := config.GetEnvironment()
+	env := cfg.GetEnvironment()
 	if env == nil {
 		return errNoEnvironment
 	}
 
-	deviceFlow, err := env.NewDeviceAuthorizationFlow()
+	deviceFlow, err := env.UserDeviceAuthorizationFlow()
+	if errors.Is(err, config.ErrNoUserLogin) {
+		return fmt.Errorf("you are not logged in through the browser. Please run 'kinde login' first")
+	}
 	if err != nil {
 		return err
 	}
@@ -54,7 +58,7 @@ func (c *whoAmICmd) runWhoAmI(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to get token: %w", err)
 	}
 
-	log.Info().Any("token_claims", token.GetClaims()).Str("client_id", env.ClientID).Msgf("Authenticated")
+	log.Info().Any("token_claims", token.GetClaims()).Str("client_id", env.User.ClientID).Msgf("Authenticated")
 
 	return nil
 }

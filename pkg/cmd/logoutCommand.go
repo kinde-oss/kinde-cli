@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"errors"
+
 	"github.com/kinde-oss/kinde-cli/pkg/config"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
@@ -23,33 +25,28 @@ func newLogoutCmd() *logoutCmd {
 	return logoutCmd
 }
 
+// runLogout clears both logins for the current domain. Both session stores
+// are always cleared, so it also removes anything left by an interrupted login.
 func (c *logoutCmd) runLogout(cmd *cobra.Command, args []string) error {
 	log := log.Ctx(cmd.Context())
-	config := config.FromContext[config.Config](cmd.Context())
+	cfg := config.FromContext[config.Config](cmd.Context())
 
-	env := config.GetEnvironment()
+	env := cfg.GetEnvironment()
 	if env == nil {
 		return errNoEnvironment
 	}
 
-	// Clear client secret from session if it exists (for client credentials flow)
-	if err := env.ClearClientSecretFromSession(); err != nil {
-		// Log the error but don't fail the logout - the secret might not exist
-		log.Debug().Err(err).Msg("Failed to clear client secret from session (may not exist)")
-	}
-
-	// Handle device authorization flow logout
-	deviceFlow, err := env.NewDeviceAuthorizationFlow()
-	if err != nil {
+	if err := errors.Join(env.ClearM2MLogin(), env.ClearUserLogin()); err != nil {
 		return err
 	}
 
-	err = deviceFlow.Logout()
-	if err != nil {
-		// Log the error but don't fail the logout - device flow might not be active
-		log.Debug().Err(err).Msg("Failed to logout from device flow (may not be active)")
+	if err := cfg.SetEnvironment(func(e *config.Environment) {
+		e.M2M = nil
+		e.User = nil
+	}); err != nil {
+		return err
 	}
 
-	log.Info().Msg("Successfully logged out")
+	log.Info().Str("domain", env.DomainName).Msg("Logged out")
 	return nil
 }
