@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/kinde-oss/kinde-cli/pkg/cmd"
+	"github.com/kinde-oss/kinde-cli/pkg/iostreams"
 	"github.com/kinde-oss/kinde-cli/pkg/release"
 )
 
@@ -31,8 +32,9 @@ func run() int {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	if err := cmd.Execute(ctx, os.Args[1:]); err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+	ios := iostreams.System()
+	if err := cmd.Execute(ctx, os.Args[1:], ios); err != nil {
+		fmt.Fprintf(ios.ErrOut, "Error: %v\n", err)
 		return 1
 	}
 	return 0

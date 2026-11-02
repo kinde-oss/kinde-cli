@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/jwalton/go-supportscolor"
 	"github.com/rs/zerolog"
 	log "github.com/rs/zerolog/log"
 
 	"github.com/kinde-oss/kinde-cli/pkg/config"
+	"github.com/kinde-oss/kinde-cli/pkg/iostreams"
 	cli_log "github.com/kinde-oss/kinde-cli/pkg/log"
 	"github.com/kinde-oss/kinde-cli/pkg/release"
 	"github.com/spf13/cobra"
@@ -18,23 +18,22 @@ import (
 
 var errNoEnvironment = errors.New("no Kinde domain configured. Run 'kinde login --domain <your Kinde domain>'")
 
-func init() {
-	cobra.OnInitialize()
+// Execute runs the CLI with the given arguments (excluding the program name)
+// and returns any error so the caller can set the exit code. All input and
+// output goes through ios.
+func Execute(ctx context.Context, args []string, ios *iostreams.IOStreams) error {
 
-	log.Logger = cli_log.GetLogWriter(&cli_log.SharedLogSettings{
+	logger := cli_log.GetLogWriter(&cli_log.SharedLogSettings{
 		ComponentName:        "kinde_cli",
 		PrettyPrint:          true,
-		UseColor:             supportscolor.Stdout().SupportsColor,
+		UseColor:             ios.ColorEnabled(),
 		ConsoleFieldsExclude: &[]string{"component"}, //this is only used for pretty printing
+		Out:                  ios.ErrOut,
 	})
-
+	log.Logger = logger
 	zerolog.DefaultContextLogger = &log.Logger
-	slog.SetDefault(cli_log.GetSlogAdapter(log.Logger))
-}
-
-// Execute runs the CLI with the given arguments (excluding the program name)
-// and returns any error so the caller can set the exit code.
-func Execute(ctx context.Context, args []string) error {
+	slog.SetDefault(cli_log.GetSlogAdapter(logger))
+	ctx = logger.WithContext(ctx)
 
 	rootCmd := &cobra.Command{
 		Use:           "kinde",
@@ -46,6 +45,9 @@ func Execute(ctx context.Context, args []string) error {
 		Long:          "The official command-line for Kinde.",
 	}
 	rootCmd.SetArgs(args)
+	rootCmd.SetIn(ios.In)
+	rootCmd.SetOut(ios.Out)
+	rootCmd.SetErr(ios.ErrOut)
 
 	cfg, err := config.NewConfig()
 	if err != nil {
@@ -62,8 +64,8 @@ func Execute(ctx context.Context, args []string) error {
 		return err
 	}
 
-	rootCmd.AddCommand(newVersionCmd().cmd)
-	rootCmd.AddCommand(newLoginCmd().cmd)
+	rootCmd.AddCommand(newVersionCmd(ios).cmd)
+	rootCmd.AddCommand(newLoginCmd(ios).cmd)
 	rootCmd.AddCommand(newLogoutCmd().cmd)
 	rootCmd.AddCommand(newWhoAmI().cmd)
 	rootCmd.AddCommand(manageCmd.cmd)

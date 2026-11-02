@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"context"
 	"os"
 	"path/filepath"
 	"testing"
@@ -9,15 +8,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
-
-// useTempConfig points the CLI at an empty config directory so tests never
-// read or write the real ~/.config/kinde.
-func useTempConfig(t *testing.T) string {
-	t.Helper()
-	dir := t.TempDir()
-	t.Setenv("XDG_CONFIG_HOME", dir)
-	return dir
-}
 
 func TestExecute_ReturnsErrors(t *testing.T) {
 	tests := []struct {
@@ -32,27 +22,28 @@ func TestExecute_ReturnsErrors(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			useTempConfig(t)
-			err := Execute(context.Background(), tt.args)
+			stdout, _, err := newTestCLI(t).run(tt.args...)
 			assert.Error(t, err)
+			assert.Empty(t, stdout, "failures must not write to stdout")
 		})
 	}
 }
 
-func TestExecute_Succeeds(t *testing.T) {
-	useTempConfig(t)
-	err := Execute(context.Background(), []string{"--help"})
+func TestExecute_HelpGoesToStdout(t *testing.T) {
+	stdout, stderr, err := newTestCLI(t).run("--help")
 	assert.NoError(t, err)
+	assert.Contains(t, stdout, "Usage:")
+	assert.Empty(t, stderr)
 }
 
 func TestExecute_InvalidConfigIsReportedAndKept(t *testing.T) {
-	dir := useTempConfig(t)
-	configFile := filepath.Join(dir, "kinde", "config.json")
+	cli := newTestCLI(t)
+	configFile := filepath.Join(cli.configDir, "kinde", "config.json")
 	invalid := []byte(`{"current":"mybiz.kinde.com",}`)
 	require.NoError(t, os.MkdirAll(filepath.Dir(configFile), 0700))
 	require.NoError(t, os.WriteFile(configFile, invalid, 0600))
 
-	err := Execute(context.Background(), []string{"--help"})
+	_, _, err := cli.run("--help")
 
 	assert.ErrorContains(t, err, configFile)
 	contents, readErr := os.ReadFile(configFile)

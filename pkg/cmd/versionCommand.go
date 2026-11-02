@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/kinde-oss/kinde-cli/pkg/iostreams"
 	"github.com/kinde-oss/kinde-cli/pkg/release"
 	"github.com/spf13/cobra"
 )
@@ -11,7 +12,7 @@ type versionCmd struct {
 	cmd *cobra.Command
 }
 
-func newVersionCmd() *versionCmd {
+func newVersionCmd(ios *iostreams.IOStreams) *versionCmd {
 	return &versionCmd{
 		cmd: &cobra.Command{
 			Use:   "version",
@@ -19,15 +20,15 @@ func newVersionCmd() *versionCmd {
 			Short: "Version",
 			Run: func(cmd *cobra.Command, args []string) {
 
-				fmt.Print(`
-    __ __  _             __    
-   / //_/ (_)____   ____/ /___ 
+				fmt.Fprint(ios.Out, `
+    __ __  _             __
+   / //_/ (_)____   ____/ /___
   / ,<   / // __ \ / __  // _ \
  / /| | / // / / // /_/ //  __/
-/_/ |_|/_//_/ /_/ \__,_/ \___/      
+/_/ |_|/_//_/ /_/ \__,_/ \___/
 `)
-				fmt.Println()
-				fmt.Printf("Version %v\n", release.Version)
+				fmt.Fprintln(ios.Out)
+				fmt.Fprintf(ios.Out, "Version %v\n", release.Version)
 				release.IsNeedingUpdate()
 			},
 		},

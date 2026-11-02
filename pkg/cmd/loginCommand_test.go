@@ -3,17 +3,20 @@ package cmd
 import (
 	"testing"
 
+	"github.com/kinde-oss/kinde-cli/pkg/iostreams"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestNewLoginCmd_ReturnsLoginCmd(t *testing.T) {
-	cmdStruct := newLoginCmd()
+	ios, _, _, _ := iostreams.Test()
+	cmdStruct := newLoginCmd(ios)
 	assert.NotNil(t, cmdStruct)
 	assert.NotNil(t, cmdStruct.cmd)
 }
 
 func TestNewLoginCmd_CommandProperties(t *testing.T) {
-	cmdStruct := newLoginCmd()
+	ios, _, _, _ := iostreams.Test()
+	cmdStruct := newLoginCmd(ios)
 	cmd := cmdStruct.cmd
 
 	assert.Equal(t, "login", cmd.Use)
@@ -23,6 +26,7 @@ func TestNewLoginCmd_CommandProperties(t *testing.T) {
 }
 
 func TestNewLoginCmd_RunEIsSet(t *testing.T) {
-	cmdStruct := newLoginCmd()
+	ios, _, _, _ := iostreams.Test()
+	cmdStruct := newLoginCmd(ios)
 	assert.NotNil(t, cmdStruct.cmd.RunE)
 }

@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/99designs/keyring"
 	"github.com/kinde-oss/kinde-go/frameworks/cli"
 	"github.com/kinde-oss/kinde-go/jwt"
 	"github.com/kinde-oss/kinde-go/oauth2/authorization_code"
@@ -25,13 +26,30 @@ type (
 	}
 )
 
+// sessionStoreOptions are extra options applied to every session store.
+// Tests set them with UseFileSessionStore so secrets never reach the OS keychain.
+var sessionStoreOptions []cli.Option
+
+// UseFileSessionStore makes session stores use a password-encrypted file in
+// the config directory instead of the OS keychain. It returns a function that
+// restores the default. Intended for tests.
+func UseFileSessionStore(password string) (restore func()) {
+	previous := sessionStoreOptions
+	sessionStoreOptions = []cli.Option{
+		cli.WithAllowedBackends([]keyring.BackendType{keyring.FileBackend}),
+		cli.WithFilePasswordFunc(keyring.FixedStringPrompt(password)),
+	}
+	return func() { sessionStoreOptions = previous }
+}
+
 func (env *Environment) getCliSession() (cli.ICliSession, error) {
 
 	chainFileName, err := env.keychainFolderName(env.DomainName)
 	if err != nil {
 		return nil, err
 	}
-	cliSession, err := cli.NewCliSession(fmt.Sprintf("%v_%v", CLI_NAME, env.DomainName), cli.WithFileDir(chainFileName))
+	opts := append([]cli.Option{cli.WithFileDir(chainFileName)}, sessionStoreOptions...)
+	cliSession, err := cli.NewCliSession(fmt.Sprintf("%v_%v", CLI_NAME, env.DomainName), opts...)
 	return cliSession, err
 
 }

@@ -21,6 +21,8 @@ type SharedLogSettings struct {
 	ConsoleFormatExtra   func(m map[string]interface{}, buf *bytes.Buffer) error
 	PrettyPrint          bool
 	UseColor             bool
+	// Out is where log lines are written; defaults to os.Stderr.
+	Out io.Writer
 }
 
 func GetSlogAdapter(l zerolog.Logger) *slog.Logger {
@@ -30,7 +32,12 @@ func GetSlogAdapter(l zerolog.Logger) *slog.Logger {
 
 func GetLogWriter(settings *SharedLogSettings) zerolog.Logger {
 
-	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
+	out := settings.Out
+	if out == nil {
+		out = os.Stderr
+	}
+
+	slog.SetDefault(slog.New(slog.NewTextHandler(out, &slog.HandlerOptions{
 		Level: slog.LevelInfo,
 	})))
 
@@ -44,7 +51,7 @@ func GetLogWriter(settings *SharedLogSettings) zerolog.Logger {
 	if logLevelStr, ok := os.LookupEnv("KINDE_LOG_LEVEL"); ok {
 		parsedLogLevel, err := zerolog.ParseLevel(logLevelStr)
 		if err != nil {
-			fmt.Printf("Log Level of %v is not a valid value - Defaulting to INFO level\n", logLevelStr)
+			fmt.Fprintf(out, "Log Level of %v is not a valid value - Defaulting to INFO level\n", logLevelStr)
 			zerolog.SetGlobalLevel(zerolog.InfoLevel)
 		} else {
 			logLevel = parsedLogLevel
@@ -76,7 +83,7 @@ func GetLogWriter(settings *SharedLogSettings) zerolog.Logger {
 		}
 
 		consoleWriter := ConsoleWriter{
-			Out:           os.Stderr,
+			Out:           out,
 			TimeFormat:    time.RFC3339,
 			PartsOrder:    *settings.ConsolePartsOrder,
 			PartsExclude:  *settings.ConsolePartsExclude,
@@ -92,7 +99,7 @@ func GetLogWriter(settings *SharedLogSettings) zerolog.Logger {
 
 		zerologWriter = zerolog.New(consoleWriter).With().Timestamp().Str("component", settings.ComponentName).Logger()
 	} else {
-		zerologWriter = zerolog.New(io.Writer(os.Stderr)).With().Timestamp().Str("component", settings.ComponentName).Logger()
+		zerologWriter = zerolog.New(out).With().Timestamp().Str("component", settings.ComponentName).Logger()
 	}
 
 	return zerologWriter

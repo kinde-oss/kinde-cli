@@ -3,9 +3,9 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/kinde-oss/kinde-cli/pkg/config"
+	"github.com/kinde-oss/kinde-cli/pkg/iostreams"
 	"github.com/mdp/qrterminal/v3"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
@@ -13,11 +13,12 @@ import (
 
 type loginCmd struct {
 	cmd *cobra.Command
+	ios *iostreams.IOStreams
 }
 
-func newLoginCmd() *loginCmd {
+func newLoginCmd(ios *iostreams.IOStreams) *loginCmd {
 
-	loginCmd := &loginCmd{}
+	loginCmd := &loginCmd{ios: ios}
 
 	loginCmd.cmd = &cobra.Command{
 		Use:   "login",
@@ -97,9 +98,9 @@ func (c *loginCmd) runLogin(cmd *cobra.Command, args []string) error {
 		}
 
 		log.Info().Msgf("Please open the following URL in your browser: %v", deviceAuth.VerificationURIComplete)
-		fmt.Println()
-		qrterminal.GenerateHalfBlock(deviceAuth.VerificationURIComplete, qrterminal.M, os.Stdout)
-		fmt.Println()
+		fmt.Fprintln(c.ios.Out)
+		qrterminal.GenerateHalfBlock(deviceAuth.VerificationURIComplete, qrterminal.M, c.ios.Out)
+		fmt.Fprintln(c.ios.Out)
 
 		log.Info().Msg("Waiting for user to authorize...")
 
