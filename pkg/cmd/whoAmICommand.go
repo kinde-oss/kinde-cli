@@ -1,21 +1,22 @@
 package cmd
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 
 	"github.com/kinde-oss/kinde-cli/pkg/config"
-	"github.com/rs/zerolog/log"
+	"github.com/kinde-oss/kinde-cli/pkg/iostreams"
 	"github.com/spf13/cobra"
 )
 
 type whoAmICmd struct {
-	cmd         *cobra.Command
-	kindeDomain string
+	cmd *cobra.Command
+	ios *iostreams.IOStreams
 }
 
-func newWhoAmI() *whoAmICmd {
-	whoAmICmd := &whoAmICmd{}
+func newWhoAmI(ios *iostreams.IOStreams) *whoAmICmd {
+	whoAmICmd := &whoAmICmd{ios: ios}
 
 	whoAmICmd.cmd = &cobra.Command{
 		Use:   "whoami",
@@ -28,7 +29,6 @@ func newWhoAmI() *whoAmICmd {
 }
 
 func (c *whoAmICmd) runWhoAmI(cmd *cobra.Command, args []string) error {
-	log := log.Ctx(cmd.Context())
 	cfg := config.FromContext[config.Config](cmd.Context())
 
 	env := cfg.GetEnvironment()
@@ -44,8 +44,6 @@ func (c *whoAmICmd) runWhoAmI(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	log.Info().Str("domain", env.DomainName).Msg("Checking authentication status")
-
 	if isAuthenticated, err := deviceFlow.IsAuthenticated(cmd.Context()); !isAuthenticated {
 		if err != nil {
 			return fmt.Errorf("failed to check authentication status: %w", err)
@@ -58,7 +56,11 @@ func (c *whoAmICmd) runWhoAmI(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to get token: %w", err)
 	}
 
-	log.Info().Any("token_claims", token.GetClaims()).Str("client_id", env.User.ClientID).Msgf("Authenticated")
-
+	// The token's claims are the data, so they go to stdout as JSON.
+	claims, err := json.MarshalIndent(token.GetClaims(), "", "  ")
+	if err != nil {
+		return fmt.Errorf("failed to encode token claims: %w", err)
+	}
+	fmt.Fprintf(c.ios.Out, "%s\n", claims)
 	return nil
 }

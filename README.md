@@ -109,6 +109,8 @@ go install github.com/kinde-oss/kinde-cli/cmd/kinde@latest
 
 Run `kinde --help` to see every command, and `kinde <command> --help` for its flags.
 
+Commands print the API's response as JSON on stdout, so you can pipe it to tools like `jq`. Messages and errors go to stderr, and a failed command exits with status 1.
+
 ## Authentication
 
 The Kinde Management API only accepts tokens issued to an M2M application, so every resource command (`users`, `organizations`, `roles`, ...) needs an M2M login. Its secret is stored in your operating system's keychain, never in the config file.
@@ -197,7 +199,7 @@ The config file is `~/.config/kinde/config.json` (or `$XDG_CONFIG_HOME/kinde/con
 ## Troubleshooting
 
 - **"no M2M login"**: run `kinde login` with an M2M application's credentials, or set the environment variables above.
-- **Permission errors**: check the command's `--help` for the scope it needs, and grant that scope to your M2M application in Kinde.
+- **403 Forbidden**: the error names the scope the command needs (also shown in its `--help`). Grant that scope to your M2M application in Kinde.
 - **Keychain**: on Linux, credentials are kept in an encrypted file instead of a system keychain, so the CLI also works on servers and in CI. Set `KINDE_KEYCHAIN_PASS` to supply its password when there's no terminal to prompt in.
 - **Logging**: `KINDE_LOG_LEVEL` sets the log level (e.g. `debug`), and `KINDE_STRUCTURED_LOG=true` writes logs as JSON.
 

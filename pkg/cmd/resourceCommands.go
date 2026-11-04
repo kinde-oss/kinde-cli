@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"reflect"
@@ -8,9 +9,7 @@ import (
 	"strings"
 
 	"github.com/kinde-oss/kinde-cli/pkg/config"
-	"github.com/kinde-oss/kinde-go/kinde"
 	"github.com/kinde-oss/kinde-go/kinde/management_api"
-	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
 
@@ -93,9 +92,6 @@ func planForOperation(operation management_api.OperationName) (*requestPlan, err
 }
 
 func callApiMethod(cmd *cobra.Command, env *config.Environment, op resourceCommand, methodArgs []reflect.Value) error {
-	log := log.Ctx(cmd.Context())
-	ctx := cmd.Context()
-
 	clientCredentials, err := env.M2MClientCredentialsFlow()
 	if errors.Is(err, config.ErrNoM2MLogin) {
 		return fmt.Errorf("%w (%s). Management commands need an M2M application: run 'kinde login --client_id <id> --client_secret <secret>', or set %s and %s",
@@ -105,28 +101,23 @@ func callApiMethod(cmd *cobra.Command, env *config.Environment, op resourceComma
 		return fmt.Errorf("failed to create client credentials flow: %w", err)
 	}
 
-	kindeDomainUrl := fmt.Sprintf("https://%s", env.DomainName)
-	managementApi, err := kinde.NewManagementAPI(ctx, kindeDomainUrl, clientCredentials)
+	httpClient, err := clientCredentials.GetClient(cmd.Context())
 	if err != nil {
-		return fmt.Errorf("failed to create management API client: %w", err)
+		return fmt.Errorf("failed to create HTTP client: %w", err)
+	}
+	accessToken := func(ctx context.Context) (string, error) {
+		token, err := clientCredentials.GetToken(ctx)
+		if err != nil {
+			return "", fmt.Errorf("failed to get an access token: %w", err)
+		}
+		raw := token.GetRawToken()
+		if raw == nil {
+			return "", errors.New("failed to get an access token: the token is empty")
+		}
+		return raw.AccessToken, nil
 	}
 
-	instanceMethod := reflect.ValueOf(managementApi).MethodByName(op.operation)
-	args := append([]reflect.Value{reflect.ValueOf(ctx)}, methodArgs...)
-
-	results := instanceMethod.Call(args)
-	for _, result := range results {
-		if !result.IsValid() || (result.Kind() == reflect.Ptr || result.Kind() == reflect.Interface) && result.IsNil() {
-			continue
-		}
-		resultInstance := result.Interface()
-		if error, ok := resultInstance.(error); ok {
-			return error
-		}
-		log.Info().Any("result", resultInstance).Msg("API call result")
-	}
-
-	return nil
+	return callOperation(cmd, "https://"+env.DomainName, httpClient, accessToken, op.operation, methodArgs)
 }
 
 // flagNameFor returns the kebab-case flag name for a request field, prefixed

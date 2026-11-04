@@ -3,12 +3,14 @@ package cmd
 import (
 	"testing"
 
+	"github.com/kinde-oss/kinde-cli/pkg/iostreams"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestNewLogoutCmd_ReturnsLogoutCmd(t *testing.T) {
-	cmd := newLogoutCmd()
+	ios, _, _, _ := iostreams.Test()
+	cmd := newLogoutCmd(ios)
 	assert.NotNil(t, cmd, "newLogoutCmd should not return nil")
 	assert.NotNil(t, cmd.cmd, "logoutCmd.cmd should not be nil")
 	assert.Equal(t, "logout", cmd.cmd.Use, "Command 'Use' should be 'logout'")

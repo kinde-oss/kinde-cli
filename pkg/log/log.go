@@ -38,21 +38,22 @@ func GetLogWriter(settings *SharedLogSettings) zerolog.Logger {
 	}
 
 	slog.SetDefault(slog.New(slog.NewTextHandler(out, &slog.HandlerOptions{
-		Level: slog.LevelInfo,
+		Level: slog.LevelWarn,
 	})))
 
 	prettyPrintLogs := true
-	logLevel := zerolog.InfoLevel
+	// Logs are for diagnosing problems; commands print their own output.
+	// Set KINDE_LOG_LEVEL=debug or info to see more.
+	logLevel := zerolog.WarnLevel
 
 	if structuredLog, err := strconv.ParseBool(os.Getenv("KINDE_STRUCTURED_LOG")); err == nil {
 		prettyPrintLogs = !structuredLog
 	}
 
-	if logLevelStr, ok := os.LookupEnv("KINDE_LOG_LEVEL"); ok {
+	if logLevelStr := os.Getenv("KINDE_LOG_LEVEL"); logLevelStr != "" {
 		parsedLogLevel, err := zerolog.ParseLevel(logLevelStr)
 		if err != nil {
-			fmt.Fprintf(out, "Log Level of %v is not a valid value - Defaulting to INFO level\n", logLevelStr)
-			zerolog.SetGlobalLevel(zerolog.InfoLevel)
+			fmt.Fprintf(out, "KINDE_LOG_LEVEL %q is not a valid level (debug, info, warn, error); using warn\n", logLevelStr)
 		} else {
 			logLevel = parsedLogLevel
 		}

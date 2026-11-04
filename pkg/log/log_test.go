@@ -21,7 +21,7 @@ func TestGetLogWriter_PrettyPrint_DefaultSettings(t *testing.T) {
 	os.Stderr = w
 
 	logger := GetLogWriter(settings)
-	logger.Info().Msg("test message")
+	logger.Warn().Msg("test message")
 
 	w.Close()
 	os.Stderr = origStderr
@@ -50,7 +50,7 @@ func TestGetLogWriter_StructuredLog(t *testing.T) {
 	os.Stderr = w
 
 	logger := GetLogWriter(settings)
-	logger.Info().Msg("structured log message")
+	logger.Warn().Msg("structured log message")
 
 	w.Close()
 	os.Stderr = origStderr
@@ -83,7 +83,7 @@ func TestGetLogWriter_InvalidLogLevel(t *testing.T) {
 	os.Stderr = w
 
 	logger := GetLogWriter(settings)
-	logger.Info().Msg("info message")
+	logger.Warn().Msg("info message")
 
 	w.Close()
 	os.Stderr = origStderr
@@ -92,5 +92,23 @@ func TestGetLogWriter_InvalidLogLevel(t *testing.T) {
 
 	if !strings.Contains(output, "info message") {
 		t.Errorf("Expected log output to contain 'info message', got: %s", output)
+	}
+}
+
+func TestGetLogWriter_HidesInfoByDefault(t *testing.T) {
+	t.Setenv("KINDE_STRUCTURED_LOG", "false")
+	os.Unsetenv("KINDE_LOG_LEVEL")
+
+	var buf bytes.Buffer
+	logger := GetLogWriter(&SharedLogSettings{ComponentName: "quiet", Out: &buf})
+	logger.Info().Msg("routine detail")
+	logger.Warn().Msg("something is off")
+
+	output := buf.String()
+	if strings.Contains(output, "routine detail") {
+		t.Errorf("Expected info logs to be hidden by default, got: %s", output)
+	}
+	if !strings.Contains(output, "something is off") {
+		t.Errorf("Expected warnings to be shown, got: %s", output)
 	}
 }

@@ -73,7 +73,7 @@ func (c *loginCmd) loginM2M(cmd *cobra.Command, cfg *config.Config, env *config.
 	}
 	cfg.SetDefaultDomain(env.DomainName)
 
-	log.Info().Str("domain", env.DomainName).Msgf("Authenticated using client_credentials")
+	fmt.Fprintf(c.ios.ErrOut, "Logged in to %s with M2M application %s\n", env.DomainName, c.clientID)
 	return nil
 }
 
@@ -91,12 +91,11 @@ func (c *loginCmd) loginUser(cmd *cobra.Command, cfg *config.Config, env *config
 		return err
 	}
 
-	log.Info().Msgf("Please open the following URL in your browser: %v", deviceAuth.VerificationURIComplete)
-	fmt.Fprintln(c.ios.Out)
-	qrterminal.GenerateHalfBlock(deviceAuth.VerificationURIComplete, qrterminal.M, c.ios.Out)
-	fmt.Fprintln(c.ios.Out)
-
-	log.Info().Msg("Waiting for user to authorize...")
+	// Prompts go to stderr, keeping stdout for data.
+	fmt.Fprintf(c.ios.ErrOut, "Open this URL in your browser to log in:\n\n  %s\n\n", deviceAuth.VerificationURIComplete)
+	qrterminal.GenerateHalfBlock(deviceAuth.VerificationURIComplete, qrterminal.M, c.ios.ErrOut)
+	fmt.Fprintln(c.ios.ErrOut)
+	fmt.Fprintln(c.ios.ErrOut, "Waiting for you to approve the login...")
 
 	err = deviceFlow.ExchangeDeviceAccessToken(context.WithoutCancel(cmd.Context()), deviceAuth)
 	if err != nil {
@@ -114,6 +113,6 @@ func (c *loginCmd) loginUser(cmd *cobra.Command, cfg *config.Config, env *config
 	}
 	cfg.SetDefaultDomain(env.DomainName)
 
-	log.Info().Str("domain", env.DomainName).Msgf("Authenticated as %v", token.GetSubject())
+	fmt.Fprintf(c.ios.ErrOut, "Logged in to %s as %s\n", env.DomainName, token.GetSubject())
 	return nil
 }

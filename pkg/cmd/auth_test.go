@@ -103,8 +103,10 @@ func TestLogout_ClearsBothLogins(t *testing.T) {
 	cli.writeConfig(env)
 	require.NoError(t, env.SaveM2MSecret("s3cret"))
 
-	_, _, err := cli.run("logout")
+	stdout, stderr, err := cli.run("logout")
 	require.NoError(t, err)
+	assert.Empty(t, stdout, "status messages belong on stderr")
+	assert.Equal(t, "Logged out of "+testDomain+"\n", stderr)
 
 	saved := cli.readConfig()
 	assert.Nil(t, saved.M2M)
