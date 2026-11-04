@@ -38,6 +38,30 @@ func Execute(ctx context.Context, args []string, ios *iostreams.IOStreams) error
 	slog.SetDefault(cli_log.GetSlogAdapter(logger))
 	ctx = logger.WithContext(ctx)
 
+	cfg, err := config.NewConfig()
+	if err != nil {
+		return fmt.Errorf("failed to load configuration: %w", err)
+	}
+	ctx = config.Ctx(ctx, cfg)
+
+	rootCmd, err := NewRootCmd(ios, cfg)
+	if err != nil {
+		return err
+	}
+	rootCmd.SetArgs(args)
+
+	runErr := rootCmd.ExecuteContext(ctx)
+
+	if err := cfg.SaveIfChanged(); err != nil {
+		return errors.Join(runErr, fmt.Errorf("failed to save configuration: %w", err))
+	}
+
+	return runErr
+}
+
+// NewRootCmd builds the full command tree. Execute uses it to run the CLI;
+// the docs generator uses it to write the command reference.
+func NewRootCmd(ios *iostreams.IOStreams, cfg config.IConfig) (*cobra.Command, error) {
 	rootCmd := &cobra.Command{
 		Use:           "kinde",
 		SilenceUsage:  true,
@@ -47,16 +71,9 @@ func Execute(ctx context.Context, args []string, ios *iostreams.IOStreams) error
 		Short:         "Kinde CLI",
 		Long:          "The official command-line for Kinde.",
 	}
-	rootCmd.SetArgs(args)
 	rootCmd.SetIn(ios.In)
 	rootCmd.SetOut(ios.Out)
 	rootCmd.SetErr(ios.ErrOut)
-
-	cfg, err := config.NewConfig()
-	if err != nil {
-		return fmt.Errorf("failed to load configuration: %w", err)
-	}
-	ctx = config.Ctx(ctx, cfg)
 
 	var domainFlag string
 	rootCmd.PersistentFlags().StringVar(&domainFlag, "domain", "",
@@ -64,7 +81,7 @@ func Execute(ctx context.Context, args []string, ios *iostreams.IOStreams) error
 
 	resourceCmds, err := newResourceCommands()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	rootCmd.AddGroup(
@@ -98,11 +115,5 @@ func Execute(ctx context.Context, args []string, ios *iostreams.IOStreams) error
 		return nil
 	}
 
-	runErr := rootCmd.ExecuteContext(ctx)
-
-	if err := cfg.SaveIfChanged(); err != nil {
-		return errors.Join(runErr, fmt.Errorf("failed to save configuration: %w", err))
-	}
-
-	return runErr
+	return rootCmd, nil
 }

@@ -223,10 +223,11 @@ func enumValues(t reflect.Type) []string {
 }
 
 // registerFlags adds a flag for every field, plus --body when the operation
-// takes a JSON request body.
-func (p *requestPlan) registerFlags(flags *pflag.FlagSet) {
+// takes a JSON request body. describe returns a flag's description from the
+// API docs, or "".
+func (p *requestPlan) registerFlags(flags *pflag.FlagSet, describe func(flag string) string) {
 	for _, field := range p.fields {
-		usage := field.usage()
+		usage := field.usage(describe(field.flag))
 		switch field.kind {
 		case kindBool:
 			flags.Bool(field.flag, false, usage)
@@ -245,7 +246,9 @@ func (p *requestPlan) registerFlags(flags *pflag.FlagSet) {
 	}
 }
 
-func (f requestField) usage() string {
+// usage returns the flag's help: its description followed by how to give the
+// value, e.g. "The identity type (one of: email, username; required)".
+func (f requestField) usage(description string) string {
 	var parts []string
 	switch f.kind {
 	case kindTime:
@@ -263,7 +266,15 @@ func (f requestField) usage() string {
 	if f.required {
 		parts = append(parts, "required")
 	}
-	return strings.Join(parts, "; ")
+	hints := strings.Join(parts, "; ")
+	switch {
+	case description == "":
+		return hints
+	case hints == "":
+		return description
+	default:
+		return description + " (" + hints + ")"
+	}
 }
 
 // buildArgs creates the method arguments from the command's flags.

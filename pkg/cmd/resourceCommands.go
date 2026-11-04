@@ -49,10 +49,17 @@ func buildCobraCommand(op resourceCommand) (*cobra.Command, error) {
 		return nil, err
 	}
 
+	doc := docsFor(op.operation)
+	short := doc.Summary
+	if short == "" {
+		short = fmt.Sprintf("Management API operation %s", op.operation)
+	}
+
 	command := &cobra.Command{
 		Use:   op.name,
 		Args:  cobra.NoArgs,
-		Short: fmt.Sprintf("Management API operation %s", op.operation),
+		Short: short,
+		Long:  doc.long(),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Read the environment when the command runs, after --domain is applied.
 			env := config.FromContext[config.Config](cmd.Context()).GetEnvironment()
@@ -66,7 +73,7 @@ func buildCobraCommand(op resourceCommand) (*cobra.Command, error) {
 			return callApiMethod(cmd, env, op, methodArgs)
 		},
 	}
-	plan.registerFlags(command.Flags())
+	plan.registerFlags(command.Flags(), doc.flag)
 
 	return command, nil
 }

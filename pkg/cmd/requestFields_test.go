@@ -20,7 +20,7 @@ func buildTestArgs(t *testing.T, operation management_api.OperationName, stdin s
 	require.NoError(t, err)
 	cmd := &cobra.Command{Use: "test"}
 	cmd.SetIn(strings.NewReader(stdin))
-	plan.registerFlags(cmd.Flags())
+	plan.registerFlags(cmd.Flags(), docsFor(operation).flag)
 	require.NoError(t, cmd.ParseFlags(flags))
 	return plan.buildArgs(cmd)
 }
@@ -52,7 +52,7 @@ func TestEnumFlag_ListsAllowedValuesInHelp(t *testing.T) {
 	plan, err := planForOperation(management_api.CreateUserIdentityOperation)
 	require.NoError(t, err)
 	cmd := &cobra.Command{}
-	plan.registerFlags(cmd.Flags())
+	plan.registerFlags(cmd.Flags(), docsFor(management_api.CreateUserIdentityOperation).flag)
 	assert.Contains(t, cmd.Flags().Lookup("type").Usage, "one of: ")
 }
 
