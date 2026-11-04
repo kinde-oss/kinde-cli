@@ -1,66 +1,42 @@
+// Package release holds the CLI's version, set at build time, and checks
+// GitHub for newer releases.
 package release
 
 import (
-	"context"
 	"fmt"
-	"math/rand"
 	"strings"
-	"time"
-
-	"github.com/Masterminds/semver/v3"
-	"github.com/briandowns/spinner"
-	"github.com/google/go-github/v80/github"
 )
 
+// Set by cmd/kinde from values GoReleaser passes with -ldflags.
 var (
 	Version = ""
 	Commit  = ""
 	Date    = ""
 )
 
-func IsNeedingUpdate() {
-	client := github.NewClient(nil)
-	fmt.Printf("Checking for updates... \n")
-	s := spinner.New(spinner.CharSets[rand.Intn(len(spinner.CharSets))], 100*time.Millisecond)
-	s.Start()
-
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	rep, _, err := client.Repositories.GetLatestRelease(ctx, "kinde-oss", "kinde-cli")
-
-	s.Stop()
-
-	if err != nil {
-		return
-	}
-	latest := rep.GetTagName()
-	if latest == "" {
-		fmt.Println("Latest release tag not found; cannot check for updates")
-		return
+// String describes this build, e.g. "kinde version 1.0.0 (7bb53d3, 2026-11-04)".
+// Details a local build doesn't have are left out.
+func String() string {
+	version := strings.TrimPrefix(Version, "v")
+	if version == "" {
+		version = "dev"
 	}
 
-	// Parse versions using semver
-	currentVersion, err := semver.NewVersion(strings.TrimPrefix(Version, "v"))
-	if err != nil {
-		// Handle development versions or invalid semver
-		fmt.Printf("Current version '%s' is not a semantic version (development build)\n", Version)
-		fmt.Printf("Latest release: %v\n", latest)
-		return
+	var details []string
+	if commit := Commit; commit != "" && commit != "none" {
+		if len(commit) > 7 {
+			commit = commit[:7]
+		}
+		details = append(details, commit)
+	}
+	if date := Date; date != "" && date != "unknown" {
+		// GoReleaser passes an RFC 3339 timestamp; the day is enough.
+		date, _, _ = strings.Cut(date, "T")
+		details = append(details, date)
 	}
 
-	latestVersion, err := semver.NewVersion(strings.TrimPrefix(latest, "v"))
-	if err != nil {
-		fmt.Printf("Error parsing latest version '%s': %v\n", latest, err)
-		return
+	if len(details) == 0 {
+		return fmt.Sprintf("kinde version %s", version)
 	}
-
-	// Compare versions using semver
-	if currentVersion.LessThan(latestVersion) {
-		fmt.Printf("An update is available: %v (current: %v)\n", latest, Version)
-	} else if currentVersion.Equal(latestVersion) {
-		fmt.Printf("You are using the latest version: %v\n", Version)
-	} else {
-		// This case handles when current version is newer than latest (e.g., pre-release or development builds)
-		fmt.Printf("You are using a newer version than the latest release: %v (latest: %v)\n", Version, latest)
-	}
+	return fmt.Sprintf("kinde version %s (%s)", version, strings.Join(details, ", "))
 }

@@ -42,7 +42,7 @@ The official command-line for Kinde.
 * [kinde subscribers](kinde_subscribers.md)	 - Manage subscribers
 * [kinde timezones](kinde_timezones.md)	 - List timezones
 * [kinde users](kinde_users.md)	 - Manage users, their identities, sessions and MFA
-* [kinde version](kinde_version.md)	 - Version
+* [kinde version](kinde_version.md)	 - Show the CLI's version and check for updates
 * [kinde webhooks](kinde_webhooks.md)	 - Manage webhooks
 * [kinde whoami](kinde_whoami.md)	 - Show the user logged in through the browser
 

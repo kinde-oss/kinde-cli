@@ -50,10 +50,17 @@ func Execute(ctx context.Context, args []string, ios *iostreams.IOStreams) error
 	}
 	rootCmd.SetArgs(args)
 
+	updates := startUpdateCheck(ctx, ios, args)
 	runErr := rootCmd.ExecuteContext(ctx)
 
 	if err := cfg.SaveIfChanged(); err != nil {
 		return errors.Join(runErr, fmt.Errorf("failed to save configuration: %w", err))
+	}
+
+	// Shown after the command's output, and not after an error, which should
+	// be the last thing printed.
+	if update := <-updates; update != nil && runErr == nil {
+		fmt.Fprintf(ios.ErrOut, "\n%s\n", update.Message())
 	}
 
 	return runErr
@@ -67,10 +74,12 @@ func NewRootCmd(ios *iostreams.IOStreams, cfg config.IConfig) (*cobra.Command, e
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		Annotations:   map[string]string{},
-		Version:       release.Version,
-		Short:         "Kinde CLI",
-		Long:          "The official command-line for Kinde.",
+		// Any value enables --version; the template below prints the details.
+		Version: release.String(),
+		Short:   "Kinde CLI",
+		Long:    "The official command-line for Kinde.",
 	}
+	rootCmd.SetVersionTemplate(release.String() + "\n")
 	rootCmd.SetIn(ios.In)
 	rootCmd.SetOut(ios.Out)
 	rootCmd.SetErr(ios.ErrOut)

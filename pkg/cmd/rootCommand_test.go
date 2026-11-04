@@ -50,3 +50,13 @@ func TestExecute_InvalidConfigIsReportedAndKept(t *testing.T) {
 	require.NoError(t, readErr)
 	assert.Equal(t, invalid, contents, "an unreadable config file must not be overwritten")
 }
+
+func TestVersion_PrintsOneLineOnStdout(t *testing.T) {
+	for _, args := range [][]string{{"version"}, {"--version"}} {
+		stdout, stderr, err := newTestCLI(t).run(args...)
+
+		require.NoError(t, err, args)
+		assert.Regexp(t, `^kinde version \S+( \(.*\))?\n$`, stdout, args)
+		assert.Empty(t, stderr, "no update check outside a terminal")
+	}
+}

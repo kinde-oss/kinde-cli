@@ -185,6 +185,10 @@ kinde users create-identity --user-id kp_123 --type email --value sally@example.
 kinde feature-flags create --name "First flag" --key first_flag --type str --default-value hello
 ```
 
+## Updates
+
+`kinde version` shows the installed version and checks GitHub for a newer release. When you run commands in a terminal, the CLI also checks at most once a day and prints a notice on stderr. It never checks in scripts or CI. Set `KINDE_NO_UPDATE_NOTIFIER=1` to turn the check off.
+
 ## Shell completion
 
 Kinde CLI can generate completion scripts for `bash`, `zsh`, `fish` and `powershell`. Run `kinde completion <shell> --help` for setup instructions.

@@ -143,7 +143,9 @@ func NormalizeDomain(domain string) (string, error) {
 	return d, nil
 }
 
-func (c *Config) detectConfigFileName() (string, error) {
+// Dir returns the CLI's configuration directory, creating it if needed:
+// $XDG_CONFIG_HOME/kinde, or ~/.config/kinde.
+func Dir() (string, error) {
 	configLocation := os.Getenv("XDG_CONFIG_HOME")
 	if configLocation == "" {
 		home, err := os.UserHomeDir()
@@ -154,14 +156,18 @@ func (c *Config) detectConfigFileName() (string, error) {
 	}
 	configLocation = filepath.Join(configLocation, CLI_NAME)
 
-	err := os.MkdirAll(configLocation, 0700)
+	if err := os.MkdirAll(configLocation, 0700); err != nil {
+		return "", err
+	}
+	return configLocation, nil
+}
+
+func (c *Config) detectConfigFileName() (string, error) {
+	dir, err := Dir()
 	if err != nil {
 		return "", err
 	}
-
-	configLocation = filepath.Join(configLocation, "config.json")
-
-	return configLocation, nil
+	return filepath.Join(dir, "config.json"), nil
 }
 
 // SaveIfChanged writes the config file if a command changed the settings, so

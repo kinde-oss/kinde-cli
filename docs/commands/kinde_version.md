@@ -1,6 +1,6 @@
 ## kinde version
 
-Version
+Show the CLI's version and check for updates
 
 ```
 kinde version [flags]

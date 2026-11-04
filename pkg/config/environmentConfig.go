@@ -251,21 +251,10 @@ func (c *Environment) keychainFolderName(fileName string) (string, error) {
 
 	fileName = fmt.Sprintf("kc_%s", normalizeServiceName(fileName))
 
-	configLocation := os.Getenv("XDG_CONFIG_HOME")
-	if configLocation == "" {
-		home, err := os.UserHomeDir()
-		if err != nil {
-			return "", err
-		}
-		configLocation = filepath.Join(home, ".config")
-	}
-	configLocation = filepath.Join(configLocation, CLI_NAME)
-
-	// Ensure the base CLI_NAME directory exists
-	if err := os.MkdirAll(configLocation, 0700); err != nil {
+	configLocation, err := Dir()
+	if err != nil {
 		return "", err
 	}
-
 	configLocation = filepath.Join(configLocation, fileName)
 
 	// Ensure per‐domain dir exists too
