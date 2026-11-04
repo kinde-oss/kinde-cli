@@ -94,7 +94,7 @@ func planForOperation(operation management_api.OperationName) (*requestPlan, err
 func callApiMethod(cmd *cobra.Command, env *config.Environment, op resourceCommand, methodArgs []reflect.Value) error {
 	clientCredentials, err := env.M2MClientCredentialsFlow()
 	if errors.Is(err, config.ErrNoM2MLogin) {
-		return fmt.Errorf("%w (%s). Management commands need an M2M application: run 'kinde login --client_id <id> --client_secret <secret>', or set %s and %s",
+		return fmt.Errorf("%w (%s). Management commands need an M2M application: run 'kinde login --client-id <client ID>', or set %s and %s",
 			err, env.DomainName, config.EnvM2MClientID, config.EnvM2MClientSecret)
 	}
 	if err != nil {

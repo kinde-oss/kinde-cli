@@ -21,7 +21,7 @@ func newWhoAmI(ios *iostreams.IOStreams) *whoAmICmd {
 	whoAmICmd.cmd = &cobra.Command{
 		Use:   "whoami",
 		Args:  nil,
-		Short: "Show current logged in user",
+		Short: "Show the user logged in through the browser",
 		RunE:  whoAmICmd.runWhoAmI,
 	}
 
@@ -38,7 +38,7 @@ func (c *whoAmICmd) runWhoAmI(cmd *cobra.Command, args []string) error {
 
 	deviceFlow, err := env.UserDeviceAuthorizationFlow()
 	if errors.Is(err, config.ErrNoUserLogin) {
-		return fmt.Errorf("you are not logged in through the browser. Please run 'kinde login' first")
+		return fmt.Errorf("you are not logged in through the browser. Run 'kinde account login' first")
 	}
 	if err != nil {
 		return err
@@ -48,7 +48,7 @@ func (c *whoAmICmd) runWhoAmI(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return fmt.Errorf("failed to check authentication status: %w", err)
 		}
-		return fmt.Errorf("you are not logged in. Please run 'kinde login' first")
+		return fmt.Errorf("your browser login is no longer valid. Run 'kinde account login' again")
 	}
 
 	token, err := deviceFlow.GetToken(cmd.Context())

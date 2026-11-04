@@ -4,19 +4,20 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
+	"strings"
 
 	"github.com/kinde-oss/kinde-cli/pkg/config"
 	"github.com/kinde-oss/kinde-cli/pkg/iostreams"
-	"github.com/mdp/qrterminal/v3"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
 
 type loginCmd struct {
-	cmd          *cobra.Command
-	ios          *iostreams.IOStreams
-	clientID     string
-	clientSecret string
+	cmd               *cobra.Command
+	ios               *iostreams.IOStreams
+	clientID          string
+	clientSecretStdin bool
 }
 
 func newLoginCmd(ios *iostreams.IOStreams) *loginCmd {
@@ -25,45 +26,54 @@ func newLoginCmd(ios *iostreams.IOStreams) *loginCmd {
 
 	loginCmd.cmd = &cobra.Command{
 		Use:   "login",
-		Args:  nil,
-		Short: "Login to Kinde",
-		RunE:  loginCmd.runLogin,
+		Args:  cobra.NoArgs,
+		Short: "Log in with an M2M application to use the Management API",
+		Long: fmt.Sprintf(`Log in with a machine-to-machine (M2M) application, which the resource commands
+use to call the Kinde Management API.
+
+Create the M2M application in Kinde, authorize it for the Kinde Management API,
+and grant it the scopes you need. The client secret is asked for without being
+shown, and is stored in your operating system's keychain.
+
+In scripts, pass the secret on stdin with --client-secret-stdin, or skip
+logging in and set %s and %s.
+
+To log in as a user through the browser, use 'kinde account login'.`, config.EnvM2MClientID, config.EnvM2MClientSecret),
+		Example: `  kinde login --domain mybusiness.kinde.com --client-id <client ID>
+  echo "$CLIENT_SECRET" | kinde login --client-id <client ID> --client-secret-stdin`,
+		RunE: loginCmd.runLogin,
 	}
 
-	loginCmd.cmd.Flags().StringVar(&loginCmd.clientID, "client_id", "", "Client ID of the application to log in with")
-	loginCmd.cmd.Flags().StringVar(&loginCmd.clientSecret, "client_secret", "", "Client secret of an M2M application; logs in with client credentials instead of the browser")
+	loginCmd.cmd.Flags().StringVar(&loginCmd.clientID, "client-id", "", "Client ID of the M2M application (required)")
+	loginCmd.cmd.Flags().BoolVar(&loginCmd.clientSecretStdin, "client-secret-stdin", false, "Read the client secret from stdin")
 	return loginCmd
 }
 
+// runLogin checks the credentials first and only saves them once they work,
+// so a failed login leaves any existing M2M login in place.
 func (c *loginCmd) runLogin(cmd *cobra.Command, args []string) error {
+	log := log.Ctx(cmd.Context())
 	cfg := config.FromContext[config.Config](cmd.Context())
 
 	env := cfg.GetEnvironment()
 	if env == nil || env.DomainName == "" {
 		return errNoEnvironment
 	}
-
-	if c.clientSecret != "" {
-		return c.loginM2M(cmd, cfg, env)
-	}
-	return c.loginUser(cmd, cfg, env)
-}
-
-// loginM2M checks the credentials first and only saves them once they work,
-// so a failed login leaves any existing M2M login in place.
-func (c *loginCmd) loginM2M(cmd *cobra.Command, cfg *config.Config, env *config.Environment) error {
-	log := log.Ctx(cmd.Context())
-
 	if c.clientID == "" {
-		return errors.New("--client_id is required when using --client_secret")
+		return errors.New("missing required flags: --client-id")
+	}
+
+	clientSecret, err := c.readClientSecret()
+	if err != nil {
+		return err
 	}
 	log.Debug().Str("client_id", c.clientID).Msg("Using client credentials flow")
 
-	if err := env.VerifyClientCredentials(context.WithoutCancel(cmd.Context()), c.clientID, c.clientSecret); err != nil {
-		return fmt.Errorf("failed to authenticate using client_credentials: %w", err)
+	if err := env.VerifyClientCredentials(context.WithoutCancel(cmd.Context()), c.clientID, clientSecret); err != nil {
+		return fmt.Errorf("failed to log in with the client ID and secret: %w", err)
 	}
 
-	if err := env.SaveM2MSecret(c.clientSecret); err != nil {
+	if err := env.SaveM2MSecret(clientSecret); err != nil {
 		return err
 	}
 	if err := cfg.SetEnvironment(func(e *config.Environment) {
@@ -77,42 +87,31 @@ func (c *loginCmd) loginM2M(cmd *cobra.Command, cfg *config.Config, env *config.
 	return nil
 }
 
-func (c *loginCmd) loginUser(cmd *cobra.Command, cfg *config.Config, env *config.Environment) error {
-	log := log.Ctx(cmd.Context())
-	log.Debug().Str("client_id", c.clientID).Msg("Using device authorization flow")
-
-	deviceFlow, err := env.NewDeviceAuthorizationFlow(c.clientID)
-	if err != nil {
-		return err
+// readClientSecret reads the secret from stdin or a hidden prompt. There is
+// deliberately no flag for it: flag values are kept in shell history and are
+// visible to other users in the process list.
+func (c *loginCmd) readClientSecret() (string, error) {
+	var secret string
+	switch {
+	case c.clientSecretStdin:
+		data, err := io.ReadAll(c.ios.In)
+		if err != nil {
+			return "", fmt.Errorf("failed to read the client secret from stdin: %w", err)
+		}
+		secret = string(data)
+	case c.ios.CanPrompt():
+		var err error
+		if secret, err = c.ios.ReadSecret("Client secret: "); err != nil {
+			return "", fmt.Errorf("failed to read the client secret: %w", err)
+		}
+	default:
+		return "", fmt.Errorf("can't prompt for the client secret outside a terminal: pass it on stdin with --client-secret-stdin, or set %s and %s instead of logging in",
+			config.EnvM2MClientID, config.EnvM2MClientSecret)
 	}
 
-	deviceAuth, err := deviceFlow.StartDeviceAuth(cmd.Context())
-	if err != nil {
-		return err
+	secret = strings.TrimSpace(secret)
+	if secret == "" {
+		return "", errors.New("the client secret is empty")
 	}
-
-	// Prompts go to stderr, keeping stdout for data.
-	fmt.Fprintf(c.ios.ErrOut, "Open this URL in your browser to log in:\n\n  %s\n\n", deviceAuth.VerificationURIComplete)
-	qrterminal.GenerateHalfBlock(deviceAuth.VerificationURIComplete, qrterminal.M, c.ios.ErrOut)
-	fmt.Fprintln(c.ios.ErrOut)
-	fmt.Fprintln(c.ios.ErrOut, "Waiting for you to approve the login...")
-
-	err = deviceFlow.ExchangeDeviceAccessToken(context.WithoutCancel(cmd.Context()), deviceAuth)
-	if err != nil {
-		return err
-	}
-	token, err := deviceFlow.GetToken(cmd.Context())
-	if err != nil {
-		return fmt.Errorf("failed to get token: %w", err)
-	}
-
-	if err := cfg.SetEnvironment(func(e *config.Environment) {
-		e.User = &config.UserLogin{ClientID: c.clientID}
-	}); err != nil {
-		return err
-	}
-	cfg.SetDefaultDomain(env.DomainName)
-
-	fmt.Fprintf(c.ios.ErrOut, "Logged in to %s as %s\n", env.DomainName, token.GetSubject())
-	return nil
+	return secret, nil
 }

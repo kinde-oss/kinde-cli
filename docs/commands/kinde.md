@@ -15,6 +15,7 @@ The official command-line for Kinde.
 
 ### SEE ALSO
 
+* [kinde account](kinde_account.md)	 - Log in as a user through the browser
 * [kinde api-keys](kinde_api-keys.md)	 - Manage API keys
 * [kinde apis](kinde_apis.md)	 - Manage APIs and their scopes
 * [kinde applications](kinde_applications.md)	 - Manage applications, their connections and URLs
@@ -30,8 +31,8 @@ The official command-line for Kinde.
 * [kinde feature-flags](kinde_feature-flags.md)	 - Manage feature flags
 * [kinde identities](kinde_identities.md)	 - Manage user identities
 * [kinde industries](kinde_industries.md)	 - List industries
-* [kinde login](kinde_login.md)	 - Login to Kinde
-* [kinde logout](kinde_logout.md)	 - Logout and clear authentication tokens
+* [kinde login](kinde_login.md)	 - Log in with an M2M application to use the Management API
+* [kinde logout](kinde_logout.md)	 - Log out of both the M2M and browser logins for the domain
 * [kinde mfa](kinde_mfa.md)	 - Manage the environment's MFA configuration
 * [kinde organizations](kinde_organizations.md)	 - Manage organizations, their users and settings
 * [kinde permissions](kinde_permissions.md)	 - Manage permissions
@@ -43,5 +44,5 @@ The official command-line for Kinde.
 * [kinde users](kinde_users.md)	 - Manage users, their identities, sessions and MFA
 * [kinde version](kinde_version.md)	 - Version
 * [kinde webhooks](kinde_webhooks.md)	 - Manage webhooks
-* [kinde whoami](kinde_whoami.md)	 - Show current logged in user
+* [kinde whoami](kinde_whoami.md)	 - Show the user logged in through the browser
 

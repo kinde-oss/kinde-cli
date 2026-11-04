@@ -19,7 +19,7 @@ func newLogoutCmd(ios *iostreams.IOStreams) *logoutCmd {
 
 	logoutCmd.cmd = &cobra.Command{
 		Use:   "logout",
-		Short: "Logout and clear authentication tokens",
+		Short: "Log out of both the M2M and browser logins for the domain",
 		RunE:  logoutCmd.runLogout,
 	}
 

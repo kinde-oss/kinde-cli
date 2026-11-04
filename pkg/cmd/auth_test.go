@@ -1,12 +1,14 @@
 package cmd
 
 import (
+	"bytes"
 	"encoding/json"
 	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/kinde-oss/kinde-cli/pkg/config"
+	"github.com/kinde-oss/kinde-cli/pkg/iostreams"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -43,14 +45,69 @@ func (c *testCLI) readFullConfig() config.Config {
 	return cfg
 }
 
-func TestLogin_ClientSecretRequiresClientID(t *testing.T) {
+func TestLogin_RequiresClientID(t *testing.T) {
 	cli := newTestCLI(t)
 	cli.writeConfig(config.Environment{})
 
-	_, _, err := cli.run("login", "--client_secret", "s3cret")
+	_, _, err := cli.run("login")
 
-	assert.ErrorContains(t, err, "--client_id is required")
+	assert.EqualError(t, err, "missing required flags: --client-id")
 	assert.Nil(t, cli.readConfig().M2M, "nothing should be saved")
+}
+
+func TestLogin_HasNoClientSecretFlag(t *testing.T) {
+	cli := newTestCLI(t)
+	cli.writeConfig(config.Environment{})
+
+	// A secret in a flag ends up in shell history and the process list.
+	_, _, err := cli.run("login", "--client-id", "abc", "--client-secret", "s3cret")
+
+	assert.ErrorContains(t, err, "unknown flag: --client-secret")
+}
+
+func TestLogin_OutsideATerminalNeedsSecretOnStdin(t *testing.T) {
+	cli := newTestCLI(t)
+	cli.writeConfig(config.Environment{})
+
+	_, _, err := cli.run("login", "--client-id", "abc")
+
+	assert.ErrorContains(t, err, "--client-secret-stdin")
+	assert.ErrorContains(t, err, config.EnvM2MClientSecret)
+}
+
+func TestLogin_EmptySecretOnStdinIsRejected(t *testing.T) {
+	cli := newTestCLI(t)
+	cli.writeConfig(config.Environment{})
+
+	_, _, err := cli.runWith(func(_ *iostreams.IOStreams, in *bytes.Buffer) {
+		in.WriteString("  \n")
+	}, "login", "--client-id", "abc", "--client-secret-stdin")
+
+	assert.EqualError(t, err, "the client secret is empty")
+}
+
+func TestLogin_ReadsSecretFromStdin(t *testing.T) {
+	ios, in, _, _ := iostreams.Test()
+	in.WriteString("s3cret\n")
+	login := newLoginCmd(ios)
+	login.clientSecretStdin = true
+
+	secret, err := login.readClientSecret()
+
+	require.NoError(t, err)
+	assert.Equal(t, "s3cret", secret, "the trailing newline from echo must be removed")
+}
+
+func TestLogin_PromptsForSecretInATerminal(t *testing.T) {
+	ios, _, out, errOut := iostreams.Test()
+	ios.SetTerminalInput(func() (string, error) { return "s3cret", nil })
+
+	secret, err := newLoginCmd(ios).readClientSecret()
+
+	require.NoError(t, err)
+	assert.Equal(t, "s3cret", secret)
+	assert.Equal(t, "Client secret: \n", errOut.String(), "the prompt goes to stderr")
+	assert.Empty(t, out.String())
 }
 
 func TestLogin_ClientIDBeforeDomainDoesNotCrash(t *testing.T) {
@@ -59,19 +116,16 @@ func TestLogin_ClientIDBeforeDomainDoesNotCrash(t *testing.T) {
 	// Previously --client_id wrote to the config while flags were parsed and
 	// crashed when no domain was selected yet.
 	assert.NotPanics(t, func() {
-		_, _, _ = cli.run("login", "--client_secret", "s3cret", "--client_id", "abc")
+		_, _, _ = cli.run("login", "--client-id", "abc")
 	})
 }
 
-func TestLogin_SecretIsNeverWrittenToConfig(t *testing.T) {
-	cli := newTestCLI(t)
-	cli.writeConfig(config.Environment{})
-
-	_, _, _ = cli.run("login", "--client_secret", "s3cret")
-
-	buf, err := os.ReadFile(filepath.Join(cli.configDir, "kinde", "config.json"))
+func TestAccountLogin_IsTheBrowserLogin(t *testing.T) {
+	_, _, err := newTestCLI(t).run("account", "login", "--help")
 	require.NoError(t, err)
-	assert.NotContains(t, string(buf), "s3cret")
+
+	stdout, _, _ := newTestCLI(t).run("login", "--help")
+	assert.Contains(t, stdout, "kinde account login", "login's help should point to the browser login")
 }
 
 func TestManage_RequiresM2MLogin(t *testing.T) {
@@ -81,7 +135,7 @@ func TestManage_RequiresM2MLogin(t *testing.T) {
 	_, _, err := cli.run("business", "get")
 
 	assert.ErrorIs(t, err, config.ErrNoM2MLogin, "a browser login must not be used for management commands")
-	assert.ErrorContains(t, err, "kinde login --client_id")
+	assert.ErrorContains(t, err, "kinde login --client-id")
 }
 
 func TestWhoami_RequiresUserLogin(t *testing.T) {

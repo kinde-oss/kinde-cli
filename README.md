@@ -95,10 +95,10 @@ go install github.com/kinde-oss/kinde-cli/cmd/kinde@latest
 ## Quick start
 
 1. In Kinde, create a machine-to-machine (M2M) application, authorize it for the Kinde Management API, and grant it the scopes you need.
-2. Log in with its credentials:
+2. Log in with its client ID. You'll be asked for the client secret:
 
     ```bash
-    kinde login --domain mybusiness.kinde.com --client_id <client ID> --client_secret <client secret>
+    kinde login --domain mybusiness.kinde.com --client-id <client ID>
     ```
 
 3. Run a command:
@@ -116,13 +116,20 @@ Commands print the API's response as JSON on stdout, so you can pipe it to tools
 The Kinde Management API only accepts tokens issued to an M2M application, so every resource command (`users`, `organizations`, `roles`, ...) needs an M2M login. Its secret is stored in your operating system's keychain, never in the config file.
 
 ```bash
-kinde login --domain <your Kinde domain> --client_id <client ID> --client_secret <client secret>
+kinde login --domain <your Kinde domain> --client-id <client ID>
+Client secret:
+```
+
+The secret isn't shown as you type. There's no flag for it, because flag values are kept in your shell history. In a script, pipe it in instead:
+
+```bash
+echo "$CLIENT_SECRET" | kinde login --client-id <client ID> --client-secret-stdin
 ```
 
 You can also log in as a user through the browser (device authorization flow). This is for testing your application's sign-in, not for the Management API:
 
 ```bash
-kinde login --domain <your Kinde domain> --client_id <application client ID>
+kinde account login --domain <your Kinde domain> --client-id <application client ID>
 kinde whoami
 ```
 

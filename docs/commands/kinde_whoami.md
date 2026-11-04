@@ -1,6 +1,6 @@
 ## kinde whoami
 
-Show current logged in user
+Show the user logged in through the browser
 
 ```
 kinde whoami [flags]

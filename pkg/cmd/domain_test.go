@@ -72,7 +72,7 @@ func TestReadOnlyCommands_DoNotWriteConfig(t *testing.T) {
 func TestFailedLogin_KeepsSavedDefault(t *testing.T) {
 	cli := newLoggedInCLI(t)
 
-	_, _, err := cli.run("--domain", otherDomain, "login", "--client_secret", "s3cret")
+	_, _, err := cli.run("--domain", otherDomain, "login", "--client-id", "abc")
 
 	require.Error(t, err)
 	assert.Equal(t, testDomain, cli.readFullConfig().CurrentEnvironment)

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"bytes"
 	"context"
 	"testing"
 
@@ -30,7 +31,17 @@ func newTestCLI(t *testing.T) *testCLI {
 // run executes the CLI with args and returns what it wrote to stdout and stderr.
 func (c *testCLI) run(args ...string) (stdout, stderr string, err error) {
 	c.t.Helper()
-	ios, _, out, errOut := iostreams.Test()
+	return c.runWith(nil, args...)
+}
+
+// runWith is run with a chance to set up the streams first, e.g. to provide
+// stdin or make them behave like a terminal.
+func (c *testCLI) runWith(setup func(ios *iostreams.IOStreams, in *bytes.Buffer), args ...string) (stdout, stderr string, err error) {
+	c.t.Helper()
+	ios, in, out, errOut := iostreams.Test()
+	if setup != nil {
+		setup(ios, in)
+	}
 	err = Execute(context.Background(), args, ios)
 	return out.String(), errOut.String(), err
 }

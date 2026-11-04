@@ -1,6 +1,6 @@
 ## kinde logout
 
-Logout and clear authentication tokens
+Log out of both the M2M and browser logins for the domain
 
 ```
 kinde logout [flags]
