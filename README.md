@@ -15,12 +15,6 @@ This is a work in progress. APIs may change without notice or be missing.
   - Each variation comes with the checksum to verify authenticity
 - Secure by default. Kinde business cannot be managed via the CLI until a new M2M application is created with the management API authorized and the select scopes granted.
 
-TODO:
-- [x] Online token verification
-  - [ ] Offline token verification
-- [x] Support for user tokens and account API
-  - [ ] Spport for account API
-
 ## Getting Started
 
 ### Installation
@@ -100,7 +94,14 @@ go install github.com/kinde-oss/kinde-cli/cmd/kinde@latest
 
 ## Authentication
 
-### To login using client credentials
+| Method | Parameters | Token Type | Use Case | API Access |
+|--------|------------|------------|----------|------------|
+| **Client Credentials** | `--client_id` + `--client_secret` | Client credentials token | Server-to-server authentication | Management API |
+| **Device Authorization** | `--client_id` only | User token | Interactive user authentication | Account API |
+
+### Client Credentials Flow (Management API)
+
+To authenticate using client credentials for management API access:
 
 ```bash
 kinde login --domain <your Kinde business domain> \
@@ -108,7 +109,11 @@ kinde login --domain <your Kinde business domain> \
 --client_secret <M2M application secret> 
 ```
 
-### To login using device authorization flow
+This flow provides a client credentials token that can be used to call the management API.
+
+### Device Authorization Flow (Account API)
+
+To authenticate using device authorization flow for account API access:
 
 Please configure a default application for device flow or specify `client_id`
 
@@ -117,6 +122,10 @@ kinde login
     --domain <your Kinde business domain>
     --client_id [optional]
 ```
+
+This flow provides a user token that can be used to call the account APIs.
+
+**Note:** Providing only `client_id` will issue a user token, while providing both `client_id` and `client_secret` will use the client credentials authentication flow.
 
 ## Check authentication status
 
@@ -164,6 +173,10 @@ This command will:
 - `--help` – Show help information.
 
 ### Management API sub-commands
+
+**📚 Setup Guide:** See [Set up Kinde Management API access](https://docs.kinde.com/developer-tools/kinde-api/connect-to-kinde-api/) for detailed instructions on creating M2M applications and configuring API access.
+
+> **⚠️ Important:** Management API access is **disabled by default** for security. You must create an M2M application and authorize it for the Kinde Management API before using these commands. See the setup guide above for configuration steps.
 
 | Subcommand | Description |
 |------------|-------------|
