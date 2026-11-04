@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/kinde-oss/kinde-cli/pkg/config"
+	"github.com/kinde-oss/kinde-cli/pkg/iostreams"
 	"github.com/kinde-oss/kinde-go/kinde/management_api"
 	"github.com/spf13/cobra"
 )
@@ -17,7 +18,7 @@ const resourceGroupID = "resources"
 
 // newResourceCommands builds one top-level command per entry in
 // resourceGroups, each with a subcommand per Management API operation.
-func newResourceCommands() ([]*cobra.Command, error) {
+func newResourceCommands(ios *iostreams.IOStreams) ([]*cobra.Command, error) {
 	var groups []*cobra.Command
 
 	for _, group := range resourceGroups {
@@ -29,7 +30,7 @@ func newResourceCommands() ([]*cobra.Command, error) {
 		}
 
 		for _, op := range group.commands {
-			command, err := buildCobraCommand(op)
+			command, err := buildCobraCommand(op, ios)
 			if err != nil {
 				return nil, fmt.Errorf("failed to build command %s %s: %w", group.name, op.name, err)
 			}
@@ -42,7 +43,7 @@ func newResourceCommands() ([]*cobra.Command, error) {
 	return groups, nil
 }
 
-func buildCobraCommand(op resourceCommand) (*cobra.Command, error) {
+func buildCobraCommand(op resourceCommand, ios *iostreams.IOStreams) (*cobra.Command, error) {
 	plan, err := planForOperation(op.operation)
 	if err != nil {
 		return nil, err
@@ -69,10 +70,14 @@ func buildCobraCommand(op resourceCommand) (*cobra.Command, error) {
 			if err != nil {
 				return err
 			}
-			return callApiMethod(cmd, env, op, methodArgs)
+			return callApiMethod(cmd, ios, env, op, methodArgs)
 		},
 	}
 	plan.registerFlags(command.Flags(), doc.flag)
+	if isDestructive(op) {
+		command.Long += "\n\nThis can't be undone, so you'll be asked to confirm. Pass --yes to skip the\nquestion, e.g. in scripts."
+		command.Flags().BoolP(yesFlag, "y", false, "Don't ask for confirmation; required when not running in a terminal")
+	}
 
 	return command, nil
 }
@@ -91,7 +96,7 @@ func planForOperation(operation management_api.OperationName) (*requestPlan, err
 	return newRequestPlan(args)
 }
 
-func callApiMethod(cmd *cobra.Command, env *config.Environment, op resourceCommand, methodArgs []reflect.Value) error {
+func callApiMethod(cmd *cobra.Command, ios *iostreams.IOStreams, env *config.Environment, op resourceCommand, methodArgs []reflect.Value) error {
 	clientCredentials, err := env.M2MClientCredentialsFlow()
 	if errors.Is(err, config.ErrNoM2MLogin) {
 		return fmt.Errorf("%w (%s). Management commands need an M2M application: run 'kinde login --client-id <client ID>', or set %s and %s",
@@ -99,6 +104,13 @@ func callApiMethod(cmd *cobra.Command, env *config.Environment, op resourceComma
 	}
 	if err != nil {
 		return fmt.Errorf("failed to create client credentials flow: %w", err)
+	}
+
+	// Ask once the request is valid and there's a login to send it with.
+	if isDestructive(op) {
+		if err := confirmDestructive(cmd, ios, env, op); err != nil {
+			return err
+		}
 	}
 
 	httpClient, err := clientCredentials.GetClient(cmd.Context())

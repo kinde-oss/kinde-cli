@@ -10,6 +10,9 @@ Required scope: delete:organization_feature_flags
 
 API: DELETE /api/v1/organizations/{org_code}/feature_flags
 
+This can't be undone, so you'll be asked to confirm. Pass --yes to skip the
+question, e.g. in scripts.
+
 ```
 kinde organizations delete-feature-flag-overrides [flags]
 ```
@@ -19,6 +22,7 @@ kinde organizations delete-feature-flag-overrides [flags]
 ```
   -h, --help              help for delete-feature-flag-overrides
       --org-code string   The identifier for the organization (required)
+  -y, --yes               Don't ask for confirmation; required when not running in a terminal
 ```
 
 ### Options inherited from parent commands

@@ -14,6 +14,9 @@ Required scope: delete:organizations
 
 API: DELETE /api/v1/organization/{org_code}
 
+This can't be undone, so you'll be asked to confirm. Pass --yes to skip the
+question, e.g. in scripts.
+
 ```
 kinde organizations delete [flags]
 ```
@@ -23,6 +26,7 @@ kinde organizations delete [flags]
 ```
   -h, --help              help for delete
       --org-code string   The identifier for the organization (required)
+  -y, --yes               Don't ask for confirmation; required when not running in a terminal
 ```
 
 ### Options inherited from parent commands

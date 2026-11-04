@@ -10,6 +10,9 @@ Required scope: create:connected_apps
 
 API: POST /api/v1/connected_apps/revoke
 
+This can't be undone, so you'll be asked to confirm. Pass --yes to skip the
+question, e.g. in scripts.
+
 ```
 kinde connected-apps revoke-token [flags]
 ```
@@ -19,6 +22,7 @@ kinde connected-apps revoke-token [flags]
 ```
   -h, --help                help for revoke-token
       --session-id string   The unique sesssion id representing the login session of a user (required)
+  -y, --yes                 Don't ask for confirmation; required when not running in a terminal
 ```
 
 ### Options inherited from parent commands

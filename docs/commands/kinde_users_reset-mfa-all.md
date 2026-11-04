@@ -10,6 +10,9 @@ Required scope: delete:user_mfa
 
 API: DELETE /api/v1/users/{user_id}/mfa
 
+This can't be undone, so you'll be asked to confirm. Pass --yes to skip the
+question, e.g. in scripts.
+
 ```
 kinde users reset-mfa-all [flags]
 ```
@@ -19,6 +22,7 @@ kinde users reset-mfa-all [flags]
 ```
   -h, --help             help for reset-mfa-all
       --user-id string   The identifier for the user (required)
+  -y, --yes              Don't ask for confirmation; required when not running in a terminal
 ```
 
 ### Options inherited from parent commands

@@ -3,11 +3,13 @@
 package iostreams
 
 import (
+	"bufio"
 	"bytes"
 	"errors"
 	"fmt"
 	"io"
 	"os"
+	"strings"
 
 	"github.com/jwalton/go-supportscolor"
 	"golang.org/x/term"
@@ -69,6 +71,24 @@ func (s *IOStreams) ReadSecret(prompt string) (string, error) {
 	// The newline the user typed isn't echoed either.
 	fmt.Fprintln(s.ErrOut)
 	return secret, err
+}
+
+// Confirm writes a yes/no question to ErrOut and reads the answer from In.
+// Anything other than "y" or "yes" counts as no.
+func (s *IOStreams) Confirm(question string) (bool, error) {
+	if !s.canPrompt {
+		return false, errors.New("cannot prompt: not running in a terminal")
+	}
+	fmt.Fprintf(s.ErrOut, "%s [y/N] ", question)
+	answer, err := bufio.NewReader(s.In).ReadString('\n')
+	if err != nil && !errors.Is(err, io.EOF) {
+		return false, err
+	}
+	switch strings.ToLower(strings.TrimSpace(answer)) {
+	case "y", "yes":
+		return true, nil
+	}
+	return false, nil
 }
 
 // SetTerminalInput makes test streams behave like a terminal, answering

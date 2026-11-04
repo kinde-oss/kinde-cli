@@ -159,6 +159,8 @@ Management API commands are grouped by resource, and each one maps to a single A
 
 See the **[command reference](docs/commands/kinde.md)** for every command and flag.
 
+Commands that can't be undone (every delete, plus `api-keys rotate` and `connected-apps revoke-token`) ask you to confirm first. In scripts, pass `--yes`; without it they fail rather than wait for an answer.
+
 ### Passing values
 
 - **Simple values** are flags: `--name "Sally"`, `--page-size 10`, `--has-organization`.

@@ -55,7 +55,7 @@ func TestFlagNameFor(t *testing.T) {
 func TestEveryResourceCommandBuilds(t *testing.T) {
 	for _, group := range resourceGroups {
 		for _, op := range group.commands {
-			_, err := buildCobraCommand(op)
+			_, err := buildCobraCommand(op, nil)
 			assert.NoError(t, err, "%s %s", group.name, op.name)
 		}
 	}

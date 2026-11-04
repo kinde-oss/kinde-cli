@@ -12,6 +12,9 @@ Required scope: update:applications
 
 API: DELETE /api/v1/applications/{application_id}/access_roles/{role_id}
 
+This can't be undone, so you'll be asked to confirm. Pass --yes to skip the
+question, e.g. in scripts.
+
 ```
 kinde applications remove-access-role [flags]
 ```
@@ -22,6 +25,7 @@ kinde applications remove-access-role [flags]
       --application-id string   The identifier/client ID for the application (required)
   -h, --help                    help for remove-access-role
       --role-id string          The identifier for the role (required)
+  -y, --yes                     Don't ask for confirmation; required when not running in a terminal
 ```
 
 ### Options inherited from parent commands

@@ -10,6 +10,9 @@ Required scope: delete:role_permissions
 
 API: DELETE /api/v1/roles/{role_id}/scopes/{scope_id}
 
+This can't be undone, so you'll be asked to confirm. Pass --yes to skip the
+question, e.g. in scripts.
+
 ```
 kinde roles delete-scope [flags]
 ```
@@ -20,6 +23,7 @@ kinde roles delete-scope [flags]
   -h, --help              help for delete-scope
       --role-id string    The role id (required)
       --scope-id string   The scope id (required)
+  -y, --yes               Don't ask for confirmation; required when not running in a terminal
 ```
 
 ### Options inherited from parent commands

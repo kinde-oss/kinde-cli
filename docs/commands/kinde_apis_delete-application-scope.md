@@ -10,6 +10,9 @@ Required scope: delete:api_application_scopes
 
 API: DELETE /api/v1/apis/{api_id}/applications/{application_id}/scopes/{scope_id}
 
+This can't be undone, so you'll be asked to confirm. Pass --yes to skip the
+question, e.g. in scripts.
+
 ```
 kinde apis delete-application-scope [flags]
 ```
@@ -21,6 +24,7 @@ kinde apis delete-application-scope [flags]
       --application-id string   Application ID (required)
   -h, --help                    help for delete-application-scope
       --scope-id string         Scope ID (required)
+  -y, --yes                     Don't ask for confirmation; required when not running in a terminal
 ```
 
 ### Options inherited from parent commands

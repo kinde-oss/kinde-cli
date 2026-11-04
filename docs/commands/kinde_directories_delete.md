@@ -10,6 +10,9 @@ Required scope: delete:scim_directories
 
 API: DELETE /api/v1/directories/{directory_id}
 
+This can't be undone, so you'll be asked to confirm. Pass --yes to skip the
+question, e.g. in scripts.
+
 ```
 kinde directories delete [flags]
 ```
@@ -19,6 +22,7 @@ kinde directories delete [flags]
 ```
       --directory-id string   The directory's ID (required)
   -h, --help                  help for delete
+  -y, --yes                   Don't ask for confirmation; required when not running in a terminal
 ```
 
 ### Options inherited from parent commands

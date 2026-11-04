@@ -14,6 +14,9 @@ Required scope: delete:users
 
 API: DELETE /api/v1/user
 
+This can't be undone, so you'll be asked to confirm. Pass --yes to skip the
+question, e.g. in scripts.
+
 ```
 kinde users delete [flags]
 ```
@@ -24,6 +27,7 @@ kinde users delete [flags]
   -h, --help                help for delete
       --id string           The user's id (required)
       --is-delete-profile   Delete all data and remove the user's profile from all of Kinde, including the subscriber list
+  -y, --yes                 Don't ask for confirmation; required when not running in a terminal
 ```
 
 ### Options inherited from parent commands

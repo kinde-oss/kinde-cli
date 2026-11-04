@@ -10,6 +10,9 @@ Required scope: delete:organization_connections
 
 API: DELETE /api/v1/organizations/{organization_code}/connections/{connection_id}
 
+This can't be undone, so you'll be asked to confirm. Pass --yes to skip the
+question, e.g. in scripts.
+
 ```
 kinde organizations remove-connection [flags]
 ```
@@ -20,6 +23,7 @@ kinde organizations remove-connection [flags]
       --connection-id string       The identifier for the connection (required)
   -h, --help                       help for remove-connection
       --organization-code string   The unique code for the organization (required)
+  -y, --yes                        Don't ask for confirmation; required when not running in a terminal
 ```
 
 ### Options inherited from parent commands

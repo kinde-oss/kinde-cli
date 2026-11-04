@@ -14,6 +14,9 @@ Required scope: delete:organization_users
 
 API: DELETE /api/v1/organizations/{org_code}/users/{user_id}
 
+This can't be undone, so you'll be asked to confirm. Pass --yes to skip the
+question, e.g. in scripts.
+
 ```
 kinde organizations remove-user [flags]
 ```
@@ -24,6 +27,7 @@ kinde organizations remove-user [flags]
   -h, --help              help for remove-user
       --org-code string   The organization's code (required)
       --user-id string    The user's id (required)
+  -y, --yes               Don't ask for confirmation; required when not running in a terminal
 ```
 
 ### Options inherited from parent commands

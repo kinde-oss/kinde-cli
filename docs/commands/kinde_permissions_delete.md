@@ -10,6 +10,9 @@ Required scope: delete:permissions
 
 API: DELETE /api/v1/permissions/{permission_id}
 
+This can't be undone, so you'll be asked to confirm. Pass --yes to skip the
+question, e.g. in scripts.
+
 ```
 kinde permissions delete [flags]
 ```
@@ -19,6 +22,7 @@ kinde permissions delete [flags]
 ```
   -h, --help                   help for delete
       --permission-id string   The identifier for the permission (required)
+  -y, --yes                    Don't ask for confirmation; required when not running in a terminal
 ```
 
 ### Options inherited from parent commands

@@ -21,7 +21,7 @@ func TestEveryResourceCommandHasAPIDocs(t *testing.T) {
 }
 
 func TestResourceCommand_HelpComesFromSpec(t *testing.T) {
-	command, err := buildCobraCommand(resourceCommand{name: "create-identity", operation: management_api.CreateUserIdentityOperation})
+	command, err := buildCobraCommand(resourceCommand{name: "create-identity", operation: management_api.CreateUserIdentityOperation}, nil)
 	require.NoError(t, err)
 
 	assert.Equal(t, "Create identity", command.Short)

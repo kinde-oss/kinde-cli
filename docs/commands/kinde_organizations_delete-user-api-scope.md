@@ -10,6 +10,9 @@ Required scope: delete:organization_user_api_scopes
 
 API: DELETE /api/v1/organizations/{org_code}/users/{user_id}/apis/{api_id}/scopes/{scope_id}
 
+This can't be undone, so you'll be asked to confirm. Pass --yes to skip the
+question, e.g. in scripts.
+
 ```
 kinde organizations delete-user-api-scope [flags]
 ```
@@ -22,6 +25,7 @@ kinde organizations delete-user-api-scope [flags]
       --org-code string   The identifier for the organization (required)
       --scope-id string   Scope ID (required)
       --user-id string    User ID (required)
+  -y, --yes               Don't ask for confirmation; required when not running in a terminal
 ```
 
 ### Options inherited from parent commands

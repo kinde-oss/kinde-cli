@@ -11,6 +11,9 @@ Required scope: delete:environment_variables
 
 API: DELETE /api/v1/environment_variables/{variable_id}
 
+This can't be undone, so you'll be asked to confirm. Pass --yes to skip the
+question, e.g. in scripts.
+
 ```
 kinde environment-variables delete [flags]
 ```
@@ -20,6 +23,7 @@ kinde environment-variables delete [flags]
 ```
   -h, --help                 help for delete
       --variable-id string   The environment variable's ID (required)
+  -y, --yes                  Don't ask for confirmation; required when not running in a terminal
 ```
 
 ### Options inherited from parent commands

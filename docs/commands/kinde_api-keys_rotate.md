@@ -11,6 +11,9 @@ Required scope: update:api_keys
 
 API: PUT /api/v1/api_keys/{key_id}
 
+This can't be undone, so you'll be asked to confirm. Pass --yes to skip the
+question, e.g. in scripts.
+
 ```
 kinde api-keys rotate [flags]
 ```
@@ -20,6 +23,7 @@ kinde api-keys rotate [flags]
 ```
   -h, --help            help for rotate
       --key-id string   The ID of the API key to rotate (required)
+  -y, --yes             Don't ask for confirmation; required when not running in a terminal
 ```
 
 ### Options inherited from parent commands

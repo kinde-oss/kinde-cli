@@ -79,7 +79,7 @@ func NewRootCmd(ios *iostreams.IOStreams, cfg config.IConfig) (*cobra.Command, e
 	rootCmd.PersistentFlags().StringVar(&domainFlag, "domain", "",
 		fmt.Sprintf("Kinde domain to use for this command (default: the domain you last logged in to; or set %s)", config.EnvDomain))
 
-	resourceCmds, err := newResourceCommands()
+	resourceCmds, err := newResourceCommands(ios)
 	if err != nil {
 		return nil, err
 	}

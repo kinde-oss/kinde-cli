@@ -14,6 +14,9 @@ Required scope: delete:identities
 
 API: DELETE /api/v1/identities/{identity_id}
 
+This can't be undone, so you'll be asked to confirm. Pass --yes to skip the
+question, e.g. in scripts.
+
 ```
 kinde identities delete [flags]
 ```
@@ -23,6 +26,7 @@ kinde identities delete [flags]
 ```
   -h, --help                 help for delete
       --identity-id string   The unique identifier for the identity (required)
+  -y, --yes                  Don't ask for confirmation; required when not running in a terminal
 ```
 
 ### Options inherited from parent commands

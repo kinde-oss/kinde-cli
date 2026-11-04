@@ -10,6 +10,9 @@ Required scope: delete:application_redirect_uris
 
 API: DELETE /api/v1/applications/{app_id}/auth_redirect_urls
 
+This can't be undone, so you'll be asked to confirm. Pass --yes to skip the
+question, e.g. in scripts.
+
 ```
 kinde applications delete-callback-urls [flags]
 ```
@@ -20,6 +23,7 @@ kinde applications delete-callback-urls [flags]
       --app-id string   The identifier for the application (required)
   -h, --help            help for delete-callback-urls
       --urls string     Urls to delete, comma separated and url encoded (required)
+  -y, --yes             Don't ask for confirmation; required when not running in a terminal
 ```
 
 ### Options inherited from parent commands
