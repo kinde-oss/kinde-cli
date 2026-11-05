@@ -9,6 +9,10 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Add application access role",
 		Description: "Add a role to the set configured as allowed to access an application. Adding a\nrole does not enable role-based access control for the application.",
 		Scopes:      []string{"update:applications"},
+		Params: []paramDoc{
+			{Name: "application_id", In: "path", Type: "string", Required: true},
+			{Name: "role_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"applicationid": "The identifier/client ID for the application",
 			"roleid":        "The identifier for the role",
@@ -20,6 +24,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Add logo",
 		Description: "Add environment logo",
 		Scopes:      []string{"update:environments"},
+		Params: []paramDoc{
+			{Name: "type", In: "path", Type: "string", Required: true, Enum: []string{"dark", "light"}},
+		},
 		Flags: map[string]string{
 			"logo": "The logo file to upload",
 			"type": "The type of logo to add",
@@ -31,6 +38,10 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Add organization logo",
 		Description: "Add organization logo",
 		Scopes:      []string{"update:organizations"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+			{Name: "type", In: "path", Type: "string", Required: true, Enum: []string{"dark", "light"}},
+		},
 		Flags: map[string]string{
 			"logo":    "The logo file to upload",
 			"orgcode": "The organization's code",
@@ -43,6 +54,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Add Organization Users",
 		Description: "Add existing users to an organization.\n\nEvery key in `roles` must be a business-wide role key, or the key of one of this\norganization's own roles while organization-managed roles are available on the\nbusiness's plan. Any other key fails the whole request with `INVALID_ROLES`\ninstead of being skipped.\n\nUsers cannot be added to organizations that are managed by directory sync\n(`ORGANIZATION_MANAGED_BY_DIRECTORY_SYNC`); user and role changes for those\norganizations must be made in the upstream identity provider.",
 		Scopes:      []string{"create:organization_users"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"orgcode": "The organization's code",
 			"users":   "Users to be added to the organization",
@@ -54,6 +68,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Add role scope",
 		Description: "Add scope to role.",
 		Scopes:      []string{"update:role_permissions"},
+		Params: []paramDoc{
+			{Name: "role_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"roleid":  "The role id",
 			"scopeid": "The scope identifier",
@@ -105,6 +122,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Create organization-managed permission",
 		Description: "Define a permission that belongs to an organization. An organization can have up\nto 100 permissions of its own.\n\nOrganization-managed permissions are permissions an organization defines for\nitself. Only that organization's own roles can hold them, they appear in tokens\nthrough those roles, and they are available on the Scale plan alongside\norganization-managed roles (they use the same scopes). If the business moves off\nScale they stay stored but stop appearing in tokens. They are not available on\nthe Kinde business.",
 		Scopes:      []string{"create:organization_roles"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"description": "The permission's description (at most 255 characters)",
 			"key":         "The permission identifier to use in code (at most 64 characters)",
@@ -118,6 +138,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Create organization-managed role",
 		Description: "Create a role that belongs to an organization. An organization can have up to\n100 roles of its own.\n\nOrganization-managed roles are roles an organization owns. They can only be\nassigned to members of that organization, they hold only the permissions the\nbusiness marks as `is_organization_role_assignable`, and they are available on\nthe Scale plan. If the business moves off Scale they stay stored but stop\nappearing in tokens and permission checks.",
 		Scopes:      []string{"create:organization_roles"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"description": "The role's description",
 			"key":         "The role identifier to use in code. Unique within the organization, and never the same as a business-wide role's key",
@@ -132,6 +155,10 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Add Organization User Permission",
 		Description: "Add permission to an organization user.",
 		Scopes:      []string{"create:organization_user_permissions"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+			{Name: "user_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"orgcode":      "The organization's code",
 			"permissionid": "The permission id",
@@ -144,6 +171,10 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Add Organization User Role",
 		Description: "Add role to an organization user.\n\nRoles cannot be added to users in organizations managed by directory sync\n(`ORGANIZATION_MANAGED_BY_DIRECTORY_SYNC`); user and role changes for those\norganizations must be made in the upstream identity provider.",
 		Scopes:      []string{"create:organization_user_roles"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+			{Name: "user_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"orgcode": "The organization's code",
 			"roleid":  "The role id",
@@ -199,6 +230,11 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Create Subscriber",
 		Description: "Create subscriber.",
 		Scopes:      []string{"create:subscribers"},
+		Params: []paramDoc{
+			{Name: "first_name", In: "query", Type: "string", Required: true},
+			{Name: "last_name", In: "query", Type: "string", Required: true},
+			{Name: "email", In: "query", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"email":     "The email address of the subscriber",
 			"firstname": "Subscriber's first name",
@@ -211,6 +247,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Create identity",
 		Description: "Creates an identity for a user.\n\nIdentities cannot be added to a user managed by directory sync\n(`USER_MANAGED_BY_DIRECTORY_SYNC`); user and role changes must be made in the\nupstream identity provider.\n\nAdding an `enterprise` identity pre-provisions the user for that connection and\nreplaces all of their other identities. A user with an enterprise identity\ncannot be given any other identity (`CANNOT_ADD_ENTERPRISE_USER_IDENTITY`).",
 		Scopes:      []string{"create:user_identities"},
+		Params: []paramDoc{
+			{Name: "user_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"connectionid":   "The social or enterprise connection ID, only required when identity type is 'social' or 'enterprise'",
 			"phonecountryid": "The country code for the phone number, only required when identity type is 'phone'",
@@ -238,6 +277,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Delete Environment Feature Flag Override",
 		Description: "Delete environment feature flag override.",
 		Scopes:      []string{"delete:environment_feature_flags"},
+		Params: []paramDoc{
+			{Name: "feature_flag_key", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"featureflagkey": "The identifier for the feature flag",
 		},
@@ -255,6 +297,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Delete Feature Flag",
 		Description: "Delete feature flag",
 		Scopes:      []string{"delete:feature_flags"},
+		Params: []paramDoc{
+			{Name: "feature_flag_key", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"featureflagkey": "The identifier for the feature flag",
 		},
@@ -265,6 +310,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Delete identity",
 		Description: "Delete identity by ID.\n\nIdentities cannot be deleted from a user managed by directory sync\n(`USER_MANAGED_BY_DIRECTORY_SYNC`); user and role changes must be made in the\nupstream identity provider.",
 		Scopes:      []string{"delete:identities"},
+		Params: []paramDoc{
+			{Name: "identity_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"identityid": "The unique identifier for the identity",
 		},
@@ -275,6 +323,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Delete logo",
 		Description: "Delete environment logo",
 		Scopes:      []string{"update:environments"},
+		Params: []paramDoc{
+			{Name: "type", In: "path", Type: "string", Required: true, Enum: []string{"dark", "light"}},
+		},
 		Flags: map[string]string{
 			"type": "The type of logo to delete",
 		},
@@ -285,6 +336,10 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Delete Organization Feature Flag Override",
 		Description: "Delete organization feature flag override.",
 		Scopes:      []string{"delete:organization_feature_flags"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+			{Name: "feature_flag_key", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"featureflagkey": "The identifier for the feature flag",
 			"orgcode":        "The identifier for the organization",
@@ -296,6 +351,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Delete Organization Feature Flag Overrides",
 		Description: "Delete all organization feature flag overrides.",
 		Scopes:      []string{"delete:organization_feature_flags"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"orgcode": "The identifier for the organization",
 		},
@@ -306,6 +364,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Delete organization handle",
 		Description: "Delete organization handle",
 		Scopes:      []string{"delete:organization_handles"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"orgcode": "The organization's code",
 		},
@@ -316,6 +377,10 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Delete organization logo",
 		Description: "Delete organization logo",
 		Scopes:      []string{"update:organizations"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+			{Name: "type", In: "path", Type: "string", Required: true, Enum: []string{"dark", "light"}},
+		},
 		Flags: map[string]string{
 			"orgcode": "The organization's code",
 			"type":    "The type of logo to delete",
@@ -327,6 +392,10 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Delete organization-managed permission",
 		Description: "Delete a permission the organization owns. The organization's roles that hold it\nlose it. This works on any plan.",
 		Scopes:      []string{"delete:organization_roles"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+			{Name: "permission_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"orgcode":      "The organization's code",
 			"permissionid": "The permission's ID",
@@ -338,6 +407,10 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Delete organization-managed role",
 		Description: "Delete a role the organization owns. Members who hold it lose it. This works on\nany plan, so roles made while on Scale can be cleaned up after a downgrade.",
 		Scopes:      []string{"delete:organization_roles"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+			{Name: "role_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"orgcode": "The organization's code",
 			"roleid":  "The role's ID",
@@ -349,6 +422,11 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Delete Organization User Permission",
 		Description: "Delete permission for an organization user.",
 		Scopes:      []string{"delete:organization_user_permissions"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+			{Name: "user_id", In: "path", Type: "string", Required: true},
+			{Name: "permission_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"orgcode":      "The organization's code",
 			"permissionid": "The permission id",
@@ -361,6 +439,11 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Delete Organization User Role",
 		Description: "Delete role for an organization user.\n\nRoles cannot be removed from users in organizations managed by directory sync\n(`ORGANIZATION_MANAGED_BY_DIRECTORY_SYNC`); user and role changes for those\norganizations must be made in the upstream identity provider.",
 		Scopes:      []string{"delete:organization_user_roles"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+			{Name: "user_id", In: "path", Type: "string", Required: true},
+			{Name: "role_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"orgcode": "The organization's code",
 			"roleid":  "The role id",
@@ -373,6 +456,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Delete Permission",
 		Description: "Delete permission",
 		Scopes:      []string{"delete:permissions"},
+		Params: []paramDoc{
+			{Name: "permission_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"permissionid": "The identifier for the permission",
 		},
@@ -383,6 +469,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Delete Property",
 		Description: "Delete property.",
 		Scopes:      []string{"delete:properties"},
+		Params: []paramDoc{
+			{Name: "property_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"propertyid": "The unique identifier for the property",
 		},
@@ -393,6 +482,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Delete role",
 		Description: "Delete role",
 		Scopes:      []string{"delete:roles"},
+		Params: []paramDoc{
+			{Name: "role_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"roleid": "The identifier for the role",
 		},
@@ -403,6 +495,10 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Delete role scope",
 		Description: "Delete scope from role.",
 		Scopes:      []string{"delete:role_permissions"},
+		Params: []paramDoc{
+			{Name: "role_id", In: "path", Type: "string", Required: true},
+			{Name: "scope_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"roleid":  "The role id",
 			"scopeid": "The scope id",
@@ -414,6 +510,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Delete user sessions",
 		Description: "Invalidate user sessions.",
 		Scopes:      []string{"delete:user_sessions"},
+		Params: []paramDoc{
+			{Name: "user_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"userid": "The identifier for the user",
 		},
@@ -424,6 +523,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Delete Webhook",
 		Description: "Delete webhook",
 		Scopes:      []string{"delete:webhooks"},
+		Params: []paramDoc{
+			{Name: "webhook_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"webhookid": "The webhook id",
 		},
@@ -434,6 +536,10 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Enable connection",
 		Description: "Enable an auth connection for an application.",
 		Scopes:      []string{"create:application_connections"},
+		Params: []paramDoc{
+			{Name: "application_id", In: "path", Type: "string", Required: true},
+			{Name: "connection_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"applicationid": "The identifier/client ID for the application",
 			"connectionid":  "The identifier for the connection",
@@ -445,6 +551,10 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Enable connection",
 		Description: "Enable an auth connection for an organization.",
 		Scopes:      []string{"create:organization_connections"},
+		Params: []paramDoc{
+			{Name: "organization_code", In: "path", Type: "string", Required: true},
+			{Name: "connection_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"connectionid":     "The identifier for the connection",
 			"organizationcode": "The unique code for the organization",
@@ -456,6 +566,12 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get application access roles",
 		Description: "Gets the roles configured as allowed to access an application. These roles are\nenforced only when role-based access control is enabled for the application.",
 		Scopes:      []string{"read:applications"},
+		Params: []paramDoc{
+			{Name: "application_id", In: "path", Type: "string", Required: true},
+			{Name: "page_size", In: "query", Type: "integer"},
+			{Name: "starting_after", In: "query", Type: "string"},
+			{Name: "ending_before", In: "query", Type: "string"},
+		},
 		Flags: map[string]string{
 			"applicationid": "The identifier/client ID for the application",
 			"endingbefore":  "The ID of the role to end before",
@@ -469,6 +585,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get connections",
 		Description: "Gets all connections for an application.",
 		Scopes:      []string{"read:application_connections"},
+		Params: []paramDoc{
+			{Name: "application_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"applicationid": "The identifier/client ID for the application",
 		},
@@ -479,6 +598,12 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "List categories",
 		Description: "Returns a list of categories.",
 		Scopes:      []string{"read:property_categories"},
+		Params: []paramDoc{
+			{Name: "page_size", In: "query", Type: "integer"},
+			{Name: "starting_after", In: "query", Type: "string"},
+			{Name: "ending_before", In: "query", Type: "string"},
+			{Name: "context", In: "query", Type: "string", Enum: []string{"usr", "org"}},
+		},
 		Flags: map[string]string{
 			"context":       "Filter the results by User or Organization context",
 			"endingbefore":  "The ID of the category to end before",
@@ -492,6 +617,12 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get Connected App URL",
 		Description: "Get a URL that authenticates and authorizes a user to a third-party connected\napp.",
 		Scopes:      []string{"read:connected_apps"},
+		Params: []paramDoc{
+			{Name: "key_code_ref", In: "query", Type: "string", Required: true},
+			{Name: "user_id", In: "query", Type: "string"},
+			{Name: "org_code", In: "query", Type: "string"},
+			{Name: "override_callback_url", In: "query", Type: "string"},
+		},
 		Flags: map[string]string{
 			"keycoderef":          "The unique key code reference of the connected app to authenticate against",
 			"orgcode":             "The code of the Kinde organization that needs to authenticate to the third-party connected app",
@@ -505,6 +636,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get Connected App Token",
 		Description: "Get an access token that can be used to call the third-party provider linked to\nthe connected app.",
 		Scopes:      []string{"read:connected_apps"},
+		Params: []paramDoc{
+			{Name: "session_id", In: "query", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"sessionid": "The unique sesssion id representing the login session of a user",
 		},
@@ -515,6 +649,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get Connection",
 		Description: "Get Connection.",
 		Scopes:      []string{"read:connections"},
+		Params: []paramDoc{
+			{Name: "connection_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"connectionid": "The unique identifier for the connection",
 		},
@@ -525,6 +662,12 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get connections",
 		Description: "Returns a list of authentication connections. Optionally you can filter this by\na home realm domain.",
 		Scopes:      []string{"read:connections"},
+		Params: []paramDoc{
+			{Name: "page_size", In: "query", Type: "integer"},
+			{Name: "home_realm_domain", In: "query", Type: "string"},
+			{Name: "starting_after", In: "query", Type: "string"},
+			{Name: "ending_before", In: "query", Type: "string"},
+		},
 		Flags: map[string]string{
 			"endingbefore":    "The ID of the connection to end before",
 			"homerealmdomain": "Filter the results by the home realm domain",
@@ -545,6 +688,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get Event",
 		Description: "Returns an event",
 		Scopes:      []string{"read:events"},
+		Params: []paramDoc{
+			{Name: "event_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"eventid": "The event id",
 		},
@@ -562,6 +708,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get identity",
 		Description: "Returns an identity by ID",
 		Scopes:      []string{"read:identities"},
+		Params: []paramDoc{
+			{Name: "identity_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"identityid": "The unique identifier for the identity",
 		},
@@ -572,6 +721,10 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get an organization user's MFA configuration",
 		Description: "Get an organization user’s MFA configuration.",
 		Scopes:      []string{"read:organization_user_mfa"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+			{Name: "user_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"orgcode": "The identifier for the organization",
 			"userid":  "The identifier for the user",
@@ -583,6 +736,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get connections",
 		Description: "Gets all connections for an organization.",
 		Scopes:      []string{"read:organization_connections"},
+		Params: []paramDoc{
+			{Name: "organization_code", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"organizationcode": "The organization code",
 		},
@@ -593,6 +749,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "List Organization Feature Flags",
 		Description: "Get all organization feature flags.",
 		Scopes:      []string{"read:organization_feature_flags"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"orgcode": "The identifier for the organization",
 		},
@@ -603,6 +762,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get Organization MFA Configuration",
 		Description: "Get the MFA configuration for an organization, including the enterprise\nconnections exempt from organization MFA.",
 		Scopes:      []string{"read:organization_mfa"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"orgcode": "The identifier for the organization",
 		},
@@ -613,6 +775,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get organization passkey settings",
 		Description: "Retrieve passkey settings for an organization, including whether the\norganization overrides the environment default.",
 		Scopes:      []string{"read:organization_passkey"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"orgcode": "The organization's code",
 		},
@@ -623,6 +788,10 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get organization-managed permission",
 		Description: "Get a permission the organization owns.",
 		Scopes:      []string{"read:organization_roles"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+			{Name: "permission_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"orgcode":      "The organization's code",
 			"permissionid": "The permission's ID",
@@ -634,6 +803,12 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "List organization-managed permissions",
 		Description: "List the permissions an organization has defined for itself. Business-wide\npermissions are not included; use the permissions endpoints for those.\n\nOrganization-managed permissions are permissions an organization defines for\nitself. Only that organization's own roles can hold them, they appear in tokens\nthrough those roles, and they are available on the Scale plan alongside\norganization-managed roles (they use the same scopes). If the business moves off\nScale they stay stored but stop appearing in tokens. They are not available on\nthe Kinde business.",
 		Scopes:      []string{"read:organization_roles"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+			{Name: "sort", In: "query", Type: "string", Enum: []string{"name_asc", "name_desc", "key_asc", "key_desc"}},
+			{Name: "page_size", In: "query", Type: "integer"},
+			{Name: "next_token", In: "query", Type: "string"},
+		},
 		Flags: map[string]string{
 			"nexttoken": "A string to get the next page of results if there are more results",
 			"orgcode":   "The organization's code",
@@ -647,6 +822,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get Organization Property Values",
 		Description: "Gets properties for an organization by org code.",
 		Scopes:      []string{"read:organization_properties"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"orgcode": "The organization's code",
 		},
@@ -657,6 +835,10 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get organization-managed role",
 		Description: "Get a role the organization owns, with its permissions.",
 		Scopes:      []string{"read:organization_roles"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+			{Name: "role_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"orgcode": "The organization's code",
 			"roleid":  "The role's ID",
@@ -668,6 +850,12 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get organization role active users count",
 		Description: "Get the number of active users that hold a given role within a specific\norganization.\n\nA user is counted as active if they were issued at least one access token during\nthe requested period, regardless of organization context on the token. Only\nusers who currently hold the role in the organization are included. The count is\nscoped to the current environment.\n\nBoth `date_time_from` and `date_time_to` are required, inclusive, and must be\nISO 8601 datetimes in UTC. Provide them at second precision (no fractional\nseconds). If a value includes fractional seconds, it is normalized before any\nother processing: `date_time_from` is rounded down and `date_time_to` is rounded\nup to the nearest second. Window validation, the active-user query, and the\nechoed response bounds all use those normalized values.\n\nThe requested window must not exceed 3 days. Because both bounds are inclusive,\nthis means `date_time_to` must be earlier than `date_time_from` plus 3 days. For\nexample, `2026-07-01T00:00:00Z` to `2026-07-03T23:59:59Z` is a full 3 day window\ncovering the whole of 1, 2 and 3 July. A longer window is rejected with\n`DATE_TIME_RANGE_TOO_LARGE`.",
 		Scopes:      []string{"read:organization_user_roles"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+			{Name: "role_id", In: "path", Type: "string", Required: true},
+			{Name: "date_time_from", In: "query", Type: "string", Required: true},
+			{Name: "date_time_to", In: "query", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"datetimefrom": "Start of the active period (inclusive), as an ISO 8601 datetime in UTC at second precision",
 			"datetimeto":   "End of the active period (inclusive), as an ISO 8601 datetime in UTC at second precision",
@@ -681,6 +869,12 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "List organization role users",
 		Description: "Get users that have a given role within a specific organization.",
 		Scopes:      []string{"read:organization_user_roles"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+			{Name: "role_id", In: "path", Type: "string", Required: true},
+			{Name: "page_size", In: "query", Type: "integer"},
+			{Name: "next_token", In: "query", Type: "string"},
+		},
 		Flags: map[string]string{
 			"nexttoken": "A string to get the next page of results if there are more results",
 			"orgcode":   "The organization's code",
@@ -694,6 +888,10 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Count organization role users",
 		Description: "Get the number of users that have a given role within a specific organization.",
 		Scopes:      []string{"read:organization_user_roles"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+			{Name: "role_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"orgcode": "The organization's code",
 			"roleid":  "The role's public id",
@@ -705,6 +903,12 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "List organization-managed roles",
 		Description: "List the roles an organization has created for itself. Business-wide roles are\nnot included; use the roles endpoints for those.\n\nOrganization-managed roles are roles an organization owns. They can only be\nassigned to members of that organization, they hold only the permissions the\nbusiness marks as `is_organization_role_assignable`, and they are available on\nthe Scale plan. If the business moves off Scale they stay stored but stop\nappearing in tokens and permission checks.",
 		Scopes:      []string{"read:organization_roles"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+			{Name: "sort", In: "query", Type: "string", Enum: []string{"name_asc", "name_desc", "key_asc", "key_desc"}},
+			{Name: "page_size", In: "query", Type: "integer"},
+			{Name: "next_token", In: "query", Type: "string"},
+		},
 		Flags: map[string]string{
 			"nexttoken": "A string to get the next page of results if there are more results",
 			"orgcode":   "The organization's code",
@@ -718,6 +922,11 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "List Organization User Permissions",
 		Description: "Get permissions for an organization user.",
 		Scopes:      []string{"read:organization_user_permissions"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+			{Name: "user_id", In: "path", Type: "string", Required: true},
+			{Name: "expand", In: "query", Type: "string"},
+		},
 		Flags: map[string]string{
 			"expand":  "Additional data to include in the response. Allowed value: \"roles\"",
 			"orgcode": "The organization's code",
@@ -730,6 +939,10 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "List Organization User Roles",
 		Description: "Get roles for an organization user.",
 		Scopes:      []string{"read:organization_user_roles"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+			{Name: "user_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"orgcode": "The organization's code",
 			"userid":  "The user's id",
@@ -741,6 +954,14 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get organization users",
 		Description: "Get user details for all members of an organization.",
 		Scopes:      []string{"read:organization_users"},
+		Params: []paramDoc{
+			{Name: "sort", In: "query", Type: "string", Enum: []string{"name_asc", "name_desc", "email_asc", "email_desc"}},
+			{Name: "page_size", In: "query", Type: "integer"},
+			{Name: "next_token", In: "query", Type: "string"},
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+			{Name: "permissions", In: "query", Type: "string"},
+			{Name: "roles", In: "query", Type: "string"},
+		},
 		Flags: map[string]string{
 			"nexttoken":   "A string to get the next page of results if there are more results",
 			"orgcode":     "The organization's code",
@@ -763,6 +984,11 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "List Permissions",
 		Description: "The returned list can be sorted by permission name or permission ID in ascending\nor descending order. The number of records to return at a time can also be\ncontrolled using the `page_size` query string parameter.",
 		Scopes:      []string{"read:permissions"},
+		Params: []paramDoc{
+			{Name: "sort", In: "query", Type: "string", Enum: []string{"name_asc", "name_desc", "id_asc", "id_desc"}},
+			{Name: "page_size", In: "query", Type: "integer"},
+			{Name: "next_token", In: "query", Type: "string"},
+		},
 		Flags: map[string]string{
 			"nexttoken": "A string to get the next page of results if there are more results",
 			"pagesize":  "Number of results per page. Defaults to 10 if parameter not sent",
@@ -775,6 +1001,12 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "List properties",
 		Description: "Returns a list of properties",
 		Scopes:      []string{"read:properties"},
+		Params: []paramDoc{
+			{Name: "page_size", In: "query", Type: "integer"},
+			{Name: "starting_after", In: "query", Type: "string"},
+			{Name: "ending_before", In: "query", Type: "string"},
+			{Name: "context", In: "query", Type: "string", Enum: []string{"usr", "org", "app"}},
+		},
 		Flags: map[string]string{
 			"context":       "Filter results by user, organization or application context",
 			"endingbefore":  "The ID of the property to end before",
@@ -788,6 +1020,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get role",
 		Description: "Get a role",
 		Scopes:      []string{"read:roles"},
+		Params: []paramDoc{
+			{Name: "role_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"roleid": "The identifier for the role",
 		},
@@ -798,6 +1033,12 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get role permissions",
 		Description: "Get permissions for a role.",
 		Scopes:      []string{"read:role_permissions"},
+		Params: []paramDoc{
+			{Name: "role_id", In: "path", Type: "string", Required: true},
+			{Name: "sort", In: "query", Type: "string", Enum: []string{"name_asc", "name_desc", "id_asc", "id_desc"}},
+			{Name: "page_size", In: "query", Type: "integer"},
+			{Name: "next_token", In: "query", Type: "string"},
+		},
 		Flags: map[string]string{
 			"nexttoken": "A string to get the next page of results if there are more results",
 			"pagesize":  "Number of results per page. Defaults to 10 if parameter not sent",
@@ -811,6 +1052,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get role scopes",
 		Description: "Get scopes for a role.",
 		Scopes:      []string{"read:role_permissions"},
+		Params: []paramDoc{
+			{Name: "role_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"roleid": "The role id",
 		},
@@ -821,6 +1065,12 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get role system permissions",
 		Description: "Get system permissions for a role.\n\nSystem permissions control what organization users can do in the self-serve\nportal.",
 		Scopes:      []string{"read:role_system_permissions"},
+		Params: []paramDoc{
+			{Name: "role_id", In: "path", Type: "string", Required: true},
+			{Name: "sort", In: "query", Type: "string", Enum: []string{"name_asc", "name_desc", "id_asc", "id_desc"}},
+			{Name: "page_size", In: "query", Type: "integer"},
+			{Name: "next_token", In: "query", Type: "string"},
+		},
 		Flags: map[string]string{
 			"nexttoken": "A string to get the next page of results if there are more results",
 			"pagesize":  "Number of results per page. Defaults to 10 if parameter not sent",
@@ -834,6 +1084,11 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "List role users",
 		Description: "Get users that have a given role, across all organizations. Each user entry\nincludes the organization codes where they hold that role.",
 		Scopes:      []string{"read:organization_user_roles"},
+		Params: []paramDoc{
+			{Name: "role_id", In: "path", Type: "string", Required: true},
+			{Name: "page_size", In: "query", Type: "integer"},
+			{Name: "next_token", In: "query", Type: "string"},
+		},
 		Flags: map[string]string{
 			"nexttoken": "A string to get the next page of results if there are more results",
 			"pagesize":  "Number of results per page. Defaults to 10 if parameter not sent",
@@ -846,6 +1101,11 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "List roles",
 		Description: "The returned list can be sorted by role name or role key in ascending or\ndescending order. The number of records to return at a time can also be\ncontrolled using the `page_size` query string parameter.",
 		Scopes:      []string{"read:roles"},
+		Params: []paramDoc{
+			{Name: "sort", In: "query", Type: "string", Enum: []string{"name_asc", "name_desc", "key_asc", "key_desc"}},
+			{Name: "page_size", In: "query", Type: "integer"},
+			{Name: "next_token", In: "query", Type: "string"},
+		},
 		Flags: map[string]string{
 			"nexttoken": "A string to get the next page of results if there are more results",
 			"pagesize":  "Number of results per page. Defaults to 10 if parameter not sent",
@@ -858,6 +1118,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get Subscriber",
 		Description: "Retrieve a subscriber record.",
 		Scopes:      []string{"read:subscribers"},
+		Params: []paramDoc{
+			{Name: "subscriber_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"subscriberid": "The subscriber's id",
 		},
@@ -868,6 +1131,11 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "List Subscribers",
 		Description: "The returned list can be sorted by full name or email address in ascending or\ndescending order. The number of records to return at a time can also be\ncontrolled using the `page_size` query string parameter.",
 		Scopes:      []string{"read:subscribers"},
+		Params: []paramDoc{
+			{Name: "sort", In: "query", Type: "string", Enum: []string{"name_asc", "name_desc", "email_asc", "email_desc"}},
+			{Name: "page_size", In: "query", Type: "integer"},
+			{Name: "next_token", In: "query", Type: "string"},
+		},
 		Flags: map[string]string{
 			"nexttoken": "A string to get the next page of results if there are more results",
 			"pagesize":  "Number of results per page. Defaults to 10 if parameter not sent",
@@ -880,6 +1148,11 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "List system permissions",
 		Description: "The returned list can be sorted by system permission name or ID in ascending or\ndescending order. The number of records to return at a time can also be\ncontrolled using the `page_size` query string parameter.\n\nSystem permissions control what organization users can do in the self-serve\nportal.",
 		Scopes:      []string{"read:system_permissions"},
+		Params: []paramDoc{
+			{Name: "sort", In: "query", Type: "string", Enum: []string{"name_asc", "name_desc", "id_asc", "id_desc"}},
+			{Name: "page_size", In: "query", Type: "integer"},
+			{Name: "next_token", In: "query", Type: "string"},
+		},
 		Flags: map[string]string{
 			"nexttoken": "A string to get the next page of results if there are more results",
 			"pagesize":  "Number of results per page. Defaults to 10 if parameter not sent",
@@ -892,6 +1165,11 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get identities",
 		Description: "Gets a list of identities for an user by ID.",
 		Scopes:      []string{"read:user_identities"},
+		Params: []paramDoc{
+			{Name: "user_id", In: "path", Type: "string", Required: true},
+			{Name: "starting_after", In: "query", Type: "string"},
+			{Name: "ending_before", In: "query", Type: "string"},
+		},
 		Flags: map[string]string{
 			"endingbefore":  "The ID of the identity to end before",
 			"startingafter": "The ID of the identity to start after",
@@ -904,6 +1182,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get property values",
 		Description: "Gets properties for an user by ID.",
 		Scopes:      []string{"read:user_properties"},
+		Params: []paramDoc{
+			{Name: "user_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"userid": "The user's ID",
 		},
@@ -914,6 +1195,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get user sessions",
 		Description: "Retrieve the list of active sessions for a specific user.",
 		Scopes:      []string{"read:user_sessions"},
+		Params: []paramDoc{
+			{Name: "user_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"userid": "The identifier for the user",
 		},
@@ -924,6 +1208,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get user's MFA configuration",
 		Description: "Get a user’s MFA configuration.",
 		Scopes:      []string{"read:user_mfa"},
+		Params: []paramDoc{
+			{Name: "user_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"userid": "The identifier for the user",
 		},
@@ -948,6 +1235,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Read organization logo details",
 		Description: "Read organization logo details",
 		Scopes:      []string{"read:organizations"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"orgcode": "The organization's code",
 		},
@@ -958,6 +1248,10 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Remove application access role",
 		Description: "Remove a role from the set that is allowed to access an application. Removing a\nrole does not change whether role-based access control is enabled for the\napplication.",
 		Scopes:      []string{"update:applications"},
+		Params: []paramDoc{
+			{Name: "application_id", In: "path", Type: "string", Required: true},
+			{Name: "role_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"applicationid": "The identifier/client ID for the application",
 			"roleid":        "The identifier for the role",
@@ -969,6 +1263,10 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Remove connection",
 		Description: "Turn off an auth connection for an application",
 		Scopes:      []string{"delete:application_connections"},
+		Params: []paramDoc{
+			{Name: "application_id", In: "path", Type: "string", Required: true},
+			{Name: "connection_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"applicationid": "The identifier/client ID for the application",
 			"connectionid":  "The identifier for the connection",
@@ -980,6 +1278,10 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Remove connection",
 		Description: "Turn off an auth connection for an organization",
 		Scopes:      []string{"delete:organization_connections"},
+		Params: []paramDoc{
+			{Name: "organization_code", In: "path", Type: "string", Required: true},
+			{Name: "connection_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"connectionid":     "The identifier for the connection",
 			"organizationcode": "The unique code for the organization",
@@ -991,6 +1293,10 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Remove Organization User",
 		Description: "Remove user from an organization.\n\nUsers cannot be removed from organizations that are managed by directory sync\n(`ORGANIZATION_MANAGED_BY_DIRECTORY_SYNC`); user and role changes for those\norganizations must be made in the upstream identity provider.",
 		Scopes:      []string{"delete:organization_users"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+			{Name: "user_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"orgcode": "The organization's code",
 			"userid":  "The user's id",
@@ -1002,6 +1308,10 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Remove role permission",
 		Description: "Remove a permission from a role.",
 		Scopes:      []string{"delete:role_permissions"},
+		Params: []paramDoc{
+			{Name: "role_id", In: "path", Type: "string", Required: true},
+			{Name: "permission_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"permissionid": "The permission's public id",
 			"roleid":       "The role's public id",
@@ -1013,6 +1323,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Replace Connection",
 		Description: "Replace Connection Config.",
 		Scopes:      []string{"update:connections"},
+		Params: []paramDoc{
+			{Name: "connection_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"connectionid":        "The unique identifier for the connection",
 			"displayname":         "The public-facing name of the connection",
@@ -1038,6 +1351,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Replace Organization MFA Configuration",
 		Description: "Replace Organization MFA Configuration.",
 		Scopes:      []string{"update:organization_mfa"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"enabledfactors":              "The MFA methods to enable",
 			"exemptenterpriseconnections": "IDs of the enterprise connections whose users are not required to use MFA for this organization",
@@ -1051,6 +1367,11 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Reset specific organization MFA for a user",
 		Description: "Reset a specific organization MFA factor for a user.",
 		Scopes:      []string{"delete:organization_user_mfa"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+			{Name: "user_id", In: "path", Type: "string", Required: true},
+			{Name: "factor_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"factorid": "The identifier for the MFA factor",
 			"orgcode":  "The identifier for the organization",
@@ -1063,6 +1384,10 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Reset all organization MFA for a user",
 		Description: "Reset all organization MFA factors for a user.",
 		Scopes:      []string{"delete:organization_user_mfa"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+			{Name: "user_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"orgcode": "The identifier for the organization",
 			"userid":  "The identifier for the user",
@@ -1074,6 +1399,10 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Reset specific environment MFA for a user",
 		Description: "Reset a specific environment MFA factor for a user.",
 		Scopes:      []string{"delete:user_mfa"},
+		Params: []paramDoc{
+			{Name: "user_id", In: "path", Type: "string", Required: true},
+			{Name: "factor_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"factorid": "The identifier for the MFA factor",
 			"userid":   "The identifier for the user",
@@ -1085,6 +1414,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Reset all environment MFA for a user",
 		Description: "Reset all environment MFA factors for a user.",
 		Scopes:      []string{"delete:user_mfa"},
+		Params: []paramDoc{
+			{Name: "user_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"userid": "The identifier for the user",
 		},
@@ -1095,6 +1427,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Revoke Connected App Token",
 		Description: "Revoke the tokens linked to the connected app session.",
 		Scopes:      []string{"create:connected_apps"},
+		Params: []paramDoc{
+			{Name: "session_id", In: "query", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"sessionid": "The unique sesssion id representing the login session of a user",
 		},
@@ -1105,6 +1440,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Set User password",
 		Description: "Set user password.\n\nPasswords cannot be set on a user managed by directory sync\n(`USER_MANAGED_BY_DIRECTORY_SYNC`); user and role changes must be made in the\nupstream identity provider.",
 		Scopes:      []string{"update:user_passwords"},
+		Params: []paramDoc{
+			{Name: "user_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"hashedpassword":      "The hashed password. For aspnet-identity-v2, provide the base64-encoded AspNetUsers.PasswordHash value as-is",
 			"hashingmethod":       "The hashing method or algorithm used to encrypt the user’s password. Default is bcrypt",
@@ -1126,6 +1464,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Update Category",
 		Description: "Update category.",
 		Scopes:      []string{"update:property_categories"},
+		Params: []paramDoc{
+			{Name: "category_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"categoryid": "The unique identifier for the category",
 			"name":       "The name of the category",
@@ -1137,6 +1478,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Update Connection",
 		Description: "Update Connection.",
 		Scopes:      []string{"update:connections"},
+		Params: []paramDoc{
+			{Name: "connection_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"connectionid":        "The unique identifier for the connection",
 			"displayname":         "The public facing name of the connection",
@@ -1151,6 +1495,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Update Environment Feature Flag Override",
 		Description: "Update environment feature flag override.",
 		Scopes:      []string{"update:environment_feature_flags"},
+		Params: []paramDoc{
+			{Name: "feature_flag_key", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"featureflagkey": "The identifier for the feature flag",
 			"value":          "The flag override value",
@@ -1162,6 +1509,14 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Replace Feature Flag",
 		Description: "Update feature flag.\n\nWhile the flag has overrides in this environment, a change to its type or\noverride level is refused with `DELETE_NOT_ALLOWED`. Remove the overrides first.",
 		Scopes:      []string{"update:feature_flags"},
+		Params: []paramDoc{
+			{Name: "feature_flag_key", In: "path", Type: "string", Required: true},
+			{Name: "name", In: "query", Type: "string", Required: true},
+			{Name: "description", In: "query", Type: "string", Required: true},
+			{Name: "type", In: "query", Type: "string", Required: true, Enum: []string{"str", "int", "bool"}},
+			{Name: "allow_override_level", In: "query", Type: "string", Required: true, Enum: []string{"env", "org"}},
+			{Name: "default_value", In: "query", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"allowoverridelevel": "Allow the flag to be overridden at a different level",
 			"defaultvalue":       "Default value for the flag used by environments and organizations",
@@ -1177,6 +1532,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Update identity",
 		Description: "Update identity by ID.\n\nIdentities cannot be updated on a user managed by directory sync\n(`USER_MANAGED_BY_DIRECTORY_SYNC`); user and role changes must be made in the\nupstream identity provider.",
 		Scopes:      []string{"update:identities"},
+		Params: []paramDoc{
+			{Name: "identity_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"identityid": "The unique identifier for the identity",
 			"isprimary":  "Whether the identity is the primary for it's type",
@@ -1188,6 +1546,11 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Update Organization Feature Flag Override",
 		Description: "Update organization feature flag override.",
 		Scopes:      []string{"update:organization_feature_flags"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+			{Name: "feature_flag_key", In: "path", Type: "string", Required: true},
+			{Name: "value", In: "query", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"featureflagkey": "The identifier for the feature flag",
 			"orgcode":        "The identifier for the organization",
@@ -1200,6 +1563,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Update organization passkey settings",
 		Description: "Update passkey settings for an organization. Set\n`is_override_environment_passkey_settings` to `false` to revert to the\nenvironment default without providing a policy.",
 		Scopes:      []string{"update:organization_passkey"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"isoverrideenvironmentpasskeysettings": "Whether to use a custom passkey policy for this organization. Set to false to revert to the environment default",
 			"orgcode":                              "The organization's code",
@@ -1212,6 +1578,10 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Update organization-managed permission",
 		Description: "Update a permission the organization owns. Fields you leave out are not changed.\nThe key cannot be changed after creation.",
 		Scopes:      []string{"update:organization_roles"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+			{Name: "permission_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"description":  "The permission's description (at most 255 characters)",
 			"name":         "The permission's name (at most 64 characters)",
@@ -1225,6 +1595,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Update Organization Property values",
 		Description: "Update organization property values.",
 		Scopes:      []string{"update:organization_properties"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"orgcode":    "The identifier for the organization",
 			"properties": "Property keys and values. Set a value to an empty string or null to unset it",
@@ -1236,6 +1609,11 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Update Organization Property value",
 		Description: "Update organization property value.",
 		Scopes:      []string{"update:organization_properties"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+			{Name: "property_key", In: "path", Type: "string", Required: true},
+			{Name: "value", In: "query", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"orgcode":     "The identifier for the organization",
 			"propertykey": "The identifier for the property",
@@ -1248,6 +1626,10 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Update organization-managed role",
 		Description: "Update a role the organization owns. Fields you leave out are not changed. The\nkey cannot be changed after creation.",
 		Scopes:      []string{"update:organization_roles"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+			{Name: "role_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"description": "The role's description",
 			"name":        "The role's name",
@@ -1262,6 +1644,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Update organization session configuration",
 		Description: "Update the organization's session configuration.",
 		Scopes:      []string{"update:organizations"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"authenticatedsessionlifetime":         "Authenticated session lifetime in seconds",
 			"isuseorgauthenticatedsessionlifetime": "Whether to apply the organization's authenticated session lifetime override",
@@ -1276,6 +1661,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Update Organization Users",
 		Description: "Update users that belong to an organization.\n\n`roles` replaces the user's roles. Every key in it must be a business-wide role\nkey, or the key of one of this organization's own roles while\norganization-managed roles are available on the business's plan. Any other key\nfails the whole request with `INVALID_ROLES` instead of being skipped. Below\nthat plan the user's organization-managed role assignments are kept but not\nissued in tokens; they cannot be named in `roles` until the plan is upgraded,\nand replacing `roles` does not remove them.\n\nUsers in organizations managed by directory sync cannot be updated\n(`ORGANIZATION_MANAGED_BY_DIRECTORY_SYNC`); user and role changes for those\norganizations must be made in the upstream identity provider.",
 		Scopes:      []string{"update:organization_users"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"orgcode": "The organization's code",
 			"users":   "Users to add, update or remove from the organization",
@@ -1297,6 +1685,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Update Permission",
 		Description: "Update permission",
 		Scopes:      []string{"update:permissions"},
+		Params: []paramDoc{
+			{Name: "permission_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"description":                  "The permission's description",
 			"isorganizationroleassignable": "Whether organizations can put this permission into roles of their own (organization-managed roles, Scale plan)",
@@ -1311,6 +1702,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Update Property",
 		Description: "Update property.",
 		Scopes:      []string{"update:properties"},
+		Params: []paramDoc{
+			{Name: "property_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"categoryid":  "Which category the property belongs to",
 			"description": "Description of the property purpose",
@@ -1325,6 +1719,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Update role permissions",
 		Description: "Update role permissions.",
 		Scopes:      []string{"update:role_permissions"},
+		Params: []paramDoc{
+			{Name: "role_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"permissions": "Permissions to add or remove from the role",
 			"roleid":      "The identifier for the role",
@@ -1336,6 +1733,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Update role system permissions",
 		Description: "Update role system permissions.\n\nSystem permissions control what organization users can do in the self-serve\nportal.",
 		Scopes:      []string{"update:role_system_permissions"},
+		Params: []paramDoc{
+			{Name: "role_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"roleid":            "The identifier for the role",
 			"systempermissions": "System permissions to add or remove from the role",
@@ -1347,6 +1747,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Update role",
 		Description: "Update a role",
 		Scopes:      []string{"update:roles"},
+		Params: []paramDoc{
+			{Name: "role_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"assignmentpermissionid": "The public ID of the permission required to assign this role to users",
 			"description":            "The role's description",
@@ -1362,6 +1765,11 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Update User Feature Flag Override",
 		Description: "Update user feature flag override.",
 		Scopes:      []string{"update:user_feature_flags"},
+		Params: []paramDoc{
+			{Name: "user_id", In: "path", Type: "string", Required: true},
+			{Name: "feature_flag_key", In: "path", Type: "string", Required: true},
+			{Name: "value", In: "query", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"featureflagkey": "The identifier for the feature flag",
 			"userid":         "The identifier for the user",
@@ -1374,6 +1782,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Update Property values",
 		Description: "Update property values.",
 		Scopes:      []string{"update:user_properties"},
+		Params: []paramDoc{
+			{Name: "user_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"properties": "Property keys and values. Set a value to an empty string or null to unset it",
 			"userid":     "The identifier for the user",
@@ -1385,6 +1796,11 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Update Property value",
 		Description: "Update property value.",
 		Scopes:      []string{"update:user_properties"},
+		Params: []paramDoc{
+			{Name: "user_id", In: "path", Type: "string", Required: true},
+			{Name: "property_key", In: "path", Type: "string", Required: true},
+			{Name: "value", In: "query", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"propertykey": "The identifier for the property",
 			"userid":      "The identifier for the user",
@@ -1397,6 +1813,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Update a Webhook",
 		Description: "Update a webhook",
 		Scopes:      []string{"update:webhooks"},
+		Params: []paramDoc{
+			{Name: "webhook_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"description": "The webhook description",
 			"eventtypes":  "Array of event type keys",
@@ -1410,6 +1829,11 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Add scope to API application",
 		Description: "Add a scope to an API application.",
 		Scopes:      []string{"create:api_application_scopes"},
+		Params: []paramDoc{
+			{Name: "api_id", In: "path", Type: "string", Required: true},
+			{Name: "application_id", In: "path", Type: "string", Required: true},
+			{Name: "scope_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"apiid":         "API ID",
 			"applicationid": "Application ID",
@@ -1422,6 +1846,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Create API scope",
 		Description: "Create a new API scope.",
 		Scopes:      []string{"create:api_scopes"},
+		Params: []paramDoc{
+			{Name: "api_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"apiid":       "API ID",
 			"description": "Description of the api scope purpose",
@@ -1445,6 +1872,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Add logout redirect URLs",
 		Description: "Add additional logout redirect URLs.",
 		Scopes:      []string{"create:application_logout_uris"},
+		Params: []paramDoc{
+			{Name: "app_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"appid": "The identifier for the application",
 			"urls":  "Array of logout urls",
@@ -1456,6 +1886,12 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Add scope to organization user api",
 		Description: "Add a scope to an organization user api.",
 		Scopes:      []string{"create:organization_user_api_scopes"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+			{Name: "user_id", In: "path", Type: "string", Required: true},
+			{Name: "api_id", In: "path", Type: "string", Required: true},
+			{Name: "scope_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"apiid":   "API ID",
 			"orgcode": "The identifier for the organization",
@@ -1469,6 +1905,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Add Redirect Callback URLs",
 		Description: "Add additional redirect callback URLs.",
 		Scopes:      []string{"create:application_redirect_uris"},
+		Params: []paramDoc{
+			{Name: "app_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"appid": "The identifier for the application",
 			"urls":  "Array of callback urls",
@@ -1590,6 +2029,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Create organization invite",
 		Description: "Create a new invitation for an organization. An invitation email will be sent to\nthe provided email address if `send_email` is set to `true`.\n\nInvitations cannot be created for organizations that are managed by directory\nsync; user and role changes for those organizations must be made in the upstream\nidentity provider.\n\nRoles that require an explicit assignment permission cannot be granted to an\ninvitee unless the caller (or the user the token represents) holds that\npermission. On Kinde-hosted plans, roles outside `owner`/`admin` additionally\nrequire the `extended_roles` entitlement.\n\nPer-organization rate limits apply: a maximum number of invitations may be\ncreated per rolling 24 hour window, and a maximum number of active\n(non-accepted, non-revoked) invitations may exist at any time. Requests that\nexceed either limit are rejected.",
 		Scopes:      []string{"create:organization_invites"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"email":     "The email address of the user to invite. Maximum 254 characters",
 			"firstname": "The first name of the user to invite. Maximum 64 characters",
@@ -1621,6 +2063,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Create user billing customer",
 		Description: "Creates a billing customer for a user in an organization, and assigns a\npublished user billing plan.\n\nThis mirrors the admin \"Start billing customer\" action on the user billing page.\n\nAt most one billing customer is created per user in an organization. If one\nalready exists, the request fails with `BILLING_CUSTOMER_EXISTS`. Concurrent\ncreates that both pass the existence check before either finishes may both\nreturn success with the same customer and agreement ids (onboarding reuses the\nrow created under the advisory lock).",
 		Scopes:      []string{"create:user_billing_customers"},
+		Params: []paramDoc{
+			{Name: "user_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"billingemail":    "The email address used for billing purposes for the user",
 			"billingplancode": "Code of a published user billing plan to assign to the new billing customer",
@@ -1634,6 +2079,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Delete API",
 		Description: "Delete an API you previously created.",
 		Scopes:      []string{"delete:apis"},
+		Params: []paramDoc{
+			{Name: "api_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"apiid": "The API's ID",
 		},
@@ -1644,6 +2092,11 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Delete API application scope",
 		Description: "Delete an API application scope you previously created.",
 		Scopes:      []string{"delete:api_application_scopes"},
+		Params: []paramDoc{
+			{Name: "api_id", In: "path", Type: "string", Required: true},
+			{Name: "application_id", In: "path", Type: "string", Required: true},
+			{Name: "scope_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"apiid":         "API ID",
 			"applicationid": "Application ID",
@@ -1656,6 +2109,10 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Delete API scope",
 		Description: "Delete an API scope you previously created.",
 		Scopes:      []string{"delete:api_scopes"},
+		Params: []paramDoc{
+			{Name: "api_id", In: "path", Type: "string", Required: true},
+			{Name: "scope_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"apiid":   "API ID",
 			"scopeid": "Scope ID",
@@ -1667,6 +2124,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Delete API key",
 		Description: "Delete an API key.",
 		Scopes:      []string{"delete:api_keys"},
+		Params: []paramDoc{
+			{Name: "key_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"keyid": "The ID of the API key",
 		},
@@ -1677,6 +2137,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Delete application",
 		Description: "Delete a client / application.",
 		Scopes:      []string{"delete:applications"},
+		Params: []paramDoc{
+			{Name: "application_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"applicationid": "The identifier for the application",
 		},
@@ -1687,6 +2150,10 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Cancel billing agreement",
 		Description: "Cancels a billing agreement. The same action as Cancel plan in the self-serve\nportal and on the admin billing page.\n\nWhen the cancellation takes effect is decided by `cancel_at`, or, when it is\nomitted, by the cancellation timing of the plan version the customer agreed to:\n\n- `immediately` expires the agreement in Kinde (sets `expires_on`) and cancels\n  the linked billing-provider subscription when one exists. The response code is\n  `AGREEMENT_DELETED`.\n- `min_period_end` and `max_period_end` schedule the cancellation for the end of\n  the earliest or the latest billing period of the subscription's charges. The\n  agreement stays active, and the customer keeps their entitlements, until\n  `cancels_on`, which the response returns with code\n  `AGREEMENT_CANCELLATION_SCHEDULED`. The scheduled cancellation can be taken\n  back with `DELETE /api/v1/billing/agreements/{agreement_id}/cancellation`\n  until then. Without a provider subscription the end of the current billing\n  cycle is used; with no known period end, or one that has already passed or is\n  less than 15 minutes away, the agreement is cancelled immediately.\n\nA scheduled cancellation is idempotent: a further request for the same agreement\nwithout `cancel_at`, or with a deferred value, answers\n`AGREEMENT_CANCELLATION_SCHEDULED` with the existing `cancels_on` before any\nother check and runs no workflow. `cancel_at=immediately` on a scheduled\nagreement ends it now.\n\nOne-time purchases stay on this agreement. Once it expires they are no longer\ncurrent and do not appear on GET one-time purchases; for a scheduled\ncancellation that happens on `cancels_on`. This does not refund what was already\npaid.\n\nProration on cancellation follows the environment billing settings for both\nimmediate and scheduled cancellations. Invoice-now applies to immediate\ncancellations only: a scheduled cancellation always receives the final period\ninvoice, usage included, at the effective date. Neither can be overridden on\nthis request.\n\nIf a live `user:plan_cancellation_request` workflow is attached, it runs first.\nA deny response returns HTTP 400 with `PLAN_CANCELLATION_BLOCKED_BY_WORKFLOW`\nand the agreement is not cancelled.",
 		Scopes:      []string{"delete:billing_agreements"},
+		Params: []paramDoc{
+			{Name: "agreement_id", In: "path", Type: "string", Required: true},
+			{Name: "cancel_at", In: "query", Type: "string", Enum: []string{"immediately", "min_period_end", "max_period_end"}},
+		},
 		Flags: map[string]string{
 			"agreementid": "The ID of the billing agreement to cancel",
 			"cancelat":    "When the cancellation takes effect. Defaults to the cancellation timing of the plan version the customer agreed to",
@@ -1698,6 +2165,10 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Delete Callback URLs",
 		Description: "Delete callback URLs.",
 		Scopes:      []string{"delete:application_redirect_uris"},
+		Params: []paramDoc{
+			{Name: "app_id", In: "path", Type: "string", Required: true},
+			{Name: "urls", In: "query", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"appid": "The identifier for the application",
 			"urls":  "Urls to delete, comma separated and url encoded",
@@ -1709,6 +2180,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Delete Connection",
 		Description: "Delete connection.",
 		Scopes:      []string{"delete:connections"},
+		Params: []paramDoc{
+			{Name: "connection_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"connectionid": "The identifier for the connection",
 		},
@@ -1719,6 +2193,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Delete SCIM directory",
 		Description: "Delete a SCIM directory and all associated data.",
 		Scopes:      []string{"delete:scim_directories"},
+		Params: []paramDoc{
+			{Name: "directory_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"directoryid": "The directory's ID",
 		},
@@ -1729,6 +2206,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Delete environment variable",
 		Description: "Delete an environment variable you previously created. This feature is in beta\nand admin UI is not yet available.",
 		Scopes:      []string{"delete:environment_variables"},
+		Params: []paramDoc{
+			{Name: "variable_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"variableid": "The environment variable's ID",
 		},
@@ -1739,6 +2219,10 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Delete Logout URLs",
 		Description: "Delete logout URLs.",
 		Scopes:      []string{"delete:application_logout_uris"},
+		Params: []paramDoc{
+			{Name: "app_id", In: "path", Type: "string", Required: true},
+			{Name: "urls", In: "query", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"appid": "The identifier for the application",
 			"urls":  "Urls to delete, comma separated and url encoded",
@@ -1750,6 +2234,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Delete Organization",
 		Description: "Delete an organization.\n\nDeletion is refused when a billing customer linked to the organization has\nagreements. Billing customers with no agreements are removed with the\norganization.",
 		Scopes:      []string{"delete:organizations"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"orgcode": "The identifier for the organization",
 		},
@@ -1760,6 +2247,10 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Delete organization invite",
 		Description: "Revoke (delete) an invitation. This will mark the invitation as revoked and\nprevent it from being accepted.",
 		Scopes:      []string{"delete:organization_invites"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+			{Name: "invite_code", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"invitecode": "The invitation's code",
 			"orgcode":    "The organization's code",
@@ -1771,6 +2262,12 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Delete scope from organization user API",
 		Description: "Delete a scope from an organization user api you previously created.",
 		Scopes:      []string{"delete:organization_user_api_scopes"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+			{Name: "user_id", In: "path", Type: "string", Required: true},
+			{Name: "api_id", In: "path", Type: "string", Required: true},
+			{Name: "scope_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"apiid":   "API ID",
 			"orgcode": "The identifier for the organization",
@@ -1784,6 +2281,10 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Delete user",
 		Description: "Delete a user record.\n\nUsers managed by directory sync cannot be deleted\n(`USER_MANAGED_BY_DIRECTORY_SYNC`); user and role changes must be made in the\nupstream identity provider.",
 		Scopes:      []string{"delete:users"},
+		Params: []paramDoc{
+			{Name: "id", In: "query", Type: "string", Required: true},
+			{Name: "is_delete_profile", In: "query", Type: "boolean"},
+		},
 		Flags: map[string]string{
 			"id":              "The user's id",
 			"isdeleteprofile": "Delete all data and remove the user's profile from all of Kinde, including the subscriber list",
@@ -1795,6 +2296,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get API",
 		Description: "Retrieve API details by ID.",
 		Scopes:      []string{"read:apis"},
+		Params: []paramDoc{
+			{Name: "api_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"apiid": "The API's ID",
 		},
@@ -1805,6 +2309,10 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get API application scopes",
 		Description: "Retrieve the scopes of an API that an application has been granted. The\napplication must be authorized to use the API.",
 		Scopes:      []string{"read:api_application_scopes"},
+		Params: []paramDoc{
+			{Name: "api_id", In: "path", Type: "string", Required: true},
+			{Name: "application_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"apiid":         "API ID",
 			"applicationid": "Application ID",
@@ -1816,6 +2324,10 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get API scope",
 		Description: "Retrieve API scope by API ID.",
 		Scopes:      []string{"read:api_scopes"},
+		Params: []paramDoc{
+			{Name: "api_id", In: "path", Type: "string", Required: true},
+			{Name: "scope_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"apiid":   "API ID",
 			"scopeid": "Scope ID",
@@ -1827,6 +2339,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get API scopes",
 		Description: "Retrieve API scopes by API ID.",
 		Scopes:      []string{"read:api_scopes"},
+		Params: []paramDoc{
+			{Name: "api_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"apiid": "API ID",
 		},
@@ -1837,6 +2352,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get APIs",
 		Description: "Returns a list of your APIs. The APIs are returned sorted by name.",
 		Scopes:      []string{"read:apis"},
+		Params: []paramDoc{
+			{Name: "expand", In: "query", Type: "string", Enum: []string{"scopes"}},
+		},
 		Flags: map[string]string{
 			"expand": "Additional data to include in the response. Allowed value: \"scopes\"",
 		},
@@ -1847,6 +2365,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get API key",
 		Description: "Retrieve API key details by ID.",
 		Scopes:      []string{"read:api_keys"},
+		Params: []paramDoc{
+			{Name: "key_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"keyid": "The ID of the API key",
 		},
@@ -1857,6 +2378,14 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get API keys",
 		Description: "Returns a list of API keys.",
 		Scopes:      []string{"read:api_keys"},
+		Params: []paramDoc{
+			{Name: "page_size", In: "query", Type: "integer"},
+			{Name: "starting_after", In: "query", Type: "string"},
+			{Name: "key_type", In: "query", Type: "string", Enum: []string{"organization", "user"}},
+			{Name: "status", In: "query", Type: "string", Enum: []string{"active", "inactive", "revoked"}},
+			{Name: "user_id", In: "query", Type: "string"},
+			{Name: "org_code", In: "query", Type: "string"},
+		},
 		Flags: map[string]string{
 			"keytype":       "Filter by API key type (organization or user)",
 			"orgcode":       "Filter by organization code to get API keys associated with a specific organization",
@@ -1872,6 +2401,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get application",
 		Description: "Gets an application given the application's ID.",
 		Scopes:      []string{"read:applications"},
+		Params: []paramDoc{
+			{Name: "application_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"applicationid": "The identifier for the application",
 		},
@@ -1882,6 +2414,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get property values",
 		Description: "Gets properties for an application by client ID.",
 		Scopes:      []string{"read:application_properties"},
+		Params: []paramDoc{
+			{Name: "application_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"applicationid": "The application's ID / client ID",
 		},
@@ -1892,6 +2427,11 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get applications",
 		Description: "Get a list of applications / clients.",
 		Scopes:      []string{"read:applications"},
+		Params: []paramDoc{
+			{Name: "sort", In: "query", Type: "string", Enum: []string{"name_asc", "name_desc"}},
+			{Name: "page_size", In: "query", Type: "integer"},
+			{Name: "next_token", In: "query", Type: "string"},
+		},
 		Flags: map[string]string{
 			"nexttoken": "A string to get the next page of results if there are more results",
 			"pagesize":  "Number of results per page. Defaults to 10 if parameter not sent",
@@ -1904,6 +2444,13 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get billing agreements",
 		Description: "Returns all the agreements a billing customer currently has access to",
 		Scopes:      []string{"read:billing_agreements"},
+		Params: []paramDoc{
+			{Name: "page_size", In: "query", Type: "integer"},
+			{Name: "starting_after", In: "query", Type: "string"},
+			{Name: "ending_before", In: "query", Type: "string"},
+			{Name: "customer_id", In: "query", Type: "string", Required: true},
+			{Name: "feature_code", In: "query", Type: "string"},
+		},
 		Flags: map[string]string{
 			"customerid":    "The ID of the billing customer to retrieve agreements for",
 			"endingbefore":  "The ID of the billing agreement to end before",
@@ -1918,6 +2465,14 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get billing entitlements",
 		Description: "Returns all the entitlements a billing customer currently has access to",
 		Scopes:      []string{"read:billing_entitlements"},
+		Params: []paramDoc{
+			{Name: "page_size", In: "query", Type: "integer"},
+			{Name: "starting_after", In: "query", Type: "string"},
+			{Name: "ending_before", In: "query", Type: "string"},
+			{Name: "customer_id", In: "query", Type: "string", Required: true},
+			{Name: "max_value", In: "query", Type: "string"},
+			{Name: "expand", In: "query", Type: "string", Enum: []string{"plans"}},
+		},
 		Flags: map[string]string{
 			"customerid":    "The ID of the billing customer to retrieve entitlements for",
 			"endingbefore":  "The ID of the billing entitlement to end before",
@@ -1933,6 +2488,14 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get billing meter usage",
 		Description: "Returns meter usage records for one billing agreement and feature.\n\nBy default only records in the customer's current billing cycle are returned.\nPass `all_cycles=true` to page every record for that meter.\n\nThe response includes the same grant snapshot as POST (`units_granted`,\n`current_usage`, and `expiration_policy_code` when the grant is a one-time\npurchase). `current_usage` is the grant-relative running total after every\naccepted record — not the page sum. For never-expires one-time features that\nis the lifetime total (ingest-order absolute/delta). For cycle-end one-time\nfeatures and plan-metered entitlements that is the current billing cycle total.\nGrant fields are omitted when there is no current grant. `units_granted` is also\nomitted when the grant is unlimited; an unlimited one-time grant still returns\n`expiration_policy_code`. `customer_agreement_id` and `feature_code` are on the\nresponse, not repeated on each record.",
 		Scopes:      []string{"read:meter_usage"},
+		Params: []paramDoc{
+			{Name: "page_size", In: "query", Type: "integer"},
+			{Name: "starting_after", In: "query", Type: "string"},
+			{Name: "ending_before", In: "query", Type: "string"},
+			{Name: "customer_agreement_id", In: "query", Type: "string", Required: true},
+			{Name: "feature_code", In: "query", Type: "string", Required: true},
+			{Name: "all_cycles", In: "query", Type: "boolean"},
+		},
 		Flags: map[string]string{
 			"allcycles":           "When true, include usage records from every billing cycle",
 			"customeragreementid": "The billing agreement to retrieve meter usage for",
@@ -1948,6 +2511,14 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get billing one-time purchases",
 		Description: "Returns the current one-time purchases a billing customer has. A purchase is\ncurrent when it is paid, belongs to an active agreement, and has not expired\n(`expires_on` is null or in the future). Pending, failed, void, and expired\npurchases are omitted.\n\nChanging plan (`POST /api/v1/billing/agreements`) or cancelling the agreement\n(`DELETE /api/v1/billing/agreements/{agreement_id}`) leaves those purchases on\nthe previous agreement. They are no longer current, so they do not appear in\nthis list.\n\nEach item is one purchase row. Repeat buys of the same feature are separate\nitems. Pass `feature_totals=true` for per-feature aggregates across all current\npurchases matching the filters, not just the current page. Metered totals\ninclude `current_billing_cycle_usage` (this billing period) and\n`usage_since_first_purchased` (the ingest-order lifetime total for that\nagreement and feature).",
 		Scopes:      []string{"read:billing_one_time_purchases"},
+		Params: []paramDoc{
+			{Name: "page_size", In: "query", Type: "integer"},
+			{Name: "starting_after", In: "query", Type: "string"},
+			{Name: "ending_before", In: "query", Type: "string"},
+			{Name: "customer_id", In: "query", Type: "string", Required: true},
+			{Name: "feature_code", In: "query", Type: "string"},
+			{Name: "feature_totals", In: "query", Type: "boolean"},
+		},
 		Flags: map[string]string{
 			"customerid":    "The ID of the billing customer to retrieve one-time purchases for",
 			"endingbefore":  "The ID of the one-time purchase to end before",
@@ -1970,6 +2541,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "List Callback URLs",
 		Description: "Returns an application's redirect callback URLs.",
 		Scopes:      []string{"read:applications_redirect_uris"},
+		Params: []paramDoc{
+			{Name: "app_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"appid": "The identifier for the application",
 		},
@@ -1980,6 +2554,11 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get SCIM directories",
 		Description: "Returns a list of SCIM directories for your organization.",
 		Scopes:      []string{"read:scim_directories"},
+		Params: []paramDoc{
+			{Name: "page_size", In: "query", Type: "integer"},
+			{Name: "starting_after", In: "query", Type: "string"},
+			{Name: "organization_code", In: "query", Type: "string"},
+		},
 		Flags: map[string]string{
 			"organizationcode": "Filter by organization code to get directories for a specific organization",
 			"pagesize":         "Number of results per page. Defaults to 50 if parameter not sent",
@@ -1992,6 +2571,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get SCIM directory",
 		Description: "Retrieve SCIM directory details by ID.",
 		Scopes:      []string{"read:scim_directories"},
+		Params: []paramDoc{
+			{Name: "directory_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"directoryid": "The directory's ID",
 		},
@@ -2009,6 +2591,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get environment variable",
 		Description: "Retrieve environment variable details by ID. This feature is in beta and admin\nUI is not yet available.",
 		Scopes:      []string{"read:environment_variables"},
+		Params: []paramDoc{
+			{Name: "variable_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"variableid": "The environment variable's ID",
 		},
@@ -2026,6 +2611,12 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get identities",
 		Description: "Find identities by their exact value and return the user each one belongs to.\n\nUse this to resolve a user from any of their identities, including email\naddresses that are not their primary one. Exactly one of `email`, `phone` or\n`username` must be supplied, and the value is matched in full - this endpoint\ndoes not do partial or fuzzy matching.\n\nEmail, phone and username identities are unique across the environment and are\nalways searched. Social and enterprise identities are keyed on the ID the\nprovider issued rather than on the email address, so they are only searched when\n`connection_id` names the connection to look in.",
 		Scopes:      []string{"read:identities"},
+		Params: []paramDoc{
+			{Name: "email", In: "query", Type: "string"},
+			{Name: "phone", In: "query", Type: "string"},
+			{Name: "username", In: "query", Type: "string"},
+			{Name: "connection_id", In: "query", Type: "string"},
+		},
 		Flags: map[string]string{
 			"connectionid": "Also search the social or enterprise identities on this connection for the given email",
 			"email":        "The email address to find. Matched in full, and case-insensitively",
@@ -2046,6 +2637,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "List logout URLs",
 		Description: "Returns an application's logout redirect URLs.",
 		Scopes:      []string{"read:application_logout_uris"},
+		Params: []paramDoc{
+			{Name: "app_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"appid": "The identifier for the application",
 		},
@@ -2056,6 +2650,10 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get organization",
 		Description: "Retrieve organization details by code.",
 		Scopes:      []string{"read:organizations"},
+		Params: []paramDoc{
+			{Name: "code", In: "query", Type: "string", Required: true},
+			{Name: "expand", In: "query", Type: "string"},
+		},
 		Flags: map[string]string{
 			"code":   "The organization's code",
 			"expand": "Additional data to include in the response. Allowed value: \"billing\"",
@@ -2067,6 +2665,10 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get organization invite",
 		Description: "Get details of a specific invitation by its code.",
 		Scopes:      []string{"read:organization_invites"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+			{Name: "invite_code", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"invitecode": "The invitation's code",
 			"orgcode":    "The organization's code",
@@ -2078,6 +2680,14 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get organization invites",
 		Description: "Get a list of invitations for an organization. By default, only pending\n(non-revoked, non-accepted) invitations are returned.",
 		Scopes:      []string{"read:organization_invites"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+			{Name: "sort", In: "query", Type: "string", Enum: []string{"created_on_asc", "created_on_desc", "email_asc", "email_desc", "name_asc", "name_desc"}},
+			{Name: "page_size", In: "query", Type: "integer"},
+			{Name: "next_token", In: "query", Type: "string"},
+			{Name: "include_revoked", In: "query", Type: "boolean"},
+			{Name: "include_accepted", In: "query", Type: "boolean"},
+		},
 		Flags: map[string]string{
 			"includeaccepted": "Include accepted invitations in the results",
 			"includerevoked":  "Include revoked invitations in the results",
@@ -2093,6 +2703,11 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get organizations",
 		Description: "Get a list of organizations.",
 		Scopes:      []string{"read:organizations"},
+		Params: []paramDoc{
+			{Name: "sort", In: "query", Type: "string", Enum: []string{"name_asc", "name_desc", "email_asc", "email_desc"}},
+			{Name: "page_size", In: "query", Type: "integer"},
+			{Name: "next_token", In: "query", Type: "string"},
+		},
 		Flags: map[string]string{
 			"nexttoken": "A string to get the next page of results if there are more results",
 			"pagesize":  "Number of results per page. Defaults to 10 if parameter not sent",
@@ -2112,6 +2727,10 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get user",
 		Description: "Retrieve a user record.",
 		Scopes:      []string{"read:users"},
+		Params: []paramDoc{
+			{Name: "id", In: "query", Type: "string", Required: true},
+			{Name: "expand", In: "query", Type: "string"},
+		},
 		Flags: map[string]string{
 			"expand": "Additional data to include in the response. One or more of (comma-separated): \"organizations\", \"identities\", \"billing\"",
 			"id":     "The user's id",
@@ -2123,6 +2742,17 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Get users",
 		Description: "The returned list can be sorted by full name or email address in ascending or\ndescending order. The number of records to return at a time can also be\ncontrolled using the `page_size` query string parameter.",
 		Scopes:      []string{"read:users"},
+		Params: []paramDoc{
+			{Name: "page_size", In: "query", Type: "integer"},
+			{Name: "user_id", In: "query", Type: "string"},
+			{Name: "next_token", In: "query", Type: "string"},
+			{Name: "email", In: "query", Type: "string"},
+			{Name: "username", In: "query", Type: "string"},
+			{Name: "phone", In: "query", Type: "string"},
+			{Name: "expand", In: "query", Type: "string"},
+			{Name: "has_organization", In: "query", Type: "boolean"},
+			{Name: "active_since", In: "query", Type: "string"},
+		},
 		Flags: map[string]string{
 			"activesince":     "Filter the results to only include users who have been active since this date. Date should be in ISO 8601 format",
 			"email":           "Filter the results by email address. The query string should be comma separated and url encoded",
@@ -2141,6 +2771,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Refresh User Claims and Invalidate Cache",
 		Description: "Refreshes the user's claims and invalidates the current cache.",
 		Scopes:      []string{"update:user_refresh_claims"},
+		Params: []paramDoc{
+			{Name: "user_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"userid": "The id of the user whose claims needs to be updated",
 		},
@@ -2151,6 +2784,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Replace logout redirect URls",
 		Description: "Replace all logout redirect URLs.",
 		Scopes:      []string{"update:application_logout_uris"},
+		Params: []paramDoc{
+			{Name: "app_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"appid": "The identifier for the application",
 			"urls":  "Array of logout urls",
@@ -2162,6 +2798,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Replace Redirect Callback URLs",
 		Description: "Replace all redirect callback URLs.",
 		Scopes:      []string{"update:application_redirect_uris"},
+		Params: []paramDoc{
+			{Name: "app_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"appid": "The identifier for the application",
 			"urls":  "Array of callback urls",
@@ -2173,6 +2812,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Revert a scheduled billing agreement cancellation",
 		Description: "Takes back a scheduled cancellation of a billing agreement. The agreement stays\nactive and the linked billing-provider subscription is no longer set to cancel.\nThe same action as Keep plan in the self-serve portal and on the admin billing\npage.\n\nOnly a cancellation that has not taken effect yet can be reverted. An agreement\nthat has already expired returns HTTP 400 with `AGREEMENT_ALREADY_CANCELLED`;\none with no scheduled cancellation returns\n`AGREEMENT_NOT_SCHEDULED_FOR_CANCELLATION`.",
 		Scopes:      []string{"update:billing_agreements"},
+		Params: []paramDoc{
+			{Name: "agreement_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"agreementid": "The ID of the billing agreement whose scheduled cancellation to revert",
 		},
@@ -2183,6 +2825,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Rotate API key",
 		Description: "Rotate an API key to generate a new key while maintaining the same permissions\nand associations.",
 		Scopes:      []string{"update:api_keys"},
+		Params: []paramDoc{
+			{Name: "key_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"keyid": "The ID of the API key to rotate",
 		},
@@ -2193,6 +2838,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Rotate SCIM directory secret token",
 		Description: "Rotate the SCIM directory bearer token. The previous token stops working\nimmediately.",
 		Scopes:      []string{"update:scim_directories"},
+		Params: []paramDoc{
+			{Name: "directory_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"directoryid": "The directory's ID",
 		},
@@ -2203,6 +2851,15 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Search users",
 		Description: "Search for users based on the provided query string. Set query to '*' to filter\nby other parameters only. The number of records to return at a time can be\ncontrolled using the `page_size` query string parameter.",
 		Scopes:      []string{"read:users"},
+		Params: []paramDoc{
+			{Name: "page_size", In: "query", Type: "integer"},
+			{Name: "query", In: "query", Type: "string"},
+			{Name: "api_scopes", In: "query", Type: "string"},
+			{Name: "properties", In: "query", Type: "object"},
+			{Name: "starting_after", In: "query", Type: "string"},
+			{Name: "ending_before", In: "query", Type: "string"},
+			{Name: "expand", In: "query", Type: "string"},
+		},
 		Flags: map[string]string{
 			"apiscopes":     "Search the users by api scopes",
 			"endingbefore":  "The ID of the user to end before",
@@ -2218,6 +2875,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Authorize API applications",
 		Description: "Authorize applications to be allowed to request access tokens for an API",
 		Scopes:      []string{"update:apis"},
+		Params: []paramDoc{
+			{Name: "api_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"apiid": "The API's ID",
 		},
@@ -2228,6 +2888,10 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Update API scope",
 		Description: "Update an API scope.",
 		Scopes:      []string{"update:api_scopes"},
+		Params: []paramDoc{
+			{Name: "api_id", In: "path", Type: "string", Required: true},
+			{Name: "scope_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"apiid":       "API ID",
 			"description": "Description of the api scope purpose",
@@ -2240,6 +2904,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Update Application",
 		Description: "Updates a client's settings. For more information, read [Applications in\nKinde](https://docs.kinde.com/build/applications/about-applications)",
 		Scopes:      []string{"update:applications"},
+		Params: []paramDoc{
+			{Name: "application_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"applicationid":               "The identifier for the application",
 			"hasmarketingconsent":         "Show a marketing consent checkbox on the sign-up page",
@@ -2264,6 +2931,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Update application tokens",
 		Description: "Configure tokens for an application.",
 		Scopes:      []string{"update:application_tokens"},
+		Params: []paramDoc{
+			{Name: "application_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"accesstokenlifetime":          "The lifetime of an access token in seconds",
 			"applicationid":                "The identifier/client ID for the application",
@@ -2279,6 +2949,10 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Update property",
 		Description: "Update application property value.",
 		Scopes:      []string{"update:application_properties"},
+		Params: []paramDoc{
+			{Name: "application_id", In: "path", Type: "string", Required: true},
+			{Name: "property_key", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"applicationid": "The application's ID / client ID",
 			"propertykey":   "The property's key",
@@ -2310,6 +2984,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Update SCIM directory",
 		Description: "Update SCIM directory configuration.",
 		Scopes:      []string{"update:scim_directories"},
+		Params: []paramDoc{
+			{Name: "directory_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"directoryid":   "The directory's ID",
 			"directoryname": "A descriptive name for the SCIM directory",
@@ -2321,6 +2998,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Update environment variable",
 		Description: "Update an environment variable you previously created. This feature is in beta\nand admin UI is not yet available.",
 		Scopes:      []string{"update:environment_variables"},
+		Params: []paramDoc{
+			{Name: "variable_id", In: "path", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"issecret":   "Whether the environment variable is sensitive. Secret variables are not-readable by you or your team after creation",
 			"key":        "The key to update",
@@ -2334,6 +3014,10 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Update Organization",
 		Description: "Update an organization.\n\nWhen the organization name is updated and the organization is a billing\ncustomer, the change is also propagated to the corresponding billing customer\ndetails.",
 		Scopes:      []string{"update:organizations"},
+		Params: []paramDoc{
+			{Name: "org_code", In: "path", Type: "string", Required: true},
+			{Name: "expand", In: "query", Type: "string", Enum: []string{"billing"}},
+		},
 		Flags: map[string]string{
 			"alloweddomains":          "Domains allowed for self-sign up to this environment",
 			"backgroundcolor":         "The organization's brand settings - background color",
@@ -2366,6 +3050,9 @@ var apiDocs = map[string]operationDoc{
 		Summary:     "Update user",
 		Description: "Update a user record.\n\nWhen `given_name` or `family_name` is updated and the user is the owner of a\nfamily billing customer, the change is also propagated to the corresponding\nbilling customer details.\n\nUsers managed by directory sync cannot be updated\n(`USER_MANAGED_BY_DIRECTORY_SYNC`); user and role changes must be made in the\nupstream identity provider.",
 		Scopes:      []string{"update:users"},
+		Params: []paramDoc{
+			{Name: "id", In: "query", Type: "string", Required: true},
+		},
 		Flags: map[string]string{
 			"familyname":               "User's last name",
 			"givenname":                "User's first name",

@@ -138,15 +138,6 @@ func TestManage_RequiresM2MLogin(t *testing.T) {
 	assert.ErrorContains(t, err, "kinde login --client-id")
 }
 
-func TestWhoami_RequiresUserLogin(t *testing.T) {
-	cli := newTestCLI(t)
-	cli.writeConfig(config.Environment{M2M: &config.M2MLogin{ClientID: "abc"}})
-
-	_, _, err := cli.run("whoami")
-
-	assert.ErrorContains(t, err, "not logged in through the browser")
-}
-
 func TestLogout_ClearsBothLogins(t *testing.T) {
 	cli := newTestCLI(t)
 	env := config.Environment{

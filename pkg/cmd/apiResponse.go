@@ -30,14 +30,8 @@ func callOperation(cmd *cobra.Command, serverURL string, httpClient *http.Client
 	ctx := cmd.Context()
 	log := log.Ctx(ctx)
 
-	recorder := &recordingTransport{base: httpClient.Transport}
-	if recorder.base == nil {
-		recorder.base = http.DefaultTransport
-	}
-	recordingClient := *httpClient
-	recordingClient.Transport = recorder
-
-	client, err := management_api.NewClient(serverURL, bearerToken(accessToken), management_api.WithClient(&recordingClient))
+	recordingClient, recorder := withRecorder(httpClient)
+	client, err := management_api.NewClient(serverURL, bearerToken(accessToken), management_api.WithClient(recordingClient))
 	if err != nil {
 		return fmt.Errorf("failed to create management API client: %w", err)
 	}
@@ -52,7 +46,7 @@ func callOperation(cmd *cobra.Command, serverURL string, httpClient *http.Client
 		return callErr
 	}
 	if response.status >= 400 {
-		return newAPIError(response, docsFor(operation).Scopes)
+		return newAPIError(response, docsFor(operation).Scopes, "kinde login")
 	}
 	if callErr != nil {
 		// The API accepted the request; the SDK just couldn't decode the
@@ -60,6 +54,37 @@ func callOperation(cmd *cobra.Command, serverURL string, httpClient *http.Client
 		log.Debug().Err(callErr).Msg("SDK could not decode the response")
 	}
 	return writeJSON(cmd.OutOrStdout(), response.body)
+}
+
+// callAccountAPI sends a GET request to the Account API and prints the
+// response body as JSON on stdout.
+func callAccountAPI(cmd *cobra.Command, httpClient *http.Client, url string) error {
+	req, err := http.NewRequestWithContext(cmd.Context(), http.MethodGet, url, nil)
+	if err != nil {
+		return err
+	}
+	recordingClient, recorder := withRecorder(httpClient)
+	resp, err := recordingClient.Do(req)
+	if err != nil {
+		return err
+	}
+	resp.Body.Close()
+
+	if recorder.last.status >= 400 {
+		return newAPIError(recorder.last, nil, "kinde account login")
+	}
+	return writeJSON(cmd.OutOrStdout(), recorder.last.body)
+}
+
+// withRecorder returns a copy of httpClient that records its responses.
+func withRecorder(httpClient *http.Client) (*http.Client, *recordingTransport) {
+	recorder := &recordingTransport{base: httpClient.Transport}
+	if recorder.base == nil {
+		recorder.base = http.DefaultTransport
+	}
+	recordingClient := *httpClient
+	recordingClient.Transport = recorder
+	return &recordingClient, recorder
 }
 
 // writeJSON writes an API response body, indented when it's JSON.
@@ -123,20 +148,22 @@ func userAgent() string {
 	return "kinde-cli/" + version
 }
 
-// apiError is an error response from the Management API.
+// apiError is an error response from a Kinde API.
 type apiError struct {
 	status     int
 	messages   []string
 	scopes     []string // the scopes the operation needs, from the API docs
 	retryAfter string
+	login      string // the command that logs in again
 }
 
-func newAPIError(response *recordedResponse, scopes []string) *apiError {
+func newAPIError(response *recordedResponse, scopes []string, login string) *apiError {
 	return &apiError{
 		status:     response.status,
 		messages:   errorMessages(response.body),
 		scopes:     scopes,
 		retryAfter: response.header.Get("Retry-After"),
+		login:      login,
 	}
 }
 
@@ -149,7 +176,7 @@ func (e *apiError) Error() string {
 
 	switch e.status {
 	case http.StatusUnauthorized:
-		b.WriteString(". The M2M application's credentials may have changed: run 'kinde login' again")
+		fmt.Fprintf(&b, ". Your login may have expired or been revoked: run '%s' again", e.login)
 	case http.StatusForbidden:
 		if len(e.scopes) > 0 {
 			fmt.Fprintf(&b, ". Check that your M2M application has the %s scope for the Kinde Management API", strings.Join(e.scopes, ", "))

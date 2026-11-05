@@ -4,18 +4,28 @@ import (
 	"strings"
 )
 
-//go:generate go run ../../internal/cmd/gen-apidocs ../../api/kinde-management-api-spec.yaml apiDocs_gen.go
+//go:generate go run ../../internal/cmd/gen-apidocs ../../api/kinde-management-api-spec.yaml apiDocs_gen.go apiDocs
+//go:generate go run ../../internal/cmd/gen-apidocs ../../api/kinde-account-api-spec.yaml accountAPIDocs_gen.go accountAPIDocs
 //go:generate go run ../../internal/cmd/gen-docs ../../docs/commands
 
-// operationDoc is the help text for a Management API operation, generated
-// from the API spec into apiDocs_gen.go.
+// operationDoc is the help text for an API operation, generated from the
+// Management API spec into apiDocs_gen.go and the Account API spec into
+// accountAPIDocs_gen.go.
 type operationDoc struct {
 	Method, Path string
 	Summary      string
 	Description  string
 	Scopes       []string
+	Params       []paramDoc
 	// Flags maps docKey(flag name) to the parameter or body field's description.
 	Flags map[string]string
+}
+
+// paramDoc is a path or query parameter of an operation.
+type paramDoc struct {
+	Name, In, Type string
+	Required       bool
+	Enum           []string
 }
 
 // docsFor returns the help text for an operation. Operations missing from the

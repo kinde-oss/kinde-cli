@@ -13,19 +13,29 @@ import (
 
 // newAccountCmd groups the commands that act as a user signed in through the
 // browser, rather than as an M2M application.
-func newAccountCmd(ios *iostreams.IOStreams) *cobra.Command {
+func newAccountCmd(ios *iostreams.IOStreams) (*cobra.Command, error) {
 	accountCmd := &cobra.Command{
 		Use:   "account",
 		Args:  cobra.NoArgs,
-		Short: "Log in as a user through the browser",
-		Long: `Log in as a user of your Kinde business through the browser, for example to
-test your application's sign-in.
+		Short: "Log in as a user and see what they can access (Account API)",
+		Long: `Log in as a user of your Kinde business through the browser, and use the
+Account API to see what that user can access: their permissions, roles,
+feature flags, entitlements and properties.
 
-A user login can't call the Management API; use 'kinde login' with an M2M
-application for that.`,
+This is useful for testing how your application will see a user. A user login
+can't call the Management API; use 'kinde login' with an M2M application for
+that.`,
+		Example: `  kinde account login
+  kinde account permissions
+  kinde account feature-flags | jq '.data.feature_flags'`,
 	}
-	accountCmd.AddCommand(newAccountLoginCmd(ios).cmd)
-	return accountCmd
+	apiCmds, err := newAccountAPICommands()
+	if err != nil {
+		return nil, err
+	}
+	accountCmd.AddCommand(newAccountLoginCmd(ios).cmd, newAccountTokenCmd())
+	accountCmd.AddCommand(apiCmds...)
+	return accountCmd, nil
 }
 
 type accountLoginCmd struct {

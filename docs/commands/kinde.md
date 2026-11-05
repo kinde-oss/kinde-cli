@@ -15,7 +15,7 @@ The official command-line for Kinde.
 
 ### SEE ALSO
 
-* [kinde account](kinde_account.md)	 - Log in as a user through the browser
+* [kinde account](kinde_account.md)	 - Log in as a user and see what they can access (Account API)
 * [kinde api-keys](kinde_api-keys.md)	 - Manage API keys
 * [kinde apis](kinde_apis.md)	 - Manage APIs and their scopes
 * [kinde applications](kinde_applications.md)	 - Manage applications, their connections and URLs
@@ -44,5 +44,5 @@ The official command-line for Kinde.
 * [kinde users](kinde_users.md)	 - Manage users, their identities, sessions and MFA
 * [kinde version](kinde_version.md)	 - Show the CLI's version and check for updates
 * [kinde webhooks](kinde_webhooks.md)	 - Manage webhooks
-* [kinde whoami](kinde_whoami.md)	 - Show the user logged in through the browser
+* [kinde whoami](kinde_whoami.md)	 - Show the logins for the domain
 

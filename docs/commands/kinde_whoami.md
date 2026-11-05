@@ -1,6 +1,14 @@
 ## kinde whoami
 
-Show the user logged in through the browser
+Show the logins for the domain
+
+### Synopsis
+
+Show the logins for the domain as JSON: the M2M application used by the
+Management API commands, and the user logged in through the browser for the
+'kinde account' commands. A login that isn't set up is null.
+
+Exits with status 1 if neither login is set up.
 
 ```
 kinde whoami [flags]

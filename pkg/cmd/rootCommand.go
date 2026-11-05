@@ -92,12 +92,16 @@ func NewRootCmd(ios *iostreams.IOStreams, cfg config.IConfig) (*cobra.Command, e
 	if err != nil {
 		return nil, err
 	}
+	accountCmd, err := newAccountCmd(ios)
+	if err != nil {
+		return nil, err
+	}
 
 	rootCmd.AddGroup(
 		&cobra.Group{ID: authGroupID, Title: "Authentication:"},
 		&cobra.Group{ID: resourceGroupID, Title: "Management API (needs an M2M login):"},
 	)
-	for _, authCmd := range []*cobra.Command{newLoginCmd(ios).cmd, newLogoutCmd(ios).cmd, newAccountCmd(ios), newWhoAmI(ios).cmd} {
+	for _, authCmd := range []*cobra.Command{newLoginCmd(ios).cmd, newLogoutCmd(ios).cmd, accountCmd, newWhoAmI(ios).cmd} {
 		authCmd.GroupID = authGroupID
 		rootCmd.AddCommand(authCmd)
 	}

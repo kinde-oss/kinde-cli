@@ -36,5 +36,5 @@ kinde account login [flags]
 
 ### SEE ALSO
 
-* [kinde account](kinde_account.md)	 - Log in as a user through the browser
+* [kinde account](kinde_account.md)	 - Log in as a user and see what they can access (Account API)
 

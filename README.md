@@ -19,7 +19,7 @@ TODO:
 - [x] Online token verification
   - [ ] Offline token verification
 - [x] Support for user tokens and account API
-  - [ ] Spport for account API
+  - [x] Support for account API
 
 ## Getting Started
 
@@ -126,14 +126,13 @@ The secret isn't shown as you type. There's no flag for it, because flag values 
 echo "$CLIENT_SECRET" | kinde login --client-id <client ID> --client-secret-stdin
 ```
 
-You can also log in as a user through the browser (device authorization flow). This is for testing your application's sign-in, not for the Management API:
+You can also log in as a user through the browser (device authorization flow), and use the [Account API](#account-api) to see what that user can access. A user login can't call the Management API:
 
 ```bash
 kinde account login --domain <your Kinde domain> --client-id <application client ID>
-kinde whoami
 ```
 
-`kinde logout` removes both logins for the current domain.
+`kinde whoami` shows both logins for the domain as JSON, and `kinde logout` removes both.
 
 ### Environment variables
 
@@ -185,6 +184,27 @@ kinde users create-identity --user-id kp_123 --type email --value sally@example.
 kinde feature-flags create --name "First flag" --key first_flag --type str --default-value hello
 ```
 
+## Account API
+
+The `kinde account` commands call the Account API as the user logged in with `kinde account login`. They show what your application would see for that user:
+
+```bash
+kinde account permissions
+kinde account roles
+kinde account feature-flags
+kinde account entitlements
+kinde account entitlement --key <feature key>
+kinde account properties
+kinde account profile
+kinde account portal-link --subnav profile
+```
+
+`kinde account token` prints the user's access token, for calling the Account API or your own APIs with other tools:
+
+```bash
+curl -H "Authorization: Bearer $(kinde account token)" https://mybusiness.kinde.com/account_api/v1/permissions
+```
+
 ## Updates
 
 `kinde version` shows the installed version and checks GitHub for a newer release. When you run commands in a terminal, the CLI also checks at most once a day and prints a notice on stderr. It never checks in scripts or CI. Set `KINDE_NO_UPDATE_NOTIFIER=1` to turn the check off.
@@ -218,7 +238,7 @@ The config file is `~/.config/kinde/config.json` (or `$XDG_CONFIG_HOME/kinde/con
 
 ## Development
 
-The command help and the [command reference](docs/commands/kinde.md) are generated from the Kinde Management API spec pinned in [api/](api/kinde-management-api-spec.yaml). After updating the spec, or changing commands, regenerate them:
+The command help and the [command reference](docs/commands/kinde.md) are generated from the Kinde [Management API](api/kinde-management-api-spec.yaml) and [Account API](api/kinde-account-api-spec.yaml) specs pinned in `api/`. After updating the spec, or changing commands, regenerate them:
 
 ```bash
 go generate ./...
