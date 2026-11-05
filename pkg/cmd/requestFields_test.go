@@ -141,3 +141,8 @@ func TestTimeFlag(t *testing.T) {
 		append(base, "--meter-usage-timestamp", "yesterday")...)
 	assert.ErrorContains(t, err, "RFC 3339")
 }
+
+func TestInvalidFlags_ReportedBeforeMissingDomain(t *testing.T) {
+	_, _, err := newTestCLI(t).run("users", "create-identity", "--user-id", "kp_1", "--type", "fax")
+	assert.ErrorContains(t, err, `invalid value for --type: "fax"`)
+}

@@ -61,14 +61,15 @@ func buildCobraCommand(op resourceCommand, ios *iostreams.IOStreams) (*cobra.Com
 		Short: short,
 		Long:  doc.long(),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			// Report mistakes in the flags before anything about logins.
+			methodArgs, err := plan.buildArgs(cmd)
+			if err != nil {
+				return err
+			}
 			// Read the environment when the command runs, after --domain is applied.
 			env := config.FromContext[config.Config](cmd.Context()).GetEnvironment()
 			if env == nil {
 				return errNoEnvironment
-			}
-			methodArgs, err := plan.buildArgs(cmd)
-			if err != nil {
-				return err
 			}
 			return callApiMethod(cmd, ios, env, op, methodArgs)
 		},
