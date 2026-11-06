@@ -33,7 +33,7 @@ nfpms:
     homepage: https://kinde.com
     maintainer: Kinde <support@kinde.com>
     description: Kinde CLI utility
-    license: Apache 2.0
+    license: MIT
     formats:
       - deb
   - id: rpm
@@ -44,7 +44,7 @@ nfpms:
     homepage: https://kinde.com
     maintainer: Kinde <support@kinde.com>
     description: Kinde CLI utility
-    license: Apache 2.0
+    license: MIT
     formats:
       - rpm
 
