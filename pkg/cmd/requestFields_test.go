@@ -8,6 +8,7 @@ import (
 
 	"github.com/kinde-oss/kinde-go/kinde/management_api"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -145,4 +146,26 @@ func TestTimeFlag(t *testing.T) {
 func TestInvalidFlags_ReportedBeforeMissingDomain(t *testing.T) {
 	_, _, err := newTestCLI(t).run("users", "create-identity", "--user-id", "kp_1", "--type", "fax")
 	assert.ErrorContains(t, err, `invalid value for --type: "fax"`)
+}
+
+func TestIntFlag_RejectsValuesTheFieldCantHold(t *testing.T) {
+	parse := func(leaf reflect.Type, value string) (reflect.Value, error) {
+		field := requestField{flag: "n", leaf: leaf, kind: kindInt}
+		flags := pflag.NewFlagSet("test", pflag.ContinueOnError)
+		flags.Int64("n", 0, "")
+		require.NoError(t, flags.Parse([]string{"--n", value}))
+		return field.parse(flags)
+	}
+
+	_, err := parse(reflect.TypeFor[uint32](), "-1")
+	assert.EqualError(t, err, "-1 is out of range")
+	_, err = parse(reflect.TypeFor[int32](), "3000000000")
+	assert.EqualError(t, err, "3000000000 is out of range")
+
+	got, err := parse(reflect.TypeFor[uint32](), "42")
+	require.NoError(t, err)
+	assert.Equal(t, uint32(42), got.Interface())
+	got, err = parse(reflect.TypeFor[int](), "-5")
+	require.NoError(t, err)
+	assert.Equal(t, -5, got.Interface())
 }

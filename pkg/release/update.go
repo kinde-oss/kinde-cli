@@ -71,10 +71,21 @@ func (c *Checker) Check(ctx context.Context, force bool) (*Update, error) {
 		defer cancel()
 		latest, err := c.Fetch(ctx)
 		if err != nil {
+			// Record the attempt, keeping the last known release, so a
+			// network problem delays one command a day rather than every
+			// command.
+			failed := &checkState{CheckedAt: c.Now()}
+			if state != nil {
+				failed.Latest = state.Latest
+			}
+			c.writeState(failed)
 			return nil, err
 		}
 		state = &checkState{CheckedAt: c.Now(), Latest: latest}
 		c.writeState(state)
+	}
+	if state.Latest.Tag == "" {
+		return nil, nil // every check so far has failed
 	}
 
 	latest, err := semver.NewVersion(strings.TrimPrefix(state.Latest.Tag, "v"))

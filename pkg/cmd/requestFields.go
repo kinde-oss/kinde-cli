@@ -357,12 +357,23 @@ func (f requestField) parse(flags *pflag.FlagSet) (reflect.Value, error) {
 		return value, err
 	case kindInt:
 		n, err := flags.GetInt64(f.flag)
+		if err != nil {
+			return value, err
+		}
+		// Reject a value the field can't hold rather than send a different
+		// number than the one typed.
 		if value.CanUint() {
+			if n < 0 || value.OverflowUint(uint64(n)) {
+				return value, fmt.Errorf("%d is out of range", n)
+			}
 			value.SetUint(uint64(n))
 		} else {
+			if value.OverflowInt(n) {
+				return value, fmt.Errorf("%d is out of range", n)
+			}
 			value.SetInt(n)
 		}
-		return value, err
+		return value, nil
 	case kindFloat:
 		n, err := flags.GetFloat64(f.flag)
 		value.SetFloat(n)

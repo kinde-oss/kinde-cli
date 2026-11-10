@@ -90,3 +90,41 @@ func TestCheck_FailureIsReported(t *testing.T) {
 	assert.EqualError(t, err, "offline")
 	assert.Nil(t, update)
 }
+
+func TestCheck_FailureIsRetriedAfterADay(t *testing.T) {
+	setVersion(t, "1.0.0", "", "")
+	checker, now, fetches := fakeChecker(t, "v1.1.0")
+	online := checker.Fetch
+	checker.Fetch = func(ctx context.Context) (LatestRelease, error) {
+		*fetches++
+		return LatestRelease{}, errors.New("offline")
+	}
+
+	_, err := checker.Check(context.Background(), false)
+	require.Error(t, err)
+	update, err := checker.Check(context.Background(), false)
+	assert.NoError(t, err)
+	assert.Nil(t, update)
+	assert.Equal(t, 1, *fetches, "a failed check isn't repeated on the next command")
+
+	checker.Fetch = online
+	*now = now.Add(24 * time.Hour)
+	update, err = checker.Check(context.Background(), false)
+	require.NoError(t, err)
+	assert.NotNil(t, update)
+	assert.Equal(t, 2, *fetches)
+}
+
+func TestCheck_FailureKeepsTheLastKnownRelease(t *testing.T) {
+	setVersion(t, "1.0.0", "", "")
+	checker, now, _ := fakeChecker(t, "v1.1.0")
+	_, _ = checker.Check(context.Background(), false)
+
+	*now = now.Add(25 * time.Hour)
+	checker.Fetch = func(context.Context) (LatestRelease, error) { return LatestRelease{}, errors.New("offline") }
+	_, _ = checker.Check(context.Background(), false)
+
+	update, err := checker.Check(context.Background(), false)
+	require.NoError(t, err)
+	assert.NotNil(t, update, "the update found before the failure is still reported")
+}
