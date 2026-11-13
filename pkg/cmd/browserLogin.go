@@ -51,7 +51,8 @@ func runBrowserLogin(cmd *cobra.Command, ios *iostreams.IOStreams, cfg *config.C
 	ctx := cmd.Context()
 	httpClient := newHTTPClient()
 
-	server, err := agentauth.Discover(ctx, httpClient, "https://"+env.DomainName+"/mcp")
+	mcpURL := "https://" + env.DomainName + "/mcp"
+	server, err := agentauth.Discover(ctx, httpClient, mcpURL)
 	if errors.Is(err, agentauth.ErrSignInNotEnabled) {
 		log.Ctx(ctx).Debug().Err(err).Msg("Agent sign-in discovery failed")
 		return fmt.Errorf("the browser login isn't turned on for %s. %s, or log in with an M2M application: run 'kinde login --client-id <client ID>'",
@@ -63,7 +64,7 @@ func runBrowserLogin(cmd *cobra.Command, ios *iostreams.IOStreams, cfg *config.C
 
 	// Reuse the client registered at the last login while it's still valid,
 	// rather than registering a new one every time.
-	session := &agentauth.Session{Server: *server}
+	session := &agentauth.Session{MCPURL: mcpURL, Server: *server}
 	if previous, err := loadBrowserSession(env); err == nil && previous.Server.Issuer == server.Issuer && previous.Registration.Usable(time.Now()) {
 		session.Registration = previous.Registration
 	} else {
@@ -123,6 +124,9 @@ func callWithBrowserLogin(cmd *cobra.Command, ios *iostreams.IOStreams, env *con
 	if err != nil {
 		return fmt.Errorf("%w: run 'kinde login' again", err)
 	}
+	if session.MCPURL == "" {
+		return fmt.Errorf("your browser login for %s was saved by an older version of the CLI: run 'kinde login' again", env.DomainName)
+	}
 
 	// Ask once the request is valid and there's a login to send it with.
 	if isDestructive(op) {
@@ -141,16 +145,18 @@ func callWithBrowserLogin(cmd *cobra.Command, ios *iostreams.IOStreams, env *con
 			}
 			return "", &userFacingError{fmt.Sprintf("failed to refresh your browser login: %v", err)}
 		}
+		// Save before using it: if Kinde rotated the refresh token, losing it
+		// would force a new login on the next command.
 		if changed {
 			if err := saveBrowserSession(env, session); err != nil {
-				log.Ctx(ctx).Warn().Err(err).Msg("Could not save the refreshed browser login")
+				return "", &userFacingError{fmt.Sprintf("failed to save your refreshed browser login: %v", err)}
 			}
 		}
 		return session.Token.AccessToken, nil
 	}
 
 	transport := &mcpTransport{
-		mcpURL:    session.Server.Resource,
+		mcpURL:    session.MCPURL,
 		operation: op.operation,
 		path:      docsFor(op.operation).Path,
 		base:      httpClient.Transport,

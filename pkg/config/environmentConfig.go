@@ -186,8 +186,13 @@ func (env *Environment) M2MClientCredentialsFlow() (client_credentials.IClientCr
 		return nil, fmt.Errorf("failed to open M2M session store: %w", err)
 	}
 	secret, err := session.GetKey(clientSecretKey)
-	if err != nil {
+	if errors.Is(err, keyring.ErrKeyNotFound) {
 		return nil, fmt.Errorf("%w: client secret not found in session store", ErrNoM2MLogin)
+	}
+	if err != nil {
+		// Not "logged out": a keyring that can't be read must not make
+		// commands fall back to another login.
+		return nil, fmt.Errorf("failed to read the M2M client secret: %w", err)
 	}
 	return env.newClientCredentialsFlow(env.M2M.ClientID, string(secret), client_credentials.WithSessionHooks(session))
 }
@@ -266,8 +271,11 @@ func (env *Environment) BrowserSession() ([]byte, error) {
 		return nil, fmt.Errorf("failed to open browser session store: %w", err)
 	}
 	session, err := store.GetKey(browserSessionKey)
-	if err != nil {
+	if errors.Is(err, keyring.ErrKeyNotFound) {
 		return nil, fmt.Errorf("%w: session not found in session store", ErrNoBrowserLogin)
+	}
+	if err != nil {
+		return nil, fmt.Errorf("failed to read the browser login: %w", err)
 	}
 	return session, nil
 }
@@ -285,8 +293,10 @@ func (env *Environment) ClearBrowserLogin() error {
 func clearToken(session cli.ICliSession) error {
 	if err := session.SetRawToken(nil); err != nil {
 		// kinde-go reports an error with the file backend even when the token
-		// was removed, so only fail if it is still there.
-		if _, getErr := session.GetRawToken(); getErr == nil {
+		// was removed, so the removal only failed if the token can't be
+		// confirmed gone: it can still be read, or reading it fails for
+		// another reason.
+		if _, getErr := session.GetRawToken(); !errors.Is(getErr, keyring.ErrKeyNotFound) {
 			return fmt.Errorf("failed to clear cached token: %w", err)
 		}
 	}
@@ -296,8 +306,8 @@ func clearToken(session cli.ICliSession) error {
 // deleteKey removes a key from a session store.
 func deleteKey(session cli.ICliSession, key string) error {
 	if err := session.DeleteKey(key); err != nil {
-		// See clearToken: only fail if the key is still there.
-		if _, getErr := session.GetKey(key); getErr == nil {
+		// See clearToken: only succeed if the key is confirmed gone.
+		if _, getErr := session.GetKey(key); !errors.Is(getErr, keyring.ErrKeyNotFound) {
 			return fmt.Errorf("failed to remove %s: %w", key, err)
 		}
 	}

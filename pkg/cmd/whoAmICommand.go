@@ -3,6 +3,7 @@ package cmd
 import (
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -87,12 +88,7 @@ func (c *whoAmICmd) runWhoAmI(cmd *cobra.Command, args []string) error {
 	}
 	status.User = user
 
-	switch {
-	case status.M2M != nil:
-		status.ManagementAPI = ptr("m2m")
-	case status.Browser != nil:
-		status.ManagementAPI = ptr("browser")
-	}
+	status.ManagementAPI = managementAPILogin(env, status.Browser != nil)
 
 	if status.M2M == nil && status.Browser == nil && status.User == nil {
 		return fmt.Errorf("not logged in to %s: run 'kinde login' for the Management API, or 'kinde account login' to log in as a user of your business", env.DomainName)
@@ -114,6 +110,20 @@ func m2mLoginStatus(env *config.Environment) *m2mStatus {
 	}
 	if env.M2M != nil {
 		return &m2mStatus{ClientID: env.M2M.ClientID, Source: "login"}
+	}
+	return nil
+}
+
+// managementAPILogin reports which login the Management API commands will
+// use, by the same rule as callApiMethod: the M2M login when its credentials
+// can be read, otherwise the browser login. It's nil when neither can be used.
+func managementAPILogin(env *config.Environment, browserLogin bool) *string {
+	_, err := env.M2MClientCredentialsFlow()
+	switch {
+	case err == nil:
+		return ptr("m2m")
+	case errors.Is(err, config.ErrNoM2MLogin) && browserLogin:
+		return ptr("browser")
 	}
 	return nil
 }

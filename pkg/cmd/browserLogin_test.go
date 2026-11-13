@@ -114,6 +114,7 @@ func (f *fakeKinde) handleMCP(w http.ResponseWriter, r *http.Request) {
 		reply["result"] = map[string]any{"tools": tools}
 	case "tools/call":
 		assert.Equal(f.t, "session-1", r.Header.Get("Mcp-Session-Id"))
+		assert.Equal(f.t, "2025-06-18", r.Header.Get("MCP-Protocol-Version"), "the agreed version is sent after initializing")
 		name := req.Params["name"].(string)
 		args, _ := req.Params["arguments"].(map[string]any)
 		f.mu.Lock()
@@ -323,6 +324,7 @@ func TestBrowserLogin_ExpiredLoginAsksToLogInAgain(t *testing.T) {
 	cli.writeConfig(config.Environment{Browser: &config.BrowserLogin{ClientID: "cli-client", Issuer: fakeIssuer}})
 	env := &config.Environment{DomainName: testDomain, Browser: &config.BrowserLogin{ClientID: "cli-client"}}
 	require.NoError(t, saveBrowserSession(env, &agentauth.Session{
+		MCPURL: "https://" + testDomain + "/mcp",
 		Server: agentauth.Server{Resource: "https://" + testDomain + "/mcp"},
 		Token:  &oauth2.Token{AccessToken: "old", Expiry: time.Now().Add(-time.Hour)},
 	}))
@@ -338,11 +340,57 @@ func TestManagementCommands_PreferM2MOverBrowserLogin(t *testing.T) {
 		M2M:     &config.M2MLogin{ClientID: "m2m-app"},
 		Browser: &config.BrowserLogin{ClientID: "cli-client", Issuer: fakeIssuer},
 	})
+	saveM2MSecret(t)
+	saveTestBrowserSession(t)
 
 	status, _, err := runWhoAmI(t, cli)
 
 	require.NoError(t, err)
 	assert.Equal(t, ptr("m2m"), status.ManagementAPI)
+}
+
+func TestWhoami_ReportsTheLoginCommandsActuallyUse(t *testing.T) {
+	cli := newTestCLI(t)
+	// An M2M login whose secret is missing can't be used, so commands fall
+	// back to the browser login, and whoami must say so.
+	cli.writeConfig(config.Environment{
+		M2M:     &config.M2MLogin{ClientID: "m2m-app"},
+		Browser: &config.BrowserLogin{ClientID: "cli-client", Issuer: fakeIssuer},
+	})
+	saveTestBrowserSession(t)
+
+	status, _, err := runWhoAmI(t, cli)
+
+	require.NoError(t, err)
+	assert.Equal(t, ptr("browser"), status.ManagementAPI)
+}
+
+func saveM2MSecret(t *testing.T) {
+	t.Helper()
+	env := &config.Environment{DomainName: testDomain}
+	require.NoError(t, env.SaveM2MSecret("s3cret"))
+}
+
+func saveTestBrowserSession(t *testing.T) {
+	t.Helper()
+	env := &config.Environment{DomainName: testDomain, Browser: &config.BrowserLogin{ClientID: "cli-client"}}
+	require.NoError(t, saveBrowserSession(env, &agentauth.Session{
+		MCPURL: "https://" + testDomain + "/mcp",
+		Token:  &oauth2.Token{AccessToken: "access-1", RefreshToken: "refresh-1", Expiry: time.Now().Add(time.Hour)},
+	}))
+}
+
+func TestBrowserLogin_OldSessionWithoutMCPURLAsksToLogInAgain(t *testing.T) {
+	cli := newTestCLI(t)
+	cli.writeConfig(config.Environment{Browser: &config.BrowserLogin{ClientID: "cli-client", Issuer: fakeIssuer}})
+	env := &config.Environment{DomainName: testDomain, Browser: &config.BrowserLogin{ClientID: "cli-client"}}
+	require.NoError(t, saveBrowserSession(env, &agentauth.Session{
+		Token: &oauth2.Token{AccessToken: "access-1", Expiry: time.Now().Add(time.Hour)},
+	}))
+
+	_, _, err := cli.run("users", "list")
+
+	assert.ErrorContains(t, err, "run 'kinde login' again")
 }
 
 func TestManagementCommands_NeedALogin(t *testing.T) {

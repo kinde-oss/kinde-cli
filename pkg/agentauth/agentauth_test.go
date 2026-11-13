@@ -23,6 +23,7 @@ type fakeKinde struct {
 	*httptest.Server
 	t             *testing.T
 	enabled       bool
+	tokenEndpoint string // overrides the advertised token endpoint
 	challenge     string // code_challenge from the last authorize request
 	refreshed     int
 	registrations []map[string]any
@@ -47,10 +48,14 @@ func newFakeKinde(t *testing.T) *fakeKinde {
 		json.NewEncoder(w).Encode(map[string]any{"resource": f.URL + "/mcp", "authorization_servers": []string{issuer}})
 	})
 	mux.HandleFunc("/.well-known/oauth-authorization-server/oauth2/agents/app1", func(w http.ResponseWriter, r *http.Request) {
+		tokenEndpoint := issuer + "/token"
+		if f.tokenEndpoint != "" {
+			tokenEndpoint = f.tokenEndpoint
+		}
 		json.NewEncoder(w).Encode(map[string]any{
 			"issuer":                           issuer,
 			"authorization_endpoint":           issuer + "/authorize",
-			"token_endpoint":                   issuer + "/token",
+			"token_endpoint":                   tokenEndpoint,
 			"registration_endpoint":            issuer + "/register",
 			"code_challenge_methods_supported": []string{"S256"},
 		})
@@ -136,6 +141,24 @@ func TestDiscover_SignInTurnedOff(t *testing.T) {
 	_, err := Discover(context.Background(), http.DefaultClient, kinde.URL+"/mcp")
 
 	assert.ErrorIs(t, err, ErrSignInNotEnabled)
+}
+
+func TestDiscover_RejectsEndpointsWithoutHTTPS(t *testing.T) {
+	kinde := newFakeKinde(t)
+	kinde.tokenEndpoint = "http://kinde.example.com/token"
+
+	_, err := Discover(context.Background(), http.DefaultClient, kinde.URL+"/mcp")
+
+	assert.EqualError(t, err, `the sign-in server's endpoint "http://kinde.example.com/token" doesn't use HTTPS`)
+}
+
+func TestSecureURL(t *testing.T) {
+	assert.True(t, secureURL("https://app.kinde.com/oauth2/x/token"))
+	assert.True(t, secureURL("http://127.0.0.1:8080/token"), "this machine is allowed for tests")
+	assert.True(t, secureURL("http://localhost/token"))
+	assert.False(t, secureURL("http://app.kinde.com/token"))
+	assert.False(t, secureURL("ftp://app.kinde.com/token"))
+	assert.False(t, secureURL("not a url"))
 }
 
 func TestRegister_UsesAPortlessLoopbackRedirect(t *testing.T) {

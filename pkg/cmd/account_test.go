@@ -120,6 +120,7 @@ func runWhoAmI(t *testing.T, cli *testCLI) (whoAmIStatus, string, error) {
 func TestWhoami_ShowsM2MLogin(t *testing.T) {
 	cli := newTestCLI(t)
 	cli.writeConfig(config.Environment{M2M: &config.M2MLogin{ClientID: "abc"}})
+	saveM2MSecret(t)
 
 	status, stderr, err := runWhoAmI(t, cli)
 

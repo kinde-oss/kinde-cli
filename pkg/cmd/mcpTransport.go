@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"bufio"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -15,6 +16,13 @@ import (
 	"strings"
 )
 
+// mcpProtocolVersion is the MCP version the CLI asks for when it starts a
+// session.
+const mcpProtocolVersion = "2025-06-18"
+
+// maxMCPReply limits how much of an MCP reply is read.
+const maxMCPReply = 32 << 20
+
 // mcpTransport sends the Management API requests built by the SDK client to
 // the domain's MCP server instead, as a call to the tool of the same name.
 // The browser login's token only works there; the MCP server makes the REST
@@ -28,9 +36,10 @@ type mcpTransport struct {
 	path      string // the operation's path template, e.g. /api/v1/users/{id}
 	base      http.RoundTripper
 
-	nextID      int
-	sessionID   string
-	initialized bool
+	nextID          int
+	sessionID       string
+	protocolVersion string // agreed when the session started
+	initialized     bool
 	// redacted is set when the response hid a secret.
 	redacted bool
 }
@@ -56,32 +65,31 @@ func (t *mcpTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	auth := req.Header.Get("Authorization")
 
 	if !t.initialized {
-		if resp := t.initialize(req.Context(), auth); resp != nil {
-			return resp, nil
+		refused, err := t.initialize(req.Context(), auth)
+		if err != nil {
+			return nil, err
+		}
+		if refused != nil {
+			return response(req, refused.status, refused.body), nil
 		}
 	}
 
-	status, _, body, err := t.post(req.Context(), auth, t.request("tools/call", map[string]any{"name": t.operation, "arguments": args}))
+	reply, refused, err := t.call(req.Context(), auth, "tools/call", map[string]any{"name": t.operation, "arguments": args})
 	if err != nil {
 		return nil, err
 	}
-	if status != http.StatusOK {
-		return response(req, status, body), nil
+	if refused != nil {
+		return response(req, refused.status, refused.body), nil
 	}
-
-	message, err := t.reply(body)
-	if err != nil {
-		return nil, err
-	}
-	if message.Error != nil {
-		return nil, t.toolError(req.Context(), auth, message.Error.Message)
+	if reply.Error != nil {
+		return nil, t.toolError(req.Context(), auth, reply.Error.Message)
 	}
 
 	var text strings.Builder
-	for _, content := range message.Result.Content {
+	for _, content := range reply.Result.Content {
 		text.WriteString(content.Text)
 	}
-	if message.Result.IsError {
+	if reply.Result.IsError {
 		if match := mcpAPIError.FindStringSubmatch(text.String()); match != nil {
 			status, _ := strconv.Atoi(match[1])
 			return response(req, status, []byte(match[2])), nil
@@ -146,44 +154,47 @@ func (t *mcpTransport) toolArguments(req *http.Request) (map[string]any, error) 
 	return args, nil
 }
 
-// initialize starts the MCP session. It returns a response to pass back when
-// the MCP server refuses, e.g. 401 when the login has been revoked.
-func (t *mcpTransport) initialize(ctx context.Context, auth string) *http.Response {
-	status, header, body, err := t.post(ctx, auth, t.request("initialize", map[string]any{
-		"protocolVersion": "2025-06-18",
+// initialize starts the MCP session and agrees the protocol version. refused
+// is set when the MCP server answers with an HTTP error, e.g. 401 when the
+// login has been revoked, to pass back to the SDK client.
+func (t *mcpTransport) initialize(ctx context.Context, auth string) (refused *httpFailure, err error) {
+	reply, refused, err := t.call(ctx, auth, "initialize", map[string]any{
+		"protocolVersion": mcpProtocolVersion,
 		"capabilities":    map[string]any{},
 		"clientInfo":      map[string]any{"name": "kinde-cli", "version": userAgent()},
-	}))
-	if err != nil {
-		return response(nil, http.StatusBadGateway, []byte(err.Error()))
+	})
+	if err != nil || refused != nil {
+		return refused, err
 	}
-	if status != http.StatusOK {
-		return response(nil, status, body)
+	if reply.Error != nil {
+		return nil, &userFacingError{fmt.Sprintf("the MCP server refused to start a session: %s", reply.Error.Message)}
 	}
-	t.sessionID = header.Get("Mcp-Session-Id")
+	version := reply.Result.ProtocolVersion
+	if version == "" {
+		return nil, &userFacingError{"the MCP server didn't agree a protocol version"}
+	}
+	t.protocolVersion = version
 	t.initialized = true
-	// A notification has no reply worth checking.
-	t.post(ctx, auth, map[string]any{"jsonrpc": "2.0", "method": "notifications/initialized"})
-	return nil
+
+	if err := t.notify(ctx, auth, "notifications/initialized"); err != nil {
+		return nil, err
+	}
+	return nil, nil
 }
 
 // toolError explains a JSON-RPC error from a tool call. The commonest cause
 // is a Management API operation the MCP server doesn't offer.
 func (t *mcpTransport) toolError(ctx context.Context, auth, message string) error {
-	status, _, body, err := t.post(ctx, auth, t.request("tools/list", map[string]any{}))
-	if err == nil && status == http.StatusOK {
-		if reply, err := t.reply(body); err == nil && reply.Result.Tools != nil && !hasTool(reply.Result.Tools, t.operation) {
-			return &userFacingError{fmt.Sprintf("this command isn't available with a browser login. %s", m2mHint)}
-		}
+	reply, refused, err := t.call(ctx, auth, "tools/list", map[string]any{})
+	if err == nil && refused == nil && reply.Error == nil && reply.Result.Tools != nil && !hasTool(reply.Result.Tools, t.operation) {
+		return &userFacingError{fmt.Sprintf("this command isn't available with a browser login. %s", m2mHint)}
 	}
 	return &userFacingError{fmt.Sprintf("the MCP server rejected the request: %s", message)}
 }
 
 const m2mHint = "Log in with an M2M application to use it: run 'kinde login --client-id <client ID>'"
 
-func hasTool(tools []struct {
-	Name string `json:"name"`
-}, name string) bool {
+func hasTool(tools []mcpTool, name string) bool {
 	for _, tool := range tools {
 		if tool.Name == name {
 			return true
@@ -192,19 +203,74 @@ func hasTool(tools []struct {
 	return false
 }
 
-func (t *mcpTransport) request(method string, params any) map[string]any {
+type (
+	// httpFailure is an HTTP error from the MCP server.
+	httpFailure struct {
+		status int
+		body   []byte
+	}
+
+	mcpTool struct {
+		Name string `json:"name"`
+	}
+
+	rpcReply struct {
+		ID     json.RawMessage `json:"id"`
+		Result struct {
+			ProtocolVersion string `json:"protocolVersion"`
+			Content         []struct {
+				Text string `json:"text"`
+			} `json:"content"`
+			IsError bool      `json:"isError"`
+			Tools   []mcpTool `json:"tools"`
+		} `json:"result"`
+		Error *struct {
+			Code    int    `json:"code"`
+			Message string `json:"message"`
+		} `json:"error"`
+	}
+)
+
+// call sends a JSON-RPC request and returns its reply. refused is set
+// instead when the MCP server answers with an HTTP error.
+func (t *mcpTransport) call(ctx context.Context, auth, method string, params any) (*rpcReply, *httpFailure, error) {
 	t.nextID++
-	return map[string]any{"jsonrpc": "2.0", "id": t.nextID, "method": method, "params": params}
+	id := strconv.Itoa(t.nextID)
+	resp, err := t.send(ctx, auth, map[string]any{"jsonrpc": "2.0", "id": t.nextID, "method": method, "params": params})
+	if err != nil {
+		return nil, nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(io.LimitReader(resp.Body, maxMCPReply))
+		return nil, &httpFailure{status: resp.StatusCode, body: body}, nil
+	}
+	reply, err := readReply(resp, id)
+	return reply, nil, err
 }
 
-func (t *mcpTransport) post(ctx context.Context, auth string, message any) (status int, header http.Header, body []byte, err error) {
+// notify sends a JSON-RPC notification, which has no reply.
+func (t *mcpTransport) notify(ctx context.Context, auth, method string) error {
+	resp, err := t.send(ctx, auth, map[string]any{"jsonrpc": "2.0", "method": method})
+	if err != nil {
+		return err
+	}
+	resp.Body.Close()
+	if resp.StatusCode >= 300 {
+		return &userFacingError{fmt.Sprintf("the MCP server refused %s: %s", method, resp.Status)}
+	}
+	return nil
+}
+
+func (t *mcpTransport) send(ctx context.Context, auth string, message any) (*http.Response, error) {
 	data, err := json.Marshal(message)
 	if err != nil {
-		return 0, nil, nil, err
+		return nil, err
 	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, t.mcpURL, bytes.NewReader(data))
 	if err != nil {
-		return 0, nil, nil, err
+		return nil, err
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json, text/event-stream")
@@ -212,53 +278,72 @@ func (t *mcpTransport) post(ctx context.Context, auth string, message any) (stat
 	if t.sessionID != "" {
 		req.Header.Set("Mcp-Session-Id", t.sessionID)
 	}
+	if t.protocolVersion != "" {
+		req.Header.Set("MCP-Protocol-Version", t.protocolVersion)
+	}
 	resp, err := t.base.RoundTrip(req)
 	if err != nil {
-		return 0, nil, nil, err
+		return nil, err
 	}
-	defer resp.Body.Close()
-	body, err = io.ReadAll(resp.Body)
-	return resp.StatusCode, resp.Header, body, err
+	if id := resp.Header.Get("Mcp-Session-Id"); id != "" {
+		t.sessionID = id
+	}
+	return resp, nil
 }
 
-type rpcReply struct {
-	ID     json.RawMessage `json:"id"`
-	Result struct {
-		Content []struct {
-			Text string `json:"text"`
-		} `json:"content"`
-		IsError bool `json:"isError"`
-		Tools   []struct {
-			Name string `json:"name"`
-		} `json:"tools"`
-	} `json:"result"`
-	Error *struct {
-		Code    int    `json:"code"`
-		Message string `json:"message"`
-	} `json:"error"`
-}
+// readReply reads the reply with the given ID from a JSON response, or from a
+// server-sent events stream as events arrive, so a stream left open after the
+// reply doesn't hold the command up.
+func readReply(resp *http.Response, id string) (*rpcReply, error) {
+	mediaType, _, _ := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+	if mediaType != "text/event-stream" {
+		body, err := io.ReadAll(io.LimitReader(resp.Body, maxMCPReply))
+		if err != nil {
+			return nil, err
+		}
+		if reply, ok := matchReply(body, id); ok {
+			return reply, nil
+		}
+		return nil, errors.New("the MCP server sent no reply")
+	}
 
-// reply returns the reply to the last request, from a JSON or server-sent
-// events response.
-func (t *mcpTransport) reply(body []byte) (*rpcReply, error) {
-	var payloads [][]byte
-	if trimmed := bytes.TrimSpace(body); bytes.HasPrefix(trimmed, []byte("{")) {
-		payloads = append(payloads, trimmed)
-	} else {
-		for _, line := range bytes.Split(body, []byte("\n")) {
-			if data, ok := bytes.CutPrefix(bytes.TrimRight(line, "\r"), []byte("data:")); ok && len(bytes.TrimSpace(data)) > 0 {
-				payloads = append(payloads, data)
+	scanner := bufio.NewScanner(io.LimitReader(resp.Body, maxMCPReply))
+	scanner.Buffer(make([]byte, 64*1024), maxMCPReply)
+	var data [][]byte
+	for {
+		more := scanner.Scan()
+		line := scanner.Bytes()
+		// A blank line, or the end of the stream, ends an event. Its data
+		// lines are joined with newlines before decoding.
+		if !more || len(line) == 0 {
+			if len(data) > 0 {
+				if reply, ok := matchReply(bytes.Join(data, []byte("\n")), id); ok {
+					return reply, nil
+				}
+				data = nil
 			}
+			if !more {
+				break
+			}
+			continue
+		}
+		if value, ok := bytes.CutPrefix(line, []byte("data:")); ok {
+			data = append(data, bytes.TrimPrefix(value, []byte(" ")))
 		}
 	}
-	want := strconv.Itoa(t.nextID)
-	for _, payload := range payloads {
-		var reply rpcReply
-		if json.Unmarshal(payload, &reply) == nil && string(reply.ID) == want {
-			return &reply, nil
-		}
+	if err := scanner.Err(); err != nil {
+		return nil, fmt.Errorf("failed to read the MCP server's reply: %w", err)
 	}
 	return nil, errors.New("the MCP server sent no reply")
+}
+
+// matchReply decodes a JSON-RPC message, returning it if it answers id.
+func matchReply(data []byte, id string) (*rpcReply, bool) {
+	var reply rpcReply
+	if json.Unmarshal(data, &reply) != nil || string(reply.ID) != id {
+		return nil, false
+	}
+	return &reply, true
 }
 
 // response builds the HTTP response the SDK client sees.

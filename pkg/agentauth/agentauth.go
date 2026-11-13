@@ -75,6 +75,9 @@ func (r *Registration) Usable(now time.Time) bool {
 // Session is everything needed to call the MCP server and keep the login
 // alive. It's kept in the OS keychain.
 type Session struct {
+	// MCPURL is the MCP server the login is for. It can differ from
+	// Server.Resource, which may name a parent of it.
+	MCPURL       string        `json:"mcp_url"`
 	Server       Server        `json:"server"`
 	Registration Registration  `json:"registration"`
 	Token        *oauth2.Token `json:"token"`
@@ -113,10 +116,10 @@ func Discover(ctx context.Context, client *http.Client, mcpURL string) (*Server,
 	}
 
 	issuer := resource.AuthorizationServers[0]
-	u, err := url.Parse(issuer)
-	if err != nil || u.Scheme != "https" && !isLoopback(u.Hostname()) {
-		return nil, fmt.Errorf("invalid sign-in server %q", issuer)
+	if !secureURL(issuer) {
+		return nil, fmt.Errorf("invalid sign-in server %q: it must use HTTPS", issuer)
 	}
+	u, _ := url.Parse(issuer)
 	// RFC 8414 path insertion: the well-known segment goes before the path.
 	discoveryURL := fmt.Sprintf("%s://%s/.well-known/oauth-authorization-server%s", u.Scheme, u.Host, strings.TrimSuffix(u.Path, "/"))
 	var metadata struct {
@@ -136,6 +139,13 @@ func Discover(ctx context.Context, client *http.Client, mcpURL string) (*Server,
 		return nil, errors.New("the sign-in server doesn't support PKCE with S256")
 	case metadata.AuthorizationEndpoint == "" || metadata.TokenEndpoint == "":
 		return nil, errors.New("the sign-in server's metadata has no authorization or token endpoint")
+	}
+	// The code, PKCE verifier and refresh token go to these endpoints, so
+	// they must be protected in transit.
+	for _, endpoint := range []string{metadata.AuthorizationEndpoint, metadata.TokenEndpoint, metadata.RegistrationEndpoint} {
+		if endpoint != "" && !secureURL(endpoint) {
+			return nil, fmt.Errorf("the sign-in server's endpoint %q doesn't use HTTPS", endpoint)
+		}
 	}
 
 	return &Server{
@@ -349,6 +359,16 @@ func covers(resource, target string) bool {
 	}
 	rp, tp := strings.TrimSuffix(r.Path, "/"), strings.TrimSuffix(t.Path, "/")
 	return tp == rp || strings.HasPrefix(tp, rp+"/")
+}
+
+// secureURL reports whether credentials can be sent to rawURL: HTTPS, or
+// plain HTTP to this machine.
+func secureURL(rawURL string) bool {
+	u, err := url.Parse(rawURL)
+	if err != nil || u.Host == "" {
+		return false
+	}
+	return u.Scheme == "https" || u.Scheme == "http" && isLoopback(u.Hostname())
 }
 
 func isLoopback(host string) bool {
