@@ -44,7 +44,7 @@ func TestIdentitiesHaveSeparateSessionStores(t *testing.T) {
 	m2mSession, err := env.getCliSession(IdentityM2M)
 	require.NoError(t, err)
 	_, err = m2mSession.GetRawToken()
-	assert.Error(t, err, "a browser login token must not be visible to the M2M login")
+	assert.Error(t, err, "a user login token must not be visible to the M2M login")
 }
 
 func TestM2MSecretSaveAndClear(t *testing.T) {
@@ -85,15 +85,42 @@ func TestUserFlowRequiresUserLogin(t *testing.T) {
 	assert.ErrorIs(t, err, ErrNoUserLogin)
 }
 
+func TestBrowserSessionSaveAndClear(t *testing.T) {
+	useTestSessionStore(t)
+	env := &Environment{DomainName: "mybiz.kinde.com"}
+
+	_, err := env.BrowserSession()
+	assert.ErrorIs(t, err, ErrNoBrowserLogin, "no browser login in the config")
+
+	env.Browser = &BrowserLogin{ClientID: "cli", Issuer: "https://app.kinde.com/oauth2/x"}
+	_, err = env.BrowserSession()
+	assert.ErrorIs(t, err, ErrNoBrowserLogin, "nothing saved yet")
+
+	require.NoError(t, env.SaveBrowserSession([]byte(`{"token":"t"}`)))
+	session, err := env.BrowserSession()
+	require.NoError(t, err)
+	assert.Equal(t, `{"token":"t"}`, string(session))
+
+	m2mSession, err := env.getCliSession(IdentityM2M)
+	require.NoError(t, err)
+	_, err = m2mSession.GetKey(browserSessionKey)
+	assert.Error(t, err, "the browser login must not be visible to the M2M login")
+
+	require.NoError(t, env.ClearBrowserLogin())
+	_, err = env.BrowserSession()
+	assert.ErrorIs(t, err, ErrNoBrowserLogin, "session should be gone after clearing")
+}
+
 func TestEnvironmentJSONHasNoSecrets(t *testing.T) {
 	env := Environment{
 		DomainName: "mybiz.kinde.com",
 		M2M:        &M2MLogin{ClientID: "m2m-app"},
+		Browser:    &BrowserLogin{ClientID: "cli", Issuer: "https://app.kinde.com/oauth2/x"},
 		User:       &UserLogin{ClientID: "user-app"},
 	}
 	buf, err := json.Marshal(env)
 	require.NoError(t, err)
 	assert.JSONEq(t,
-		`{"domain_name":"mybiz.kinde.com","m2m":{"client_id":"m2m-app"},"user":{"client_id":"user-app"}}`,
+		`{"domain_name":"mybiz.kinde.com","m2m":{"client_id":"m2m-app"},"browser":{"client_id":"cli","issuer":"https://app.kinde.com/oauth2/x"},"user":{"client_id":"user-app"}}`,
 		string(buf))
 }

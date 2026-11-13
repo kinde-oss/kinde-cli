@@ -31,8 +31,8 @@ The official command-line for Kinde.
 * [kinde feature-flags](kinde_feature-flags.md)	 - Manage feature flags
 * [kinde identities](kinde_identities.md)	 - Manage user identities
 * [kinde industries](kinde_industries.md)	 - List industries
-* [kinde login](kinde_login.md)	 - Log in with an M2M application to use the Management API
-* [kinde logout](kinde_logout.md)	 - Log out of both the M2M and browser logins for the domain
+* [kinde login](kinde_login.md)	 - Log in to use the Management API, through the browser or with an M2M application
+* [kinde logout](kinde_logout.md)	 - Log out of every login for the domain
 * [kinde mfa](kinde_mfa.md)	 - Manage the environment's MFA configuration
 * [kinde organizations](kinde_organizations.md)	 - Manage organizations, their users and settings
 * [kinde permissions](kinde_permissions.md)	 - Manage permissions

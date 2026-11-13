@@ -14,7 +14,7 @@ func TestNewLogoutCmd_ReturnsLogoutCmd(t *testing.T) {
 	assert.NotNil(t, cmd, "newLogoutCmd should not return nil")
 	assert.NotNil(t, cmd.cmd, "logoutCmd.cmd should not be nil")
 	assert.Equal(t, "logout", cmd.cmd.Use, "Command 'Use' should be 'logout'")
-	assert.Equal(t, "Log out of both the M2M and browser logins for the domain", cmd.cmd.Short, "Command 'Short' should match")
+	assert.Equal(t, "Log out of every login for the domain", cmd.cmd.Short, "Command 'Short' should match")
 	assert.IsType(t, &cobra.Command{}, cmd.cmd, "cmd.cmd should be of type *cobra.Command")
 	assert.NotNil(t, cmd.cmd.RunE, "RunE should be set")
 }

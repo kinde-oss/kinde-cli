@@ -90,7 +90,7 @@ func TestCallAccountAPI_UnauthorizedPointsToAccountLogin(t *testing.T) {
 	assert.Empty(t, out)
 }
 
-func TestAccountCommands_NeedABrowserLogin(t *testing.T) {
+func TestAccountCommands_NeedAUserLogin(t *testing.T) {
 	for _, args := range [][]string{{"account", "roles"}, {"account", "token"}} {
 		cli := newTestCLI(t)
 		cli.writeConfig(config.Environment{M2M: &config.M2MLogin{ClientID: "abc"}})
@@ -124,7 +124,7 @@ func TestWhoami_ShowsM2MLogin(t *testing.T) {
 	status, stderr, err := runWhoAmI(t, cli)
 
 	require.NoError(t, err)
-	assert.Equal(t, whoAmIStatus{Domain: testDomain, M2M: &m2mStatus{ClientID: "abc", Source: "login"}}, status)
+	assert.Equal(t, whoAmIStatus{Domain: testDomain, ManagementAPI: ptr("m2m"), M2M: &m2mStatus{ClientID: "abc", Source: "login"}}, status)
 	assert.Empty(t, stderr)
 }
 
@@ -140,9 +140,9 @@ func TestWhoami_EnvironmentVariablesTakePrecedence(t *testing.T) {
 	assert.Equal(t, &m2mStatus{ClientID: "from-env", Source: "environment"}, status.M2M)
 }
 
-func TestWhoami_InvalidBrowserLoginIsReported(t *testing.T) {
+func TestWhoami_InvalidUserLoginIsReported(t *testing.T) {
 	cli := newTestCLI(t)
-	// A browser login in the config, but no token in the session store.
+	// A user login in the config, but no token in the session store.
 	cli.writeConfig(config.Environment{M2M: &config.M2MLogin{ClientID: "abc"}, User: &config.UserLogin{}})
 
 	status, stderr, err := runWhoAmI(t, cli)

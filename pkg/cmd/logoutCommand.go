@@ -19,14 +19,19 @@ func newLogoutCmd(ios *iostreams.IOStreams) *logoutCmd {
 
 	logoutCmd.cmd = &cobra.Command{
 		Use:   "logout",
-		Short: "Log out of both the M2M and browser logins for the domain",
-		RunE:  logoutCmd.runLogout,
+		Short: "Log out of every login for the domain",
+		Long: `Log out of every login for the domain: the M2M application, the browser
+login and the user login.
+
+This removes them from this computer. The access key Kinde created for your
+browser login stays until an owner turns off AI agent sign-in.`,
+		RunE: logoutCmd.runLogout,
 	}
 
 	return logoutCmd
 }
 
-// runLogout clears both logins for the current domain. Both session stores
+// runLogout clears every login for the current domain. The session stores
 // are always cleared, so it also removes anything left by an interrupted login.
 func (c *logoutCmd) runLogout(cmd *cobra.Command, args []string) error {
 	cfg := config.FromContext[config.Config](cmd.Context())
@@ -36,13 +41,14 @@ func (c *logoutCmd) runLogout(cmd *cobra.Command, args []string) error {
 		return errNoEnvironment
 	}
 
-	if err := errors.Join(env.ClearM2MLogin(), env.ClearUserLogin()); err != nil {
+	if err := errors.Join(env.ClearM2MLogin(), env.ClearBrowserLogin(), env.ClearUserLogin()); err != nil {
 		return err
 	}
 
-	if env.M2M != nil || env.User != nil {
+	if env.M2M != nil || env.Browser != nil || env.User != nil {
 		if err := cfg.SetEnvironment(func(e *config.Environment) {
 			e.M2M = nil
+			e.Browser = nil
 			e.User = nil
 		}); err != nil {
 			return err

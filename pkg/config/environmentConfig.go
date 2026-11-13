@@ -22,22 +22,32 @@ type Identity string
 const (
 	// IdentityM2M is a machine-to-machine application, used for the Management API.
 	IdentityM2M Identity = "m2m"
-	// IdentityUser is a user signed in through the browser, used for the Account API.
+	// IdentityUser is a user of the business signed in with the device flow
+	// ('kinde account login'), used for the Account API.
 	IdentityUser Identity = "user"
+	// IdentityBrowser is a Kinde team member signed in through the browser with
+	// Kinde's AI agent sign-in ('kinde login'), used for the Management API
+	// through the domain's MCP server.
+	IdentityBrowser Identity = "browser"
 )
 
-const clientSecretKey = "client_secret"
+const (
+	clientSecretKey   = "client_secret"
+	browserSessionKey = "browser_session"
+)
 
 var (
-	ErrNoM2MLogin  = errors.New("no M2M login for this domain")
-	ErrNoUserLogin = errors.New("no browser login for this domain")
+	ErrNoM2MLogin     = errors.New("no M2M login for this domain")
+	ErrNoUserLogin    = errors.New("no user login for this domain")
+	ErrNoBrowserLogin = errors.New("no browser login for this domain")
 )
 
 type (
 	Environment struct {
-		DomainName string     `json:"domain_name"`
-		M2M        *M2MLogin  `json:"m2m,omitempty"`
-		User       *UserLogin `json:"user,omitempty"`
+		DomainName string        `json:"domain_name"`
+		M2M        *M2MLogin     `json:"m2m,omitempty"`
+		Browser    *BrowserLogin `json:"browser,omitempty"`
+		User       *UserLogin    `json:"user,omitempty"`
 	}
 
 	// M2MLogin records an M2M login. The client secret is kept in the
@@ -46,8 +56,17 @@ type (
 		ClientID string `json:"client_id"`
 	}
 
-	// UserLogin records a browser login. ClientID is empty when Kinde's
-	// default application for the device flow is used.
+	// BrowserLogin records a browser login ('kinde login'). The tokens are
+	// kept in the session store, never in the config file.
+	BrowserLogin struct {
+		// ClientID is the client the CLI registered with the sign-in server.
+		ClientID string `json:"client_id"`
+		// Issuer is the sign-in server.
+		Issuer string `json:"issuer"`
+	}
+
+	// UserLogin records a user login ('kinde account login'). ClientID is
+	// empty when the business's default application for the device flow is used.
 	UserLogin struct {
 		ClientID string `json:"client_id,omitempty"`
 	}
@@ -182,8 +201,8 @@ func (env *Environment) ClearM2MLogin() error {
 	return errors.Join(clearToken(session), deleteKey(session, clientSecretKey))
 }
 
-// NewDeviceAuthorizationFlow returns a browser (device) login flow backed by
-// the user session store. An empty clientID uses Kinde's default application.
+// NewDeviceAuthorizationFlow returns a device login flow backed by the user
+// session store. An empty clientID uses the business's default device application.
 func (env *Environment) NewDeviceAuthorizationFlow(clientID string) (authorization_code.IDeviceAuthorizationFlow, error) {
 	session, err := env.getCliSession(IdentityUser)
 	if err != nil {
@@ -207,7 +226,7 @@ func (env *Environment) NewDeviceAuthorizationFlow(clientID string) (authorizati
 	return authorization_code.NewDeviceAuthorizationFlow(env.kindeDomain(), opts...)
 }
 
-// UserDeviceAuthorizationFlow returns a flow for the saved browser login.
+// UserDeviceAuthorizationFlow returns a flow for the saved user login.
 func (env *Environment) UserDeviceAuthorizationFlow() (authorization_code.IDeviceAuthorizationFlow, error) {
 	if env.User == nil {
 		return nil, ErrNoUserLogin
@@ -215,13 +234,51 @@ func (env *Environment) UserDeviceAuthorizationFlow() (authorization_code.IDevic
 	return env.NewDeviceAuthorizationFlow(env.User.ClientID)
 }
 
-// ClearUserLogin removes the browser login's cached tokens.
+// ClearUserLogin removes the user login's cached tokens.
 func (env *Environment) ClearUserLogin() error {
 	session, err := env.getCliSession(IdentityUser)
 	if err != nil {
 		return fmt.Errorf("failed to open user session store: %w", err)
 	}
 	return clearToken(session)
+}
+
+// SaveBrowserSession stores the browser login's session (sign-in server,
+// registration and tokens). The caller records the login in the config.
+func (env *Environment) SaveBrowserSession(session []byte) error {
+	store, err := env.getCliSession(IdentityBrowser)
+	if err != nil {
+		return fmt.Errorf("failed to open browser session store: %w", err)
+	}
+	if err := store.SetKey(browserSessionKey, session); err != nil {
+		return fmt.Errorf("failed to store the browser login: %w", err)
+	}
+	return nil
+}
+
+// BrowserSession returns the browser login's stored session.
+func (env *Environment) BrowserSession() ([]byte, error) {
+	if env.Browser == nil {
+		return nil, ErrNoBrowserLogin
+	}
+	store, err := env.getCliSession(IdentityBrowser)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open browser session store: %w", err)
+	}
+	session, err := store.GetKey(browserSessionKey)
+	if err != nil {
+		return nil, fmt.Errorf("%w: session not found in session store", ErrNoBrowserLogin)
+	}
+	return session, nil
+}
+
+// ClearBrowserLogin removes the browser login's stored session.
+func (env *Environment) ClearBrowserLogin() error {
+	store, err := env.getCliSession(IdentityBrowser)
+	if err != nil {
+		return fmt.Errorf("failed to open browser session store: %w", err)
+	}
+	return deleteKey(store, browserSessionKey)
 }
 
 // clearToken removes the cached OAuth token from a session store.

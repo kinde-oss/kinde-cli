@@ -39,7 +39,7 @@ func callCreateIdentity(t *testing.T, status int, header http.Header, body strin
 	cmd.SetContext(context.Background())
 	token := func(context.Context) (string, error) { return "test-token", nil }
 
-	err = callOperation(cmd, server.URL, server.Client(), token, management_api.CreateUserIdentityOperation, args)
+	err = callOperation(cmd, server.URL, server.Client(), token, management_api.CreateUserIdentityOperation, args, loginM2M)
 	return received, out.String(), err
 }
 

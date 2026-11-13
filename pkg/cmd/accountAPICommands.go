@@ -155,7 +155,7 @@ func accountRequestURL(doc operationDoc, fields []accountField, flags *pflag.Fla
 	return path, nil
 }
 
-// userLoginFlow returns the browser login for the domain, explaining how to
+// userLoginFlow returns the user login for the domain, explaining how to
 // log in when there isn't one.
 func userLoginFlow(env *config.Environment) (authorization_code.IDeviceAuthorizationFlow, error) {
 	flow, err := env.UserDeviceAuthorizationFlow()
@@ -165,14 +165,14 @@ func userLoginFlow(env *config.Environment) (authorization_code.IDeviceAuthoriza
 	return flow, err
 }
 
-// newAccountTokenCmd prints the browser login's access token, for calling the
+// newAccountTokenCmd prints the user login's access token, for calling the
 // Account API (or your own APIs) with other tools.
 func newAccountTokenCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "token",
 		Args:  cobra.NoArgs,
-		Short: "Print the access token of the browser login",
-		Long: `Print the access token of the browser login.
+		Short: "Print the access token of the user login",
+		Long: `Print the access token of the user login ('kinde account login').
 
 Use it to call the Account API, or your own APIs, with other tools. Treat it like
 a password: anyone with the token can act as you until it expires.`,
@@ -192,7 +192,7 @@ a password: anyone with the token can act as you until it expires.`,
 			}
 			accessToken, ok := token.GetAccessToken()
 			if !ok {
-				return errors.New("the browser login has no access token: run 'kinde account login' again")
+				return errors.New("the user login has no access token: run 'kinde account login' again")
 			}
 			fmt.Fprintln(cmd.OutOrStdout(), accessToken)
 			return nil

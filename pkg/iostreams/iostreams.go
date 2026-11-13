@@ -99,6 +99,19 @@ func (s *IOStreams) Confirm(question string) (bool, error) {
 	return false, nil
 }
 
+// Prompt writes question to ErrOut and reads a line from In.
+func (s *IOStreams) Prompt(question string) (string, error) {
+	if !s.canPrompt {
+		return "", errors.New("cannot prompt: not running in a terminal")
+	}
+	fmt.Fprint(s.ErrOut, question)
+	answer, err := bufio.NewReader(s.In).ReadString('\n')
+	if err != nil && !errors.Is(err, io.EOF) {
+		return "", err
+	}
+	return strings.TrimSpace(answer), nil
+}
+
 // SetTerminalInput makes test streams behave like a terminal, answering
 // secret prompts with readSecret.
 func (s *IOStreams) SetTerminalInput(readSecret func() (string, error)) {

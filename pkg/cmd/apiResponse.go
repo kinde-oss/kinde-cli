@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -19,6 +20,14 @@ import (
 // accessTokenFunc returns an access token for the Management API.
 type accessTokenFunc func(ctx context.Context) (string, error)
 
+// loginKind is the login a Management API request is sent with.
+type loginKind int
+
+const (
+	loginM2M     loginKind = iota // an M2M application, calling the REST API
+	loginBrowser                  // a Kinde team member, through the MCP server
+)
+
 // callOperation calls a Management API operation and prints the response
 // body as JSON on stdout.
 //
@@ -26,7 +35,7 @@ type accessTokenFunc func(ctx context.Context) (string, error)
 // errors, so the response is recorded at the HTTP level and any status of 400
 // or more becomes an error. Printing the recorded body, rather than the SDK's
 // decoded value, also keeps fields the SDK doesn't know about yet.
-func callOperation(cmd *cobra.Command, serverURL string, httpClient *http.Client, accessToken accessTokenFunc, operation string, methodArgs []reflect.Value) error {
+func callOperation(cmd *cobra.Command, serverURL string, httpClient *http.Client, accessToken accessTokenFunc, operation string, methodArgs []reflect.Value, login loginKind) error {
 	ctx := cmd.Context()
 	log := log.Ctx(ctx)
 
@@ -43,10 +52,16 @@ func callOperation(cmd *cobra.Command, serverURL string, httpClient *http.Client
 	response := recorder.last
 	if response == nil {
 		// The request was never sent, e.g. no access token could be obtained.
+		var userErr *userFacingError
+		if errors.As(callErr, &userErr) {
+			return userErr
+		}
 		return callErr
 	}
 	if response.status >= 400 {
-		return newAPIError(response, docsFor(operation).Scopes, "kinde login")
+		apiErr := newAPIError(response, docsFor(operation).Scopes, "kinde login")
+		apiErr.browser = login == loginBrowser
+		return apiErr
 	}
 	if callErr != nil {
 		// The API accepted the request; the SDK just couldn't decode the
@@ -155,6 +170,7 @@ type apiError struct {
 	scopes     []string // the scopes the operation needs, from the API docs
 	retryAfter string
 	login      string // the command that logs in again
+	browser    bool   // sent with a browser login rather than an M2M application
 }
 
 func newAPIError(response *recordedResponse, scopes []string, login string) *apiError {
@@ -178,7 +194,11 @@ func (e *apiError) Error() string {
 	case http.StatusUnauthorized:
 		fmt.Fprintf(&b, ". Your login may have expired or been revoked: run '%s' again", e.login)
 	case http.StatusForbidden:
-		if len(e.scopes) > 0 {
+		switch {
+		case len(e.scopes) == 0:
+		case e.browser:
+			fmt.Fprintf(&b, ". This needs the %s scope: an owner can raise your team role's access level in Kinde under Settings > APIs > Kinde Management API", strings.Join(e.scopes, ", "))
+		default:
 			fmt.Fprintf(&b, ". Check that your M2M application has the %s scope for the Kinde Management API", strings.Join(e.scopes, ", "))
 		}
 	case http.StatusTooManyRequests:

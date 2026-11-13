@@ -45,14 +45,24 @@ func (c *testCLI) readFullConfig() config.Config {
 	return cfg
 }
 
-func TestLogin_RequiresClientID(t *testing.T) {
+func TestLogin_BrowserLoginNeedsATerminal(t *testing.T) {
 	cli := newTestCLI(t)
 	cli.writeConfig(config.Environment{})
 
 	_, _, err := cli.run("login")
 
-	assert.EqualError(t, err, "missing required flags: --client-id")
-	assert.Nil(t, cli.readConfig().M2M, "nothing should be saved")
+	assert.ErrorContains(t, err, "the browser login needs a terminal")
+	assert.ErrorContains(t, err, "--client-secret-stdin", "it should point scripts to the M2M login")
+	assert.Nil(t, cli.readConfig().Browser, "nothing should be saved")
+}
+
+func TestLogin_SecretOnStdinNeedsClientID(t *testing.T) {
+	cli := newTestCLI(t)
+	cli.writeConfig(config.Environment{})
+
+	_, _, err := cli.run("login", "--client-secret-stdin")
+
+	assert.EqualError(t, err, "--client-secret-stdin needs --client-id")
 }
 
 func TestLogin_HasNoClientSecretFlag(t *testing.T) {
@@ -120,12 +130,12 @@ func TestLogin_ClientIDBeforeDomainDoesNotCrash(t *testing.T) {
 	})
 }
 
-func TestAccountLogin_IsTheBrowserLogin(t *testing.T) {
+func TestLoginHelp_PointsToTheUserLogin(t *testing.T) {
 	_, _, err := newTestCLI(t).run("account", "login", "--help")
 	require.NoError(t, err)
 
 	stdout, _, _ := newTestCLI(t).run("login", "--help")
-	assert.Contains(t, stdout, "kinde account login", "login's help should point to the browser login")
+	assert.Contains(t, stdout, "kinde account login", "login's help should point to the user login")
 }
 
 func TestManage_RequiresM2MLogin(t *testing.T) {
@@ -134,7 +144,7 @@ func TestManage_RequiresM2MLogin(t *testing.T) {
 
 	_, _, err := cli.run("business", "get")
 
-	assert.ErrorIs(t, err, config.ErrNoM2MLogin, "a browser login must not be used for management commands")
+	assert.ErrorIs(t, err, config.ErrNoM2MLogin, "a user login must not be used for management commands")
 	assert.ErrorContains(t, err, "kinde login --client-id")
 }
 

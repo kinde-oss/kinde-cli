@@ -20,7 +20,7 @@ func TestNewLoginCmd_CommandProperties(t *testing.T) {
 	cmd := cmdStruct.cmd
 
 	assert.Equal(t, "login", cmd.Use)
-	assert.Equal(t, "Log in with an M2M application to use the Management API", cmd.Short)
+	assert.Equal(t, "Log in to use the Management API, through the browser or with an M2M application", cmd.Short)
 	assert.NotNil(t, cmd.RunE)
 }
 

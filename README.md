@@ -13,7 +13,7 @@ This is a work in progress. APIs may change without notice or be missing.
   - Ships for multiple platforms - Linux, MacOS, Windows
   - Ships for multiple architectures - x64, i386, ARM, Apple ARM
   - Each variation comes with the checksum to verify authenticity
-- Secure by default. Kinde business cannot be managed via the CLI until a new M2M application is created with the management API authorized and the select scopes granted.
+- Secure by default. The CLI can only manage a Kinde business once an owner turns on AI agent sign-in (access then follows each person's team role), or an M2M application is authorized for the Management API with selected scopes.
 
 TODO:
 - [x] Online token verification
@@ -94,14 +94,15 @@ go install github.com/kinde-oss/kinde-cli/cmd/kinde@latest
 
 ## Quick start
 
-1. In Kinde, create a machine-to-machine (M2M) application, authorize it for the Kinde Management API, and grant it the scopes you need.
-2. Log in with its client ID. You'll be asked for the client secret:
+1. Log in. The browser opens and you sign in with your Kinde account:
 
     ```bash
-    kinde login --domain mybusiness.kinde.com --client-id <client ID>
+    kinde login --domain mybusiness.kinde.com
     ```
 
-3. Run a command:
+    This needs **AI agent sign-in** turned on for your business (see [Authentication](#authentication)). Otherwise, or in scripts, log in with an M2M application instead.
+
+2. Run a command:
 
     ```bash
     kinde users list --page-size 5
@@ -113,7 +114,30 @@ Commands print the API's response as JSON on stdout, so you can pipe it to tools
 
 ## Authentication
 
-The Kinde Management API only accepts tokens issued to an M2M application, so every resource command (`users`, `organizations`, `roles`, ...) needs an M2M login. Its secret is stored in your operating system's keychain, never in the config file.
+There are two ways to log in for the Management API commands (`users`, `organizations`, `roles`, ...). When both are set up for a domain, the commands use the M2M application.
+
+| | Browser login | M2M login |
+|---|---|---|
+| Log in with | `kinde login` | `kinde login --client-id <client ID>` |
+| Who you are | You, with your Kinde account | A machine-to-machine application |
+| What you can do | Whatever your team role allows | The scopes granted to the application |
+| Commands | All except a few (billing, organization roles and permissions, logos) | All |
+| Secrets in responses | Hidden | Shown |
+| Works in CI | No: someone has to sign in | Yes |
+
+### Browser login
+
+```bash
+kinde login --domain <your Kinde domain>
+```
+
+The browser opens on Kinde's sign-in page. Sign in with the account you use for the Kinde dashboard, and the CLI is logged in. It stays logged in, renewing the login in the background, until you run `kinde logout`.
+
+The browser login uses Kinde's **AI agent sign-in**, the same sign-in AI agents such as Claude use, and sends commands through your business's MCP server. An owner turns it on in Kinde under **Settings > APIs > Kinde Management API > Enable OAuth sign-in**, and sets how much each team role can do. Turning it off logs everyone out.
+
+### M2M login
+
+In Kinde, create a machine-to-machine (M2M) application, authorize it for the Kinde Management API, and grant it the scopes you need. Then log in with its client ID. Its secret is stored in your operating system's keychain, never in the config file.
 
 ```bash
 kinde login --domain <your Kinde domain> --client-id <client ID>
@@ -126,17 +150,19 @@ The secret isn't shown as you type. There's no flag for it, because flag values 
 echo "$CLIENT_SECRET" | kinde login --client-id <client ID> --client-secret-stdin
 ```
 
-You can also log in as a user through the browser (device authorization flow), and use the [Account API](#account-api) to see what that user can access. A user login can't call the Management API:
+### User login (Account API)
+
+You can also log in as a user of your business (device authorization flow), and use the [Account API](#account-api) to see what that user can access. It needs a Device and IoT application in your business, and can't call the Management API:
 
 ```bash
-kinde account login --domain <your Kinde domain> --client-id <application client ID>
+kinde account login --domain <your Kinde domain> --client-id <device application client ID>
 ```
 
-`kinde whoami` shows both logins for the domain as JSON, and `kinde logout` removes both.
+`kinde whoami` shows every login for the domain as JSON, including which one the Management API commands use, and `kinde logout` removes them all.
 
 ### Environment variables
 
-In CI, or anywhere you'd rather not store credentials, set these instead of running `kinde login`:
+In CI, or anywhere you'd rather not store credentials, set these instead of running `kinde login`. The M2M variables take precedence over any saved login:
 
 | Variable | Purpose |
 |----------|---------|

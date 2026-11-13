@@ -27,40 +27,54 @@ func newLoginCmd(ios *iostreams.IOStreams) *loginCmd {
 	loginCmd.cmd = &cobra.Command{
 		Use:   "login",
 		Args:  cobra.NoArgs,
-		Short: "Log in with an M2M application to use the Management API",
-		Long: fmt.Sprintf(`Log in with a machine-to-machine (M2M) application, which the resource commands
-use to call the Kinde Management API.
+		Short: "Log in to use the Management API, through the browser or with an M2M application",
+		Long: fmt.Sprintf(`Log in to a Kinde business so the Management API commands can run.
 
-Create the M2M application in Kinde, authorize it for the Kinde Management API,
-and grant it the scopes you need. The client secret is asked for without being
-shown, and is stored in your operating system's keychain.
+With no flags, the browser opens and you sign in with your Kinde account. What
+you can do follows your team role. This uses Kinde's AI agent sign-in, which an
+owner turns on in Kinde under Settings > APIs > Kinde Management API, and sends
+commands through the business's MCP server. A few commands aren't available
+there, and secrets such as client secrets are hidden: log in with an M2M
+application for those.
 
-In scripts, pass the secret on stdin with --client-secret-stdin, or skip
-logging in and set %s and %s.
+With --client-id, you log in with a machine-to-machine (M2M) application
+instead. Create it in Kinde, authorize it for the Kinde Management API, and
+grant it the scopes you need. The client secret is asked for without being
+shown, and is stored in your operating system's keychain. In scripts, pass the
+secret on stdin with --client-secret-stdin, or skip logging in and set %s
+and %s.
 
-To log in as a user through the browser, use 'kinde account login'.`, config.EnvM2MClientID, config.EnvM2MClientSecret),
-		Example: `  kinde login --domain mybusiness.kinde.com --client-id <client ID>
+When both logins are set up, Management API commands use the M2M application.
+
+To log in as a user of your business for the Account API, use
+'kinde account login'.`, config.EnvM2MClientID, config.EnvM2MClientSecret),
+		Example: `  kinde login --domain mybusiness.kinde.com
+  kinde login --domain mybusiness.kinde.com --client-id <client ID>
   echo "$CLIENT_SECRET" | kinde login --client-id <client ID> --client-secret-stdin`,
 		RunE: loginCmd.runLogin,
 	}
 
-	loginCmd.cmd.Flags().StringVar(&loginCmd.clientID, "client-id", "", "Client ID of the M2M application (required)")
-	loginCmd.cmd.Flags().BoolVar(&loginCmd.clientSecretStdin, "client-secret-stdin", false, "Read the client secret from stdin")
+	loginCmd.cmd.Flags().StringVar(&loginCmd.clientID, "client-id", "", "Client ID of an M2M application, to log in with it instead of the browser")
+	loginCmd.cmd.Flags().BoolVar(&loginCmd.clientSecretStdin, "client-secret-stdin", false, "Read the M2M application's client secret from stdin")
 	return loginCmd
 }
 
-// runLogin checks the credentials first and only saves them once they work,
-// so a failed login leaves any existing M2M login in place.
+// runLogin logs in through the browser, or with an M2M application when
+// --client-id is given. M2M credentials are checked first and only saved once
+// they work, so a failed login leaves any existing M2M login in place.
 func (c *loginCmd) runLogin(cmd *cobra.Command, args []string) error {
 	log := log.Ctx(cmd.Context())
 	cfg := config.FromContext[config.Config](cmd.Context())
 
-	env := cfg.GetEnvironment()
-	if env == nil || env.DomainName == "" {
-		return errNoEnvironment
+	if c.clientID == "" && c.clientSecretStdin {
+		return errors.New("--client-secret-stdin needs --client-id")
+	}
+	env, err := loginEnvironment(c.ios, cfg)
+	if err != nil {
+		return err
 	}
 	if c.clientID == "" {
-		return errors.New("missing required flags: --client-id")
+		return runBrowserLogin(cmd, c.ios, cfg, env)
 	}
 
 	clientSecret, err := c.readClientSecret()

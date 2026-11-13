@@ -1,10 +1,10 @@
 ## kinde account token
 
-Print the access token of the browser login
+Print the access token of the user login
 
 ### Synopsis
 
-Print the access token of the browser login.
+Print the access token of the user login ('kinde account login').
 
 Use it to call the Account API, or your own APIs, with other tools. Treat it like
 a password: anyone with the token can act as you until it expires.

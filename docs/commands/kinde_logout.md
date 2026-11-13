@@ -1,6 +1,14 @@
 ## kinde logout
 
-Log out of both the M2M and browser logins for the domain
+Log out of every login for the domain
+
+### Synopsis
+
+Log out of every login for the domain: the M2M application, the browser
+login and the user login.
+
+This removes them from this computer. The access key Kinde created for your
+browser login stays until an owner turns off AI agent sign-in.
 
 ```
 kinde logout [flags]

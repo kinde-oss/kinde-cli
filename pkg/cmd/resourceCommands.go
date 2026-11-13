@@ -98,9 +98,14 @@ func planForOperation(operation management_api.OperationName) (*requestPlan, err
 }
 
 func callApiMethod(cmd *cobra.Command, ios *iostreams.IOStreams, env *config.Environment, op resourceCommand, methodArgs []reflect.Value) error {
+	// The M2M login is used whenever it's set up: it can run every command
+	// and shows secrets. Otherwise the browser login is used.
 	clientCredentials, err := env.M2MClientCredentialsFlow()
+	if errors.Is(err, config.ErrNoM2MLogin) && env.Browser != nil {
+		return callWithBrowserLogin(cmd, ios, env, op, methodArgs)
+	}
 	if errors.Is(err, config.ErrNoM2MLogin) {
-		return fmt.Errorf("%w (%s). Management commands need an M2M application: run 'kinde login --client-id <client ID>', or set %s and %s",
+		return fmt.Errorf("%w (%s): run 'kinde login' to sign in through the browser, or 'kinde login --client-id <client ID>' for an M2M application, or set %s and %s",
 			err, env.DomainName, config.EnvM2MClientID, config.EnvM2MClientSecret)
 	}
 	if err != nil {
@@ -130,7 +135,7 @@ func callApiMethod(cmd *cobra.Command, ios *iostreams.IOStreams, env *config.Env
 		return raw.AccessToken, nil
 	}
 
-	return callOperation(cmd, "https://"+env.DomainName, httpClient, accessToken, op.operation, methodArgs)
+	return callOperation(cmd, "https://"+env.DomainName, httpClient, accessToken, op.operation, methodArgs, loginM2M)
 }
 
 // flagNameFor returns the kebab-case flag name for a request field, prefixed

@@ -19,7 +19,7 @@ import (
 
 const authGroupID = "auth"
 
-var errNoEnvironment = errors.New("no Kinde domain configured. Run 'kinde login --domain <your Kinde domain>'")
+var errNoEnvironment = fmt.Errorf("no Kinde domain configured: pass --domain <your Kinde domain> or set %s", config.EnvDomain)
 
 // Execute runs the CLI with the given arguments (excluding the program name)
 // and returns any error so the caller can set the exit code. All input and
@@ -99,7 +99,7 @@ func NewRootCmd(ios *iostreams.IOStreams, cfg config.IConfig) (*cobra.Command, e
 
 	rootCmd.AddGroup(
 		&cobra.Group{ID: authGroupID, Title: "Authentication:"},
-		&cobra.Group{ID: resourceGroupID, Title: "Management API (needs an M2M login):"},
+		&cobra.Group{ID: resourceGroupID, Title: "Management API:"},
 	)
 	for _, authCmd := range []*cobra.Command{newLoginCmd(ios).cmd, newLogoutCmd(ios).cmd, accountCmd, newWhoAmI(ios).cmd} {
 		authCmd.GroupID = authGroupID
