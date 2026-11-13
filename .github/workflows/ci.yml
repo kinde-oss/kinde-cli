@@ -21,6 +21,12 @@ jobs:
     - name: Test
       run: go test -v ./...
 
+    - name: Check generated files are up to date
+      run: |
+        go generate ./...
+        git add -N .
+        git diff --exit-code || (echo "Generated files are out of date: run 'go generate ./...' and commit the result" && exit 1)
+
     - id: govulncheck
       uses: golang/govulncheck-action@v1
       with:

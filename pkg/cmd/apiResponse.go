@@ -1,0 +1,257 @@
+package cmd
+
+import (
+	"bytes"
+	"context"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"net/http"
+	"reflect"
+	"strings"
+
+	"github.com/kinde-oss/kinde-cli/pkg/release"
+	"github.com/kinde-oss/kinde-go/kinde/management_api"
+	"github.com/rs/zerolog/log"
+	"github.com/spf13/cobra"
+)
+
+// accessTokenFunc returns an access token for the Management API.
+type accessTokenFunc func(ctx context.Context) (string, error)
+
+// loginKind is the login a Management API request is sent with.
+type loginKind int
+
+const (
+	loginM2M     loginKind = iota // an M2M application, calling the REST API
+	loginBrowser                  // a Kinde team member, through the MCP server
+)
+
+// callOperation calls a Management API operation and prints the response
+// body as JSON on stdout.
+//
+// The SDK returns error responses (400, 403, 429...) as ordinary values, not
+// errors, so the response is recorded at the HTTP level and any status of 400
+// or more becomes an error. Printing the recorded body, rather than the SDK's
+// decoded value, also keeps fields the SDK doesn't know about yet.
+func callOperation(cmd *cobra.Command, serverURL string, httpClient *http.Client, accessToken accessTokenFunc, operation string, methodArgs []reflect.Value, login loginKind) error {
+	ctx := cmd.Context()
+	log := log.Ctx(ctx)
+
+	recordingClient, recorder := withRecorder(httpClient)
+	client, err := management_api.NewClient(serverURL, bearerToken(accessToken), management_api.WithClient(recordingClient))
+	if err != nil {
+		return fmt.Errorf("failed to create management API client: %w", err)
+	}
+
+	method := reflect.ValueOf(client).MethodByName(operation)
+	results := method.Call(append([]reflect.Value{reflect.ValueOf(ctx)}, methodArgs...))
+	callErr, _ := results[len(results)-1].Interface().(error)
+
+	response := recorder.last
+	if response == nil {
+		// The request was never sent, e.g. no access token could be obtained.
+		var userErr *userFacingError
+		if errors.As(callErr, &userErr) {
+			return userErr
+		}
+		return callErr
+	}
+	if response.status >= 400 {
+		apiErr := newAPIError(response, docsFor(operation).Scopes, "kinde login")
+		apiErr.browser = login == loginBrowser
+		return apiErr
+	}
+	if callErr != nil {
+		// The API accepted the request; the SDK just couldn't decode the
+		// response (often a value newer than the SDK). The body is still valid.
+		log.Debug().Err(callErr).Msg("SDK could not decode the response")
+	}
+	return writeJSON(cmd.OutOrStdout(), response.body)
+}
+
+// callAccountAPI sends a GET request to the Account API and prints the
+// response body as JSON on stdout.
+func callAccountAPI(cmd *cobra.Command, httpClient *http.Client, url string) error {
+	req, err := http.NewRequestWithContext(cmd.Context(), http.MethodGet, url, nil)
+	if err != nil {
+		return err
+	}
+	recordingClient, recorder := withRecorder(httpClient)
+	resp, err := recordingClient.Do(req)
+	if err != nil {
+		return err
+	}
+	resp.Body.Close()
+
+	if recorder.last.status >= 400 {
+		return newAPIError(recorder.last, nil, "kinde account login")
+	}
+	return writeJSON(cmd.OutOrStdout(), recorder.last.body)
+}
+
+// withRecorder returns a copy of httpClient that records its responses.
+func withRecorder(httpClient *http.Client) (*http.Client, *recordingTransport) {
+	recorder := &recordingTransport{base: httpClient.Transport}
+	if recorder.base == nil {
+		recorder.base = http.DefaultTransport
+	}
+	recordingClient := *httpClient
+	recordingClient.Transport = recorder
+	return &recordingClient, recorder
+}
+
+// writeJSON writes an API response body, indented when it's JSON.
+func writeJSON(out io.Writer, body []byte) error {
+	body = bytes.TrimSpace(body)
+	if len(body) == 0 {
+		return nil
+	}
+	var indented bytes.Buffer
+	if err := json.Indent(&indented, body, "", "  "); err == nil {
+		body = indented.Bytes()
+	}
+	_, err := fmt.Fprintf(out, "%s\n", body)
+	return err
+}
+
+// bearerToken implements management_api.SecuritySource.
+type bearerToken accessTokenFunc
+
+func (f bearerToken) KindeBearerAuth(ctx context.Context, _ management_api.OperationName) (management_api.KindeBearerAuth, error) {
+	token, err := f(ctx)
+	return management_api.KindeBearerAuth{Token: token}, err
+}
+
+type recordedResponse struct {
+	status int
+	header http.Header
+	body   []byte
+}
+
+// recordingTransport keeps the status and body of the last response, and
+// identifies the CLI in the User-Agent header.
+type recordingTransport struct {
+	base http.RoundTripper
+	last *recordedResponse
+}
+
+func (t *recordingTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	req = req.Clone(req.Context())
+	req.Header.Set("User-Agent", userAgent())
+
+	resp, err := t.base.RoundTrip(req)
+	if err != nil {
+		return nil, err
+	}
+	body, err := io.ReadAll(resp.Body)
+	resp.Body.Close()
+	if err != nil {
+		return nil, fmt.Errorf("failed to read response: %w", err)
+	}
+	resp.Body = io.NopCloser(bytes.NewReader(body))
+	t.last = &recordedResponse{status: resp.StatusCode, header: resp.Header, body: body}
+	return resp, nil
+}
+
+func userAgent() string {
+	version := release.Version
+	if version == "" {
+		version = "dev"
+	}
+	return "kinde-cli/" + version
+}
+
+// apiError is an error response from a Kinde API.
+type apiError struct {
+	status     int
+	messages   []string
+	scopes     []string // the scopes the operation needs, from the API docs
+	retryAfter string
+	login      string // the command that logs in again
+	browser    bool   // sent with a browser login rather than an M2M application
+}
+
+func newAPIError(response *recordedResponse, scopes []string, login string) *apiError {
+	return &apiError{
+		status:     response.status,
+		messages:   errorMessages(response.body),
+		scopes:     scopes,
+		retryAfter: response.header.Get("Retry-After"),
+		login:      login,
+	}
+}
+
+func (e *apiError) Error() string {
+	var b strings.Builder
+	fmt.Fprintf(&b, "the API returned %d %s", e.status, http.StatusText(e.status))
+	if len(e.messages) > 0 {
+		b.WriteString(": " + strings.Join(e.messages, "; "))
+	}
+
+	switch e.status {
+	case http.StatusUnauthorized:
+		fmt.Fprintf(&b, ". Your login may have expired or been revoked: run '%s' again", e.login)
+	case http.StatusForbidden:
+		switch {
+		case len(e.scopes) == 0:
+		case e.browser:
+			fmt.Fprintf(&b, ". This needs the %s scope: an owner can raise your team role's access level in Kinde under Settings > APIs > Kinde Management API", strings.Join(e.scopes, ", "))
+		default:
+			fmt.Fprintf(&b, ". Check that your M2M application has the %s scope for the Kinde Management API", strings.Join(e.scopes, ", "))
+		}
+	case http.StatusTooManyRequests:
+		if e.retryAfter != "" {
+			fmt.Fprintf(&b, ". Try again in %s seconds", e.retryAfter)
+		} else {
+			b.WriteString(". Try again shortly")
+		}
+	}
+	return b.String()
+}
+
+// maxRawErrorBody is how much of an unrecognized error body is shown.
+const maxRawErrorBody = 300
+
+// errorMessages extracts readable messages from an error response body.
+// Kinde normally sends {"errors": [{"code": ..., "message": ...}]}.
+func errorMessages(body []byte) []string {
+	var parsed struct {
+		Errors []struct {
+			Code    string `json:"code"`
+			Message string `json:"message"`
+		} `json:"errors"`
+		Code             string `json:"code"`
+		Message          string `json:"message"`
+		Error            string `json:"error"`
+		ErrorDescription string `json:"error_description"`
+	}
+	body = bytes.TrimSpace(body)
+	if len(body) == 0 {
+		return nil
+	}
+	if err := json.Unmarshal(body, &parsed); err != nil {
+		text := string(body)
+		if len(text) > maxRawErrorBody {
+			text = text[:maxRawErrorBody] + "..."
+		}
+		return []string{text}
+	}
+
+	var messages []string
+	add := func(code, message string) {
+		switch {
+		case code != "" && message != "":
+			messages = append(messages, code+": "+message)
+		case code+message != "":
+			messages = append(messages, code+message)
+		}
+	}
+	for _, e := range parsed.Errors {
+		add(e.Code, e.Message)
+	}
+	add(parsed.Code, parsed.Message)
+	add(parsed.Error, parsed.ErrorDescription)
+	return messages
+}

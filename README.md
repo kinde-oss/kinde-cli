@@ -13,13 +13,13 @@ This is a work in progress. APIs may change without notice or be missing.
   - Ships for multiple platforms - Linux, MacOS, Windows
   - Ships for multiple architectures - x64, i386, ARM, Apple ARM
   - Each variation comes with the checksum to verify authenticity
-- Secure by default. Kinde business cannot be managed via the CLI until a new M2M application is created with the management API authorized and the select scopes granted.
+- Secure by default. The CLI can only manage a Kinde business once an owner turns on AI agent sign-in (access then follows each person's team role), or an M2M application is authorized for the Management API with selected scopes.
 
 TODO:
 - [x] Online token verification
   - [ ] Offline token verification
 - [x] Support for user tokens and account API
-  - [ ] Spport for account API
+  - [x] Support for account API
 
 ## Getting Started
 
@@ -92,159 +92,183 @@ Download a pre-built binary from [Releases](https://github.com/kinde-oss/kinde-c
 go install github.com/kinde-oss/kinde-cli/cmd/kinde@latest
 ```
 
-### Quick Start and top-level commands
+## Quick start
 
-`kinde help` for top-level help
+1. Log in. The browser opens and you sign in with your Kinde account:
 
-`kinde help <command>` to get options for each command
+    ```bash
+    kinde login --domain mybusiness.kinde.com
+    ```
+
+    This needs **AI agent sign-in** turned on for your business (see [Authentication](#authentication)). Otherwise, or in scripts, log in with an M2M application instead.
+
+2. Run a command:
+
+    ```bash
+    kinde users list --page-size 5
+    ```
+
+Run `kinde --help` to see every command, and `kinde <command> --help` for its flags.
+
+Commands print the API's response as JSON on stdout, so you can pipe it to tools like `jq`. Messages and errors go to stderr, and a failed command exits with status 1.
 
 ## Authentication
 
-### To login using client credentials
+There are two ways to log in for the Management API commands (`users`, `organizations`, `roles`, ...). When both are set up for a domain, the commands use the M2M application.
+
+| | Browser login | M2M login |
+|---|---|---|
+| Log in with | `kinde login` | `kinde login --client-id <client ID>` |
+| Who you are | You, with your Kinde account | A machine-to-machine application |
+| What you can do | Whatever your team role allows | The scopes granted to the application |
+| Commands | All except a few (billing, organization roles and permissions, logos) | All |
+| Secrets in responses | Hidden | Shown |
+| Works in CI | No: someone has to sign in | Yes |
+
+### Browser login
 
 ```bash
-kinde login --domain <your Kinde business domain> \
---client_id <M2M application> \
---client_secret <M2M application secret> 
+kinde login --domain <your Kinde domain>
 ```
 
-### To login using device authorization flow
+The browser opens on Kinde's sign-in page. Sign in with the account you use for the Kinde dashboard, and the CLI is logged in. It stays logged in, renewing the login in the background, until you run `kinde logout`.
 
-Please configure a default application for device flow or specify `client_id`
+The browser login uses Kinde's **AI agent sign-in**, the same sign-in AI agents such as Claude use, and sends commands through your business's MCP server. An owner turns it on in Kinde under **Settings > APIs > Kinde Management API > Enable OAuth sign-in**, and sets how much each team role can do. Turning it off logs everyone out.
+
+### M2M login
+
+In Kinde, create a machine-to-machine (M2M) application, authorize it for the Kinde Management API, and grant it the scopes you need. Then log in with its client ID. Its secret is stored in your operating system's keychain, never in the config file.
 
 ```bash
-kinde login
-    --domain <your Kinde business domain>
-    --client_id [optional]
+kinde login --domain <your Kinde domain> --client-id <client ID>
+Client secret:
 ```
 
-## Check authentication status
-
-## Terminal autocomplete
-
-Kinde CLI comes with terminal autocompletion support for `bash`, `fish`, `powershell`, and `zsh`
-
-You can see instructions for your shell/OS combination by executing the following
-
-```
-kinde help completion <bash|fish|powershell|ash>
-```
-
-1. Use `kinde <command>` to interact with your Kinde account.
-
-## Usage
-
-### Commands
-
-- `login` – Authenticate with Kinde.
-  - Multi-tenancy is supported via `--domain <your Kinde business domain>`
-- `logout` – Remove authentication credentials.
-- `whoami` – Show current authenticated token details.
-- `version` – Show current version and check for updates.
-- `manage` - provides access to management API
-- `help` – Show help for commands.
-
-### Version Check
-
-The `version` command displays your current Kinde CLI version and automatically checks for updates against the latest GitHub releases:
+The secret isn't shown as you type. There's no flag for it, because flag values are kept in your shell history. In a script, pipe it in instead:
 
 ```bash
-kinde version
+echo "$CLIENT_SECRET" | kinde login --client-id <client ID> --client-secret-stdin
 ```
 
-This command will:
-- Display the current installed version
-- Check the latest release from the GitHub repository
-- Compare versions using semantic versioning
-- Show whether an update is available or if you're using the latest version
-- Handle development builds and pre-release versions appropriately
+### User login (Account API)
 
-### Flags
+You can also log in as a user of your business (device authorization flow), and use the [Account API](#account-api) to see what that user can access. It needs a Device and IoT application in your business, and can't call the Management API:
 
-- `--help` – Show help information.
+```bash
+kinde account login --domain <your Kinde domain> --client-id <device application client ID>
+```
 
-### Management API sub-commands
+`kinde whoami` shows every login for the domain as JSON, including which one the Management API commands use, and `kinde logout` removes them all.
 
-| Subcommand | Description |
-|------------|-------------|
-| [api_keys](docs/manage-commands-reference.md#1-api-keys-management-api_keys) | Manage API keys |
-| [apis](docs/manage-commands-reference.md#2-apis-management-apis) | Manage APIs |
-| [applications](docs/manage-commands-reference.md#3-applications-management-applications) | Manage applications |
-| [billing](docs/manage-commands-reference.md#4-billing-management-billing) | Manage billing |
-| [business](docs/manage-commands-reference.md#5-business-management-business) | Manage business settings |
-| [categories](docs/manage-commands-reference.md#6-categories-management-categories) | Manage categories |
-| [connected_apps](docs/manage-commands-reference.md#7-connected-apps-management-connected_apps) | Manage connected applications |
-| [connections](docs/manage-commands-reference.md#8-connections-management-connections) | Manage connections |
-| [environment_variables](docs/manage-commands-reference.md#9-environment-variables-management-environment_variables) | Manage environment variables |
-| [environments](docs/manage-commands-reference.md#10-environments-management-environments) | Manage environments |
-| [events](docs/manage-commands-reference.md#11-events-management-events) | Manage events |
-| [feature_flags](docs/manage-commands-reference.md#12-feature-flags-management-feature_flags) | Manage feature flags |
-| [industries](docs/manage-commands-reference.md#13-industries-management-industries) | Manage industries |
-| [organizations](docs/manage-commands-reference.md#14-organizations-management-organizations) | Manage organizations |
-| [permissions](docs/manage-commands-reference.md#15-permissions-management-permissions) | Manage permissions |
-| [properties](docs/manage-commands-reference.md#16-properties-management-properties) | Manage properties |
-| [roles](docs/manage-commands-reference.md#17-roles-management-roles) | Manage roles |
-| [subscribers](docs/manage-commands-reference.md#18-subscribers-management-subscribers) | Manage subscribers |
-| [timezones](docs/manage-commands-reference.md#19-timezones-management-timezones) | Manage timezones |
-| [users](docs/subcommands/users.md) | Manage users |
-| [webhooks](docs/manage-commands-reference.md#21-webhooks-management-webhooks) | Manage webhooks |
+### Environment variables
 
-**📖 Complete Reference:** See [Manage Commands Reference](docs/manage-commands-reference.md) for detailed documentation of all subcommands and their available operations.
+In CI, or anywhere you'd rather not store credentials, set these instead of running `kinde login`. The M2M variables take precedence over any saved login:
+
+| Variable | Purpose |
+|----------|---------|
+| `KINDE_DOMAIN` | The Kinde domain to use |
+| `KINDE_MANAGEMENT_CLIENT_ID` | M2M application client ID |
+| `KINDE_MANAGEMENT_CLIENT_SECRET` | M2M application client secret |
+
+### Multiple businesses
+
+`kinde login` remembers the domain you logged in to as the default. To run a single command against another domain, use `--domain` (or `KINDE_DOMAIN`); it doesn't change the default.
+
+```bash
+kinde users list --domain otherbusiness.kinde.com
+```
+
+## Commands
+
+Management API commands are grouped by resource, and each one maps to a single API operation. For example, `kinde users create-identity` calls `POST /api/v1/users/{user_id}/identities`. Each command's help shows the scope your M2M application needs.
+
+See the **[command reference](docs/commands/kinde.md)** for every command and flag.
+
+Commands that can't be undone (every delete, plus `api-keys rotate` and `connected-apps revoke-token`) ask you to confirm first. In scripts, pass `--yes`; without it they fail rather than wait for an answer.
+
+### Passing values
+
+- **Simple values** are flags: `--name "Sally"`, `--page-size 10`, `--has-organization`.
+- **Lists** are comma-separated: `--scope-ids s1,s2`.
+- **Fields that take one of a set of values** list them in `--help` and reject anything else.
+- **Objects and lists of objects** are JSON: `--users '[{"id":"kp_123"}]'`.
+- **`--body`** sends the whole request body as JSON, inline, from a file (`--body @user.json`), or from stdin (`--body -`). Flags override fields in the body.
+
+### Examples
+
+```bash
+# List users with their identities
+kinde users list --page-size 2 --expand identities
+
+# Create a user from a file
+kinde users create --body @user.json
+
+# Add an email identity to a user
+kinde users create-identity --user-id kp_123 --type email --value sally@example.com
+
+# Create a string feature flag
+kinde feature-flags create --name "First flag" --key first_flag --type str --default-value hello
+```
+
+## Account API
+
+The `kinde account` commands call the Account API as the user logged in with `kinde account login`. They show what your application would see for that user:
+
+```bash
+kinde account permissions
+kinde account roles
+kinde account feature-flags
+kinde account entitlements
+kinde account entitlement --key <feature key>
+kinde account properties
+kinde account profile
+kinde account portal-link --subnav profile
+```
+
+`kinde account token` prints the user's access token, for calling the Account API or your own APIs with other tools:
+
+```bash
+curl -H "Authorization: Bearer $(kinde account token)" https://mybusiness.kinde.com/account_api/v1/permissions
+```
+
+## Updates
+
+`kinde version` shows the installed version and checks GitHub for a newer release. When you run commands in a terminal, the CLI also checks at most once a day and prints a notice on stderr. It never checks in scripts or CI. Set `KINDE_NO_UPDATE_NOTIFIER=1` to turn the check off.
+
+## Shell completion
+
+Kinde CLI can generate completion scripts for `bash`, `zsh`, `fish` and `powershell`. Run `kinde completion <shell> --help` for setup instructions.
 
 ## Configuration
 
-Configuration is stored in `$HOME/.kinde/config.json` by default for *nix-based systems, `<user profile>\.config\kinde\config.json` for Windows. You can set API keys, business, and other preferences.
-
-Example:
+The config file is `~/.config/kinde/config.json` (or `$XDG_CONFIG_HOME/kinde/config.json`). It records the default domain and which logins exist for each domain; secrets and tokens are kept in the keychain.
 
 ```json
 {
   "current": "mybusiness.kinde.com",
   "environments": {
     "mybusiness.kinde.com": {
-      "domain_name": "app.kinde.com"
-    },
-    "mybusiness2.localkinde.com": {
-      "domain_name": "app.localkinde.com"
-    },
-    "mybusiness2.kinde.com": {
-      "domain_name": "mybusiness2.kinde.com",
-      "client_id": "xxx",
-      "client_secret": "yyy"
+      "domain_name": "mybusiness.kinde.com",
+      "m2m": { "client_id": "a1b2c3" }
     }
   }
 }
 ```
 
-## Examples
-
-- List users:
-    ```bash
-    kinde manage users get_all --page_size 2
-    ```
-- Show token details of the logged-in user:
-    ```bash
-    kinde whoami
-    ```
-- Create a user
-    ```bash
-    kinde manage users create
-    ```
-- Create an environment-level feature-flag of type `string`
-  ```
-    kinde manage feature_flags create --name "first flag" --key "first_key" --allow_override_level "env" --type "str"
-   ```
-
 ## Troubleshooting
 
-- CLI validates the token against public JWKS and requires internet connectivity.
-- Check your configuration file for errors.
-- Ensure your API credentials are valid. To use management API, please create an M2M application and grant it access to the management API, enable appropriate scopes to grant the specific level of access.
-- **Keychain Configuration**: You can configure keychain behavior using environment variables:
-  - `KINDE_KEYCHAIN_PASS` - Override the default keychain password when user interaction is not possible
-  - `KINDE_LOG_LEVEL` - Set the logging level for the CLI
-  - `KINDE_STRUCTURED_LOG` - Enable JSON-only output for CI/CD or automated processing (default: `false`, set to `true` to enable)
-- **Linux Keychain**: On Linux systems, the CLI uses filesystem-based keychain storage instead of system keychains. This design choice ensures compatibility with server environments and CI/CD pipelines where system keychain services may not be available or accessible.
+- **"no M2M login"**: run `kinde login` with an M2M application's credentials, or set the environment variables above.
+- **403 Forbidden**: the error names the scope the command needs (also shown in its `--help`). Grant that scope to your M2M application in Kinde.
+- **Keychain**: on Linux, credentials are kept in an encrypted file instead of a system keychain, so the CLI also works on servers and in CI. Set `KINDE_KEYCHAIN_PASS` to supply its password when there's no terminal to prompt in.
+- **Logging**: `KINDE_LOG_LEVEL` sets the log level (e.g. `debug`), and `KINDE_STRUCTURED_LOG=true` writes logs as JSON.
+
+## Development
+
+The command help and the [command reference](docs/commands/kinde.md) are generated from the Kinde [Management API](api/kinde-management-api-spec.yaml) and [Account API](api/kinde-account-api-spec.yaml) specs pinned in `api/`. After updating the spec, or changing commands, regenerate them:
+
+```bash
+go generate ./...
+```
 
 ## Contributing
 
