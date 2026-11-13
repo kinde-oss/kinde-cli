@@ -242,6 +242,11 @@ func (t *mcpTransport) call(ctx context.Context, auth, method string, params any
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode >= 300 && resp.StatusCode < 400 {
+		// The transport doesn't follow redirects, and a 3xx passed back to
+		// the SDK client would look like success without the tool running.
+		return nil, nil, &userFacingError{fmt.Sprintf("the MCP server redirected the request (%s) instead of answering it", resp.Status)}
+	}
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(io.LimitReader(resp.Body, maxMCPReply))
 		return nil, &httpFailure{status: resp.StatusCode, body: body}, nil
@@ -328,7 +333,8 @@ func readReply(resp *http.Response, id string) (*rpcReply, error) {
 			continue
 		}
 		if value, ok := bytes.CutPrefix(line, []byte("data:")); ok {
-			data = append(data, bytes.TrimPrefix(value, []byte(" ")))
+			// Copied: the scanner reuses its buffer on the next Scan.
+			data = append(data, bytes.Clone(bytes.TrimPrefix(value, []byte(" "))))
 		}
 	}
 	if err := scanner.Err(); err != nil {

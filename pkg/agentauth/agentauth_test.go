@@ -24,6 +24,8 @@ type fakeKinde struct {
 	t             *testing.T
 	enabled       bool
 	tokenEndpoint string // overrides the advertised token endpoint
+	metadataURL   string // overrides the metadata URL in the 401 challenge
+	redirectToken string // makes the token endpoint redirect here
 	challenge     string // code_challenge from the last authorize request
 	refreshed     int
 	registrations []map[string]any
@@ -41,7 +43,11 @@ func newFakeKinde(t *testing.T) *fakeKinde {
 			w.WriteHeader(http.StatusForbidden)
 			return
 		}
-		w.Header().Set("WWW-Authenticate", fmt.Sprintf(`Bearer resource_metadata="%s/.well-known/oauth-protected-resource/mcp"`, f.URL))
+		metadataURL := f.URL + "/.well-known/oauth-protected-resource/mcp"
+		if f.metadataURL != "" {
+			metadataURL = f.metadataURL
+		}
+		w.Header().Set("WWW-Authenticate", fmt.Sprintf(`Bearer resource_metadata="%s"`, metadataURL))
 		w.WriteHeader(http.StatusUnauthorized)
 	})
 	mux.HandleFunc("/.well-known/oauth-protected-resource/mcp", func(w http.ResponseWriter, r *http.Request) {
@@ -79,6 +85,10 @@ func newFakeKinde(t *testing.T) *fakeKinde {
 		http.Redirect(w, r, redirect.String(), http.StatusFound)
 	})
 	mux.HandleFunc("/oauth2/agents/app1/token", func(w http.ResponseWriter, r *http.Request) {
+		if f.redirectToken != "" {
+			http.Redirect(w, r, f.redirectToken, http.StatusTemporaryRedirect)
+			return
+		}
 		require.NoError(t, r.ParseForm())
 		assert.Equal(t, "cli-client", r.PostForm.Get("client_id"))
 		w.Header().Set("Content-Type", "application/json")
@@ -150,6 +160,28 @@ func TestDiscover_RejectsEndpointsWithoutHTTPS(t *testing.T) {
 	_, err := Discover(context.Background(), http.DefaultClient, kinde.URL+"/mcp")
 
 	assert.EqualError(t, err, `the sign-in server's endpoint "http://kinde.example.com/token" doesn't use HTTPS`)
+}
+
+func TestDiscover_RejectsMetadataWithoutHTTPS(t *testing.T) {
+	kinde := newFakeKinde(t)
+	kinde.metadataURL = "http://kinde.example.com/.well-known/oauth-protected-resource/mcp"
+
+	_, err := Discover(context.Background(), http.DefaultClient, kinde.URL+"/mcp")
+
+	assert.EqualError(t, err, `the protected resource metadata "http://kinde.example.com/.well-known/oauth-protected-resource/mcp" doesn't use HTTPS`)
+}
+
+func TestRefresh_RefusesARedirectToHTTP(t *testing.T) {
+	kinde := newFakeKinde(t)
+	server, err := Discover(context.Background(), http.DefaultClient, kinde.URL+"/mcp")
+	require.NoError(t, err)
+	kinde.redirectToken = "http://kinde.example.com/token"
+
+	session := &Session{Server: *server, Registration: Registration{ClientID: "cli-client"},
+		Token: &oauth2.Token{RefreshToken: "refresh-1", Expiry: time.Now().Add(-time.Minute)}}
+	_, err = Refresh(context.Background(), http.DefaultClient, session)
+
+	assert.ErrorContains(t, err, "refusing to follow a redirect to http://kinde.example.com/token: it doesn't use HTTPS")
 }
 
 func TestSecureURL(t *testing.T) {

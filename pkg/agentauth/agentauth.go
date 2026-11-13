@@ -86,6 +86,10 @@ type Session struct {
 // Discover finds the sign-in server for an MCP server by calling it without
 // a token and following its 401 challenge (RFC 9728, then RFC 8414).
 func Discover(ctx context.Context, client *http.Client, mcpURL string) (*Server, error) {
+	client = secureClient(client)
+	if !secureURL(mcpURL) {
+		return nil, fmt.Errorf("invalid MCP server %q: it must use HTTPS", mcpURL)
+	}
 	resp, err := postJSON(ctx, client, mcpURL, initializeRequest, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to reach %s: %w", mcpURL, err)
@@ -100,6 +104,11 @@ func Discover(ctx context.Context, client *http.Client, mcpURL string) (*Server,
 	if metadataURL == "" {
 		u, _ := url.Parse(mcpURL)
 		metadataURL = fmt.Sprintf("%s://%s/.well-known/oauth-protected-resource%s", u.Scheme, u.Host, u.Path)
+	}
+	// The metadata names the sign-in server, so it must come over TLS, or
+	// anyone on the network could send the login somewhere else (RFC 9728).
+	if !secureURL(metadataURL) {
+		return nil, fmt.Errorf("the protected resource metadata %q doesn't use HTTPS", metadataURL)
 	}
 	var resource struct {
 		Resource             string   `json:"resource"`
@@ -159,6 +168,7 @@ func Discover(ctx context.Context, client *http.Client, mcpURL string) (*Server,
 
 // Register registers the CLI as a public client (RFC 7591).
 func Register(ctx context.Context, client *http.Client, server *Server) (*Registration, error) {
+	client = secureClient(client)
 	if server.RegistrationEndpoint == "" {
 		return nil, errors.New("the sign-in server doesn't accept client registration")
 	}
@@ -188,6 +198,7 @@ func Register(ctx context.Context, client *http.Client, server *Server) (*Regist
 // open is called with the sign-in URL; it should show the URL and try to
 // open the browser.
 func Authorize(ctx context.Context, client *http.Client, server *Server, registration *Registration, open func(url string)) (*oauth2.Token, error) {
+	client = secureClient(client)
 	listener, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
 		return nil, fmt.Errorf("failed to listen for the sign-in redirect: %w", err)
@@ -281,7 +292,7 @@ func Refresh(ctx context.Context, client *http.Client, session *Session) (change
 		return false, errors.New("the login has expired")
 	}
 	config := oauthConfig(&session.Server, &session.Registration, "")
-	ctx = context.WithValue(ctx, oauth2.HTTPClient, client)
+	ctx = context.WithValue(ctx, oauth2.HTTPClient, secureClient(client))
 	token, err := config.TokenSource(ctx, session.Token).Token()
 	if err != nil {
 		return false, err
@@ -359,6 +370,28 @@ func covers(resource, target string) bool {
 	}
 	rp, tp := strings.TrimSuffix(r.Path, "/"), strings.TrimSuffix(t.Path, "/")
 	return tp == rp || strings.HasPrefix(tp, rp+"/")
+}
+
+// secureClient returns a copy of client that refuses to follow a redirect to
+// an address secureURL rejects. Token requests are POSTs whose body holds the
+// code, PKCE verifier or refresh token, and Go follows 307 and 308 redirects
+// with the body.
+func secureClient(client *http.Client) *http.Client {
+	secured := *client
+	previous := client.CheckRedirect
+	secured.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+		if !secureURL(req.URL.String()) {
+			return fmt.Errorf("refusing to follow a redirect to %s: it doesn't use HTTPS", req.URL.Redacted())
+		}
+		if previous != nil {
+			return previous(req, via)
+		}
+		if len(via) >= 10 {
+			return errors.New("stopped after 10 redirects")
+		}
+		return nil
+	}
+	return &secured
 }
 
 // secureURL reports whether credentials can be sent to rawURL: HTTPS, or

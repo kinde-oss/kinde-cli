@@ -21,7 +21,11 @@ type mcpServer struct {
 	version   string
 	initError bool
 	splitData bool // split the tools/call reply across data: lines
-	holdOpen  chan struct{}
+	// bigFirstLine sends a first data: line too long to stay put in the
+	// scanner's buffer.
+	bigFirstLine bool
+	redirect     bool // answer tools/call with a redirect
+	holdOpen     chan struct{}
 
 	mu           sync.Mutex
 	afterInitHdr []http.Header
@@ -59,7 +63,21 @@ func (m *mcpServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if m.redirect {
+		http.Redirect(w, r, "https://elsewhere.example.com/mcp", http.StatusTemporaryRedirect)
+		return
+	}
 	w.Header().Set("Content-Type", "text/event-stream")
+	if m.bigFirstLine {
+		// The second line arrives in a later read, after the scanner has had
+		// to move the first one within its buffer.
+		long := strings.Repeat("x", 40*1024)
+		fmt.Fprintf(w, "data: {\"jsonrpc\":\"2.0\",\"id\":%v,\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"%s\"}\n", req.ID, long)
+		w.(http.Flusher).Flush()
+		time.Sleep(50 * time.Millisecond)
+		fmt.Fprint(w, "data: ]}}\n\n")
+		return
+	}
 	reply := fmt.Sprintf(`{"jsonrpc":"2.0","id":%v,"result":{"content":[{"type":"text","text":"{\"ok\":true}"}]}}`, req.ID)
 	if m.splitData {
 		half := strings.Index(reply, `"result"`)
@@ -136,6 +154,20 @@ func TestMCPTransport_ReturnsWhenTheReplyArrivesEvenIfTheStreamStaysOpen(t *test
 	require.NoError(t, err)
 	body, _ := io.ReadAll(resp.Body)
 	assert.JSONEq(t, `{"ok":true}`, string(body))
+}
+
+func TestMCPTransport_KeepsLongDataLinesIntact(t *testing.T) {
+	resp, err := callTool(t, &mcpServer{version: mcpProtocolVersion, bigFirstLine: true})
+
+	require.NoError(t, err)
+	body, _ := io.ReadAll(resp.Body)
+	assert.Equal(t, strings.Repeat("x", 40*1024), string(body))
+}
+
+func TestMCPTransport_RedirectIsAnErrorNotSuccess(t *testing.T) {
+	_, err := callTool(t, &mcpServer{version: mcpProtocolVersion, redirect: true})
+
+	assert.EqualError(t, err, "the MCP server redirected the request (307 Temporary Redirect) instead of answering it")
 }
 
 func TestMCPTransport_ReportsAFailedInitialize(t *testing.T) {
